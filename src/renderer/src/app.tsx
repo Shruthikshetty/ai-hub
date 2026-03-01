@@ -3,7 +3,7 @@ import routes from '~react-pages'
 import AppLayout from './app-layout'
 
 /**
- * App component all routs are rendered here
+ * App component all routes are rendered here
  */
 function App(): React.JSX.Element | null {
   const allRoutes = useRoutes(routes)

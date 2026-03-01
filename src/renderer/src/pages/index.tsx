@@ -1,3 +1,4 @@
+import { Button } from '@renderer/components/ui/button'
 import { Link } from 'react-router'
 
 function IndexPage(): React.JSX.Element {
@@ -5,6 +6,7 @@ function IndexPage(): React.JSX.Element {
     <div>
       <Link to={'/settings'}>settings</Link>
       <p>home page</p>
+      <Button>Button</Button>
     </div>
   )
 }
