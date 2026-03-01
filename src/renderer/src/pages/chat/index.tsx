@@ -1,11 +1,6 @@
 import {
   PromptInput,
-  PromptInputActionAddAttachments,
-  PromptInputActionMenu,
-  PromptInputActionMenuContent,
-  PromptInputActionMenuTrigger,
   PromptInputBody,
-  PromptInputButton,
   PromptInputFooter,
   PromptInputSelect,
   PromptInputSelectContent,
@@ -16,8 +11,23 @@ import {
   PromptInputTextarea,
   PromptInputTools
 } from '@renderer/components/ai-elements/prompt-input'
-import { GlobeIcon } from 'lucide-react'
 import { useState } from 'react'
+
+// to be removed
+const models = [
+  {
+    id: 'gpt-4o-mini',
+    name: 'GPT-4o-mini'
+  },
+  {
+    id: 'gpt-4o',
+    name: 'GPT-4o'
+  },
+  {
+    id: 'gpt-4.1',
+    name: 'GPT-4.1'
+  }
+]
 
 // this is the chat page contains all the chat interface
 const ChatPage = () => {
@@ -27,38 +37,18 @@ const ChatPage = () => {
     console.log('submit')
   }
 
-  const models = [
-    {
-      id: 'gpt-4o-mini',
-      name: 'GPT-4o-mini'
-    },
-    {
-      id: 'gpt-4o',
-      name: 'GPT-4o'
-    },
-    {
-      id: 'gpt-4.1',
-      name: 'GPT-4.1'
-    }
-  ]
   return (
-    <div>
-      <PromptInput onSubmit={handleSubmit} className="mt-4" globalDrop multiple>
+    <div className="flex flex-col h-full w-full ">
+      <PromptInput onSubmit={handleSubmit} className="mt-4">
+        {/* BODY  */}
         <PromptInputBody>
           <PromptInputTextarea onChange={(e) => setText(e.target.value)} value={text} />
         </PromptInputBody>
+        {/* FOOTER */}
         <PromptInputFooter>
+          {/* All tools go here */}
           <PromptInputTools>
-            <PromptInputActionMenu>
-              <PromptInputActionMenuTrigger />
-              <PromptInputActionMenuContent>
-                <PromptInputActionAddAttachments />
-              </PromptInputActionMenuContent>
-            </PromptInputActionMenu>
-            <PromptInputButton tooltip={{ content: 'Search the web', shortcut: '⌘K' }}>
-              <GlobeIcon size={16} />
-              <span>Search</span>
-            </PromptInputButton>
+            {/*@TODO dummy selector for model later to be changed */}
             <PromptInputSelect
               onValueChange={(value) => {
                 setModel(value)
@@ -77,7 +67,8 @@ const ChatPage = () => {
               </PromptInputSelectContent>
             </PromptInputSelect>
           </PromptInputTools>
-          <PromptInputSubmit disabled={!text && !status} status={'ready'} />
+          {/* submit button */}
+          <PromptInputSubmit disabled={!text} status={'ready'} />
         </PromptInputFooter>
       </PromptInput>
     </div>
