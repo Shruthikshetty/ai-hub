@@ -4,7 +4,7 @@
 import { StreamChatRoute } from './chat.routes'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { streamText } from 'ai'
+import { convertToModelMessages, streamText } from 'ai'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
@@ -16,17 +16,18 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
     // stream the response from ai model
     const result = streamText({
       model: 'alibaba/qwen-3-14b',
-      prompt: messages
+      messages: await convertToModelMessages(messages)
     })
 
-    // stream the response
-    return result.toTextStreamResponse({
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-Vercel-AI-Data-Stream': 'v1'
-      },
-      status: HTTP_STATUS_CODES.OK
+    result.usage.then((usage) => {
+      console.log(usage)
     })
+
+    // stream the response using data stream protocol (required by DefaultChatTransport)
+    return result.toTextStreamResponse({
+      status: HTTP_STATUS_CODES.OK
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any
   } catch (error) {
     console.log(error)
     return c.json(

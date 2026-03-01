@@ -1,8 +1,8 @@
 import { type VariantProps } from 'class-variance-authority'
 import { Slot } from 'radix-ui'
 
-import { cn } from 'src/renderer/src/lib/utils'
-import { Separator } from 'src/renderer/src/components/ui/separator'
+import { cn } from '@renderer/lib/utils'
+import { Separator } from '@renderer/components/ui/separator'
 import { buttonGroupVariants } from './button-variants'
 
 function ButtonGroup({

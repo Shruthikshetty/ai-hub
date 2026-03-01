@@ -65,12 +65,29 @@ process.parentPort.on('message', async (e) => {
           body: body ? JSON.stringify(body) : undefined
         })
       )
-      const result = await res.json()
-      port.postMessage(result)
+      const contentType = res.headers.get('content-type') || ''
+      if (contentType.includes('application/json')) {
+        const result = await res.json()
+        port.postMessage({ type: 'complete', data: result })
+        port.close()
+      } else if (res.body) {
+        // Stream the response chunks back through the port
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          port.postMessage({ type: 'chunk', data: decoder.decode(value, { stream: true }) })
+        }
+        port.postMessage({ type: 'end' })
+        port.close()
+      } else {
+        port.postMessage({ type: 'complete', data: null })
+        port.close()
+      }
     } catch (error) {
       console.error('Worker request failed:', error)
-      port.postMessage({ error: 'Worker request failed', details: String(error) })
-    } finally {
+      port.postMessage({ type: 'error', data: String(error) })
       port.close()
     }
   }

@@ -26,6 +26,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.107",
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@hono/node-server": "^1.19.9",

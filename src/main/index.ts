@@ -83,30 +83,69 @@ app.whenReady().then(() => {
     })
   }
 
-  // Handle Hono requests from renderer
+  // Counter for unique stream request IDs
+  let streamRequestId = 0
+
+  // Handle regular (non-streaming) Hono requests from renderer
   ipcMain.handle('hono-request', async (_event, { path, method, body }) => {
     return new Promise((resolve, reject) => {
-      // Create a message channel for this specific request
       const { port1, port2 } = new MessageChannelMain()
 
-      // Send the request to the worker along with the port2
-      // We'll use port2 in the worker to send the response back
       worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
 
-      // Set a timeout for the request
       const timeout = setTimeout(() => {
         port1.close()
         reject(new Error('Worker request timed out'))
       }, 30_000)
 
-      // Listen for the response on port1
-      port1.on('message', (event) => {
+      port1.on('message', (msgEvent) => {
+        const msg = msgEvent.data
         clearTimeout(timeout)
-        resolve(event.data)
+        if (msg.type === 'complete') {
+          resolve(msg.data)
+        } else if (msg.type === 'error') {
+          reject(new Error(msg.data))
+        } else {
+          // Fallback: buffer all chunks for non-stream callers
+          resolve(msg.data)
+        }
         port1.close()
       })
       port1.start()
     })
+  })
+
+  // Handle streaming Hono requests - returns requestId immediately,
+  // then sends chunks and end signal as events
+  ipcMain.handle('hono-stream-request', async (event, { path, method, body }) => {
+    const { port1, port2 } = new MessageChannelMain()
+    const requestId = ++streamRequestId
+
+    worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
+
+    // Set up listener to forward chunks from worker to renderer
+    port1.on('message', (msgEvent) => {
+      const msg = msgEvent.data
+      if (msg.type === 'chunk') {
+        event.sender.send(`stream-chunk-${requestId}`, msg.data)
+      } else if (msg.type === 'end') {
+        event.sender.send(`stream-end-${requestId}`)
+        port1.close()
+      } else if (msg.type === 'error') {
+        event.sender.send(`stream-error-${requestId}`, msg.data)
+        port1.close()
+      } else if (msg.type === 'complete') {
+        // Non-streaming response came back on a stream channel
+        // Send it as a single chunk then end
+        event.sender.send(`stream-chunk-${requestId}`, JSON.stringify(msg.data))
+        event.sender.send(`stream-end-${requestId}`)
+        port1.close()
+      }
+    })
+    port1.start()
+
+    // Return the requestId immediately so the renderer can set up listeners
+    return { requestId }
   })
 
   createWindow()
