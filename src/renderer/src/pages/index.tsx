@@ -31,6 +31,9 @@ function HomePage(): React.JSX.Element {
           <Card
             key={item.name}
             className="grow border-border border transition-all hover:cursor-pointer hover:border-primary active:scale-95"
+            onClick={() => {
+              navigate(item.path)
+            }}
           >
             <CardHeader>
               <div className="flex flex-row gap-2 items-start">
@@ -73,8 +76,14 @@ function HomePage(): React.JSX.Element {
         <Button variant={'default'} className="p-5" onClick={() => navigate('/chat')}>
           Start Chatting
         </Button>
-        {/* @TODO: to be redetected */}
-        <Button variant={'secondary'} className="p-5">
+        {/* @TODO: to be redetected to exactly provide setting */}
+        <Button
+          variant={'secondary'}
+          className="p-5"
+          onClick={() => {
+            navigate('/settings')
+          }}
+        >
           Configure Providers
         </Button>
       </div>

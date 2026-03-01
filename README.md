@@ -44,7 +44,7 @@ Clone the repository and install dependencies:
 
 ```bash
 git clone <your-repo-url>
-cd electron-hono-react-template
+cd ai-hub
 npm install
 ```
 

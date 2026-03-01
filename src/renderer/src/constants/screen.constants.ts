@@ -1,5 +1,5 @@
 /**
- * contains all the constants used throwout screens
+ * contains all the constants used throughout screens
  */
 import { MessageSquare, Image, Lock, Zap } from 'lucide-react'
 
