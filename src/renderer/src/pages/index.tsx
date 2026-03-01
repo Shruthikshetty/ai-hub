@@ -1,5 +1,12 @@
 import { Button } from '@renderer/components/ui/button'
 import { useTheme } from '@renderer/components/theme-context'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@renderer/components/ui/card'
 
 // this is the main page of the app
 function HomePage(): React.JSX.Element {
@@ -17,8 +24,21 @@ function HomePage(): React.JSX.Element {
           and maintain full control over your data.
         </p>
       </div>
-      <Button onClick={() => setTheme('dark')}>dark</Button>
-      <Button onClick={() => setTheme('light')}>light</Button>
+      <Button onClick={() => setTheme('dark')} variant={'outline'}>
+        dark
+      </Button>
+      <Button onClick={() => setTheme('light')} variant={'outline'}>
+        light
+      </Button>
+      <Card>
+        <CardHeader>
+          <CardTitle>Card Title</CardTitle>
+          <CardDescription>Card Description</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Card Content</p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
