@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import Pages from 'vite-plugin-pages'
 
 export default defineConfig({
   main: {
@@ -23,6 +24,13 @@ export default defineConfig({
         '@common': resolve(__dirname, 'src/common') // Shared alias
       }
     },
-    plugins: [react(), tailwindcss()]
+    plugins: [
+      react(),
+      tailwindcss(),
+      Pages({
+        dirs: [{ dir: resolve(__dirname, 'src/renderer/src/pages'), baseRoute: '' }],
+        extensions: ['tsx']
+      })
+    ]
   }
 })
