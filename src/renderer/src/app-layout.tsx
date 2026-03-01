@@ -9,7 +9,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     <ThemeProvider>
       <div className="h-screen w-screen flex flex-row justify-baseline">
         <AppSideTray />
-        <div className="w-11/12 bg-background overflow-hidden">{children}</div>
+        <div className=" bg-background overflow-hidden w-full">{children}</div>
       </div>
     </ThemeProvider>
   )

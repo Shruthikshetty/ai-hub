@@ -1,3 +1,7 @@
+# AI Hub
+
+run ai models of your choice from any provider or run it locally
+
 ## 🛠️ Tech Stack
 
 - **Runtime**: [Electron](https://www.electronjs.org/), [Node.js](https://nodejs.org/)
