@@ -1,4 +1,8 @@
-import { AppNotFoundErrorSchema, AppValidationErrorSchema } from '../schemas/validation-errors'
+import {
+  AppInternalServerErrorSchema,
+  AppNotFoundErrorSchema,
+  AppValidationErrorSchema
+} from '../schemas/validation-errors'
 
 // defines a openapi doc object for zod not found error
 export const zodNotFoundDocObject = {
@@ -23,4 +27,14 @@ export const zodValidationErrorDocObject = {
     }
   },
   description: 'Validation error response'
+}
+
+// internal server errors doc object
+export const internalServerErrorDocObject = {
+  content: {
+    'application/json': {
+      schema: AppInternalServerErrorSchema
+    }
+  },
+  description: 'Internal server error response'
 }

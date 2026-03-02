@@ -114,6 +114,14 @@
 }
 
 @layer base {
+  /* custom scroll styles */
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

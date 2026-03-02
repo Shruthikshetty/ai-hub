@@ -38,6 +38,9 @@ export function createIPCStreamTransport(apiPath: string): TextStreamChatTranspo
             window.api.removeStreamListeners(requestId)
             controller.error(new Error(errorMsg))
           })
+
+          // Signal main process that listeners are attached — flush buffered chunks
+          window.api.streamReady(requestId)
         }
       })
 

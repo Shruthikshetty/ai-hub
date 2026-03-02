@@ -12,6 +12,7 @@ declare global {
       onStreamEnd: (requestId: number, callback: () => void) => void
       onStreamError: (requestId: number, callback: (error: string) => void) => void
       removeStreamListeners: (requestId: number) => void
+      streamReady: (requestId: number) => void
     }
   }
 }

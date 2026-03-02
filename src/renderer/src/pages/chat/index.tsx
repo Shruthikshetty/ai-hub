@@ -16,6 +16,12 @@ import { useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { createIPCStreamTransport } from '@renderer/lib/custom-transports'
 import { Message, MessageContent, MessageResponse } from '@renderer/components/ai-elements/message'
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton
+} from '@renderer/components/ai-elements/conversation'
+import { Spinner } from '@renderer/components/ui/spinner'
 
 // to be removed
 const models = [
@@ -42,8 +48,6 @@ const ChatPage = () => {
     transport: createIPCStreamTransport('/api/chat')
   })
 
-  console.log(messages)
-
   const handleSubmit = (message: PromptInputMessage) => {
     if (!message.text.trim()) return
     sendMessage({
@@ -54,30 +58,40 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full w-full ">
-      {messages.map((message) => (
-        <Message key={message.id} from={message.role}>
-          <MessageContent>
-            {message.parts.map((part, index) => {
-              switch (part.type) {
-                case 'text':
-                  return (
-                    <MessageResponse
-                      key={`${message.id}-${index}`}
-                      controls={true}
-                      isAnimating={status === 'streaming'}
-                    >
-                      {part.text}
-                    </MessageResponse>
-                  )
-                default:
-                  return null
-              }
-            })}
-          </MessageContent>
-        </Message>
-      ))}
+    <div className="flex flex-col h-full w-full p-5 md:p-10">
+      {/* All the conversations go here */}
+      <Conversation>
+        <ConversationContent>
+          {messages.map((message) => (
+            <Message key={message.id} from={message.role}>
+              <MessageContent>
+                {/*@TODO move this since it can get large  */}
+                {message.parts.map((part, index) => {
+                  switch (part.type) {
+                    case 'text':
+                      return (
+                        <MessageResponse
+                          key={`${message.id}-${index}`}
+                          controls={true}
+                          isAnimating={status === 'streaming'}
+                        >
+                          {part.text}
+                        </MessageResponse>
+                      )
+                    default:
+                      return null
+                  }
+                })}
+              </MessageContent>
+              <ConversationScrollButton />
+            </Message>
+          ))}
+          {/*  simple spinner on loading  */}
+          {status === 'streaming' || status === 'submitted' ? <Spinner /> : null}
+        </ConversationContent>
+      </Conversation>
       {error && error.message && <p className="text-red-500">{error.message}</p>}
+      {/* Prompt inputs go here */}
       <PromptInput onSubmit={handleSubmit} className="mt-4">
         {/* BODY  */}
         <PromptInputBody>
@@ -107,7 +121,7 @@ const ChatPage = () => {
             </PromptInputSelect>
           </PromptInputTools>
           {/* submit button */}
-          <PromptInputSubmit disabled={!text} status={'ready'} />
+          <PromptInputSubmit disabled={!text} status={status} />
         </PromptInputFooter>
       </PromptInput>
     </div>

@@ -29,6 +29,11 @@ const api = {
     ipcRenderer.removeAllListeners(`stream-chunk-${requestId}`)
     ipcRenderer.removeAllListeners(`stream-end-${requestId}`)
     ipcRenderer.removeAllListeners(`stream-error-${requestId}`)
+  },
+
+  // Signal to main process that stream listeners are attached and ready
+  streamReady: (requestId: number): void => {
+    ipcRenderer.send(`stream-ready-${requestId}`)
   }
 }
 

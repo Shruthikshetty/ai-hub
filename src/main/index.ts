@@ -90,6 +90,7 @@ app.whenReady().then(() => {
   ipcMain.handle('hono-request', async (_event, { path, method, body }) => {
     return new Promise((resolve, reject) => {
       const { port1, port2 } = new MessageChannelMain()
+      const chunks: string[] = []
 
       worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
 
@@ -102,44 +103,99 @@ app.whenReady().then(() => {
         const msg = msgEvent.data
         clearTimeout(timeout)
         if (msg.type === 'complete') {
-          resolve(msg.data)
+          // If chunks were buffered, concatenate them; otherwise use complete data
+          resolve(chunks.length > 0 ? chunks.join('') : msg.data)
+          port1.close()
+        } else if (msg.type === 'end') {
+          resolve(chunks.join(''))
+          port1.close()
         } else if (msg.type === 'error') {
           reject(new Error(msg.data))
+          port1.close()
+        } else if (msg.type === 'chunk') {
+          // Buffer chunks — don't resolve or close yet
+          chunks.push(msg.data)
         } else {
-          // Fallback: buffer all chunks for non-stream callers
-          resolve(msg.data)
+          // Unknown message type — buffer as fallback
+          chunks.push(msg.data)
         }
-        port1.close()
       })
       port1.start()
     })
   })
 
   // Handle streaming Hono requests - returns requestId immediately,
-  // then sends chunks and end signal as events
+  // then sends chunks and end signal as events.
+  // Uses a readiness handshake: buffer worker messages until the renderer
+  // signals it has attached listeners via 'stream-ready-{requestId}'.
   ipcMain.handle('hono-stream-request', async (event, { path, method, body }) => {
     const { port1, port2 } = new MessageChannelMain()
     const requestId = ++streamRequestId
 
-    worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
+    // Buffer for messages that arrive before renderer is ready
+    let rendererReady = false
+    const bufferedMessages: Array<{ type: string; data?: unknown }> = []
 
-    // Set up listener to forward chunks from worker to renderer
-    port1.on('message', (msgEvent) => {
-      const msg = msgEvent.data
+    // Activity-based timeout: resets on each chunk, so long-running AI ops
+    // (image gen, video gen) stay alive as long as data is flowing.
+    let inactivityTimeout: ReturnType<typeof setTimeout>
+    const INACTIVITY_MS = 300_000 // 5 minutes
+
+    const cleanup = (): void => {
+      clearTimeout(inactivityTimeout)
+      ipcMain.removeAllListeners(`stream-ready-${requestId}`)
+    }
+
+    const resetInactivityTimeout = (): void => {
+      clearTimeout(inactivityTimeout)
+      inactivityTimeout = setTimeout(() => {
+        event.sender.send(`stream-error-${requestId}`, 'Stream inactive for 5 minutes')
+        event.sender.send(`stream-end-${requestId}`)
+        port1.close()
+        cleanup()
+      }, INACTIVITY_MS)
+    }
+
+    const forwardMessage = (msg: { type: string; data?: unknown }): void => {
       if (msg.type === 'chunk') {
+        resetInactivityTimeout()
         event.sender.send(`stream-chunk-${requestId}`, msg.data)
       } else if (msg.type === 'end') {
+        cleanup()
         event.sender.send(`stream-end-${requestId}`)
         port1.close()
       } else if (msg.type === 'error') {
+        cleanup()
         event.sender.send(`stream-error-${requestId}`, msg.data)
         port1.close()
       } else if (msg.type === 'complete') {
-        // Non-streaming response came back on a stream channel
-        // Send it as a single chunk then end
+        cleanup()
         event.sender.send(`stream-chunk-${requestId}`, JSON.stringify(msg.data))
         event.sender.send(`stream-end-${requestId}`)
         port1.close()
+      }
+    }
+
+    // Start the initial inactivity timeout
+    resetInactivityTimeout()
+
+    // Listen for renderer ready signal, then flush buffer
+    ipcMain.once(`stream-ready-${requestId}`, () => {
+      rendererReady = true
+      for (const msg of bufferedMessages) {
+        forwardMessage(msg)
+      }
+      bufferedMessages.length = 0
+    })
+
+    worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
+
+    port1.on('message', (msgEvent) => {
+      const msg = msgEvent.data
+      if (rendererReady) {
+        forwardMessage(msg)
+      } else {
+        bufferedMessages.push(msg)
       }
     })
     port1.start()

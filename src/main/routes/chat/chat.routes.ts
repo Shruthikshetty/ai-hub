@@ -4,7 +4,11 @@
 import { createRoute } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { z } from 'zod'
-import { zodValidationErrorDocObject } from '../../constants/doc-constants'
+import {
+  internalServerErrorDocObject,
+  zodValidationErrorDocObject
+} from '../../constants/doc-constants'
+import { UIMessageSchema } from '../../../common/schemas/messages'
 
 // route to stream chat response
 export const streamChat = createRoute({
@@ -17,7 +21,7 @@ export const streamChat = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            messages: z.any()
+            messages: UIMessageSchema.array()
           })
         }
       },
@@ -27,13 +31,15 @@ export const streamChat = createRoute({
   responses: {
     [HTTP_STATUS_CODES.OK]: {
       content: {
-        'application/json': {
-          schema: z.any()
+        'text/plain': {
+          schema: z.string() // we are streaming text
         }
       },
       description: 'success response for chat route'
     },
-    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject
+    // @TODO verify this
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }
 })
 
