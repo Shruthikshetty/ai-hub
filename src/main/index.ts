@@ -94,28 +94,42 @@ app.whenReady().then(() => {
 
       worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
 
-      const timeout = setTimeout(() => {
+      let timeout = setTimeout(() => {
         port1.close()
         reject(new Error('Worker request timed out'))
       }, 30_000)
 
+      // used to reset the timeout for each chunk
+      const resetTimeout = () => {
+        clearTimeout(timeout)
+        timeout = setTimeout(() => {
+          port1.close()
+          reject(new Error('Worker request timed out'))
+        }, 30_000)
+      }
+
       port1.on('message', (msgEvent) => {
         const msg = msgEvent.data
-        clearTimeout(timeout)
+
         if (msg.type === 'complete') {
+          resetTimeout()
           // If chunks were buffered, concatenate them; otherwise use complete data
           resolve(chunks.length > 0 ? chunks.join('') : msg.data)
           port1.close()
         } else if (msg.type === 'end') {
+          resetTimeout()
           resolve(chunks.join(''))
           port1.close()
         } else if (msg.type === 'error') {
+          resetTimeout()
           reject(new Error(msg.data))
           port1.close()
         } else if (msg.type === 'chunk') {
+          resetTimeout()
           // Buffer chunks — don't resolve or close yet
           chunks.push(msg.data)
         } else {
+          resetTimeout()
           // Unknown message type — buffer as fallback
           chunks.push(msg.data)
         }
