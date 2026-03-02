@@ -112,16 +112,16 @@ app.whenReady().then(() => {
         const msg = msgEvent.data
 
         if (msg.type === 'complete') {
-          resetTimeout()
+          clearTimeout(timeout)
           // If chunks were buffered, concatenate them; otherwise use complete data
           resolve(chunks.length > 0 ? chunks.join('') : msg.data)
           port1.close()
         } else if (msg.type === 'end') {
-          resetTimeout()
+          clearTimeout(timeout)
           resolve(chunks.join(''))
           port1.close()
         } else if (msg.type === 'error') {
-          resetTimeout()
+          clearTimeout(timeout)
           reject(new Error(msg.data))
           port1.close()
         } else if (msg.type === 'chunk') {

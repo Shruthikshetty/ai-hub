@@ -121,7 +121,7 @@ const ChatPage = () => {
             </PromptInputSelect>
           </PromptInputTools>
           {/* submit button */}
-          <PromptInputSubmit disabled={!text} status={status} />
+          <PromptInputSubmit disabled={!text.trim() || status === 'submitted'} status={status} />
         </PromptInputFooter>
       </PromptInput>
     </div>
