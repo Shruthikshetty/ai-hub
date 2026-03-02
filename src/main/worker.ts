@@ -79,6 +79,11 @@ process.parentPort.on('message', async (e) => {
           if (done) break
           port.postMessage({ type: 'chunk', data: decoder.decode(value, { stream: true }) })
         }
+        // Flush any remaining buffered bytes from incomplete multi-byte UTF-8 sequences
+        const remaining = decoder.decode()
+        if (remaining) {
+          port.postMessage({ type: 'chunk', data: remaining })
+        }
         port.postMessage({ type: 'end' })
         port.close()
       } else {

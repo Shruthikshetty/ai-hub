@@ -11,7 +11,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
       <TooltipProvider>
         <div className="h-screen w-screen flex flex-row justify-baseline">
           <AppSideTray />
-          <div className=" bg-background overflow-auto w-full">{children}</div>
+          <div className="bg-background overflow-auto w-full">{children}</div>
         </div>
       </TooltipProvider>
     </ThemeProvider>

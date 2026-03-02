@@ -41,6 +41,11 @@ export function createIPCStreamTransport(apiPath: string): TextStreamChatTranspo
 
           // Signal main process that listeners are attached — flush buffered chunks
           window.api.streamReady(requestId)
+        },
+        cancel() {
+          // Clean up IPC listeners when the consumer aborts/cancels the stream
+          // (e.g., user navigates away or React component unmounts)
+          window.api.removeStreamListeners(requestId)
         }
       })
 
