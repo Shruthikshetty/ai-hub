@@ -14,8 +14,15 @@ export const AppValidationErrorSchema = z.object({
 /*
 defines a zod schema for not found error
 */
-
 export const AppNotFoundErrorSchema = z.object({
+  message: z.string(),
+  success: z.boolean()
+})
+
+/**
+ * defines a zod schema for internal server error
+ */
+export const AppInternalServerErrorSchema = z.object({
   message: z.string(),
   success: z.boolean()
 })

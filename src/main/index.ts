@@ -10,7 +10,7 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform !== 'darwin' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
@@ -83,30 +83,139 @@ app.whenReady().then(() => {
     })
   }
 
-  // Handle Hono requests from renderer
+  // Counter for unique stream request IDs
+  let streamRequestId = 0
+
+  // Handle regular (non-streaming) Hono requests from renderer
   ipcMain.handle('hono-request', async (_event, { path, method, body }) => {
     return new Promise((resolve, reject) => {
-      // Create a message channel for this specific request
       const { port1, port2 } = new MessageChannelMain()
+      const chunks: string[] = []
 
-      // Send the request to the worker along with the port2
-      // We'll use port2 in the worker to send the response back
       worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
 
-      // Set a timeout for the request
-      const timeout = setTimeout(() => {
+      let timeout = setTimeout(() => {
         port1.close()
         reject(new Error('Worker request timed out'))
       }, 30_000)
 
-      // Listen for the response on port1
-      port1.on('message', (event) => {
+      // used to reset the timeout for each chunk
+      const resetTimeout = () => {
         clearTimeout(timeout)
-        resolve(event.data)
-        port1.close()
+        timeout = setTimeout(() => {
+          port1.close()
+          reject(new Error('Worker request timed out'))
+        }, 30_000)
+      }
+
+      port1.on('message', (msgEvent) => {
+        const msg = msgEvent.data
+
+        if (msg.type === 'complete') {
+          clearTimeout(timeout)
+          // If chunks were buffered, concatenate them; otherwise use complete data
+          resolve(chunks.length > 0 ? chunks.join('') : msg.data)
+          port1.close()
+        } else if (msg.type === 'end') {
+          clearTimeout(timeout)
+          resolve(chunks.join(''))
+          port1.close()
+        } else if (msg.type === 'error') {
+          clearTimeout(timeout)
+          reject(new Error(msg.data))
+          port1.close()
+        } else if (msg.type === 'chunk') {
+          resetTimeout()
+          // Buffer chunks — don't resolve or close yet
+          chunks.push(msg.data)
+        } else {
+          resetTimeout()
+          // Unknown message type — buffer as fallback
+          chunks.push(msg.data)
+        }
       })
       port1.start()
     })
+  })
+
+  // Handle streaming Hono requests - returns requestId immediately,
+  // then sends chunks and end signal as events.
+  // Uses a readiness handshake: buffer worker messages until the renderer
+  // signals it has attached listeners via 'stream-ready-{requestId}'.
+  ipcMain.handle('hono-stream-request', async (event, { path, method, body }) => {
+    const { port1, port2 } = new MessageChannelMain()
+    const requestId = ++streamRequestId
+
+    // Buffer for messages that arrive before renderer is ready
+    let rendererReady = false
+    const bufferedMessages: Array<{ type: string; data?: unknown }> = []
+
+    // Activity-based timeout: resets on each chunk, so long-running AI ops
+    // (image gen, video gen) stay alive as long as data is flowing.
+    let inactivityTimeout: ReturnType<typeof setTimeout>
+    const INACTIVITY_MS = 300_000 // 5 minutes
+
+    const cleanup = (): void => {
+      clearTimeout(inactivityTimeout)
+      ipcMain.removeAllListeners(`stream-ready-${requestId}`)
+    }
+
+    const resetInactivityTimeout = (): void => {
+      clearTimeout(inactivityTimeout)
+      inactivityTimeout = setTimeout(() => {
+        event.sender.send(`stream-error-${requestId}`, 'Stream inactive for 5 minutes')
+        event.sender.send(`stream-end-${requestId}`)
+        port1.close()
+        cleanup()
+      }, INACTIVITY_MS)
+    }
+
+    const forwardMessage = (msg: { type: string; data?: unknown }): void => {
+      if (msg.type === 'chunk') {
+        resetInactivityTimeout()
+        event.sender.send(`stream-chunk-${requestId}`, msg.data)
+      } else if (msg.type === 'end') {
+        cleanup()
+        event.sender.send(`stream-end-${requestId}`)
+        port1.close()
+      } else if (msg.type === 'error') {
+        cleanup()
+        event.sender.send(`stream-error-${requestId}`, msg.data)
+        port1.close()
+      } else if (msg.type === 'complete') {
+        cleanup()
+        event.sender.send(`stream-chunk-${requestId}`, JSON.stringify(msg.data))
+        event.sender.send(`stream-end-${requestId}`)
+        port1.close()
+      }
+    }
+
+    // Start the initial inactivity timeout
+    resetInactivityTimeout()
+
+    // Listen for renderer ready signal, then flush buffer
+    ipcMain.once(`stream-ready-${requestId}`, () => {
+      rendererReady = true
+      for (const msg of bufferedMessages) {
+        forwardMessage(msg)
+      }
+      bufferedMessages.length = 0
+    })
+
+    worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
+
+    port1.on('message', (msgEvent) => {
+      const msg = msgEvent.data
+      if (rendererReady) {
+        forwardMessage(msg)
+      } else {
+        bufferedMessages.push(msg)
+      }
+    })
+    port1.start()
+
+    // Return the requestId immediately so the renderer can set up listeners
+    return { requestId }
   })
 
   createWindow()

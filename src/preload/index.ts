@@ -3,10 +3,38 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
 const api = {
-  // this is a generic function that can be used to send request to hono app
+  // Generic function for non-streaming requests
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   request: (path: string, method = 'GET', body?: any) =>
-    ipcRenderer.invoke('hono-request', { path, method, body })
+    ipcRenderer.invoke('hono-request', { path, method, body }),
+
+  // Streaming: returns requestId, then use event-based methods to receive chunks
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  startStream: (path: string, method = 'GET', body?: any): Promise<{ requestId: number }> =>
+    ipcRenderer.invoke('hono-stream-request', { path, method, body }),
+
+  onStreamChunk: (requestId: number, callback: (data: string) => void): void => {
+    ipcRenderer.on(`stream-chunk-${requestId}`, (_event, data) => callback(data))
+  },
+
+  onStreamEnd: (requestId: number, callback: () => void): void => {
+    ipcRenderer.on(`stream-end-${requestId}`, () => callback())
+  },
+
+  onStreamError: (requestId: number, callback: (error: string) => void): void => {
+    ipcRenderer.on(`stream-error-${requestId}`, (_event, error) => callback(error))
+  },
+
+  removeStreamListeners: (requestId: number): void => {
+    ipcRenderer.removeAllListeners(`stream-chunk-${requestId}`)
+    ipcRenderer.removeAllListeners(`stream-end-${requestId}`)
+    ipcRenderer.removeAllListeners(`stream-error-${requestId}`)
+  },
+
+  // Signal to main process that stream listeners are attached and ready
+  streamReady: (requestId: number): void => {
+    ipcRenderer.send(`stream-ready-${requestId}`)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
