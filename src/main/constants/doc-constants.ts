@@ -1,4 +1,5 @@
 import {
+  AppBadRequestErrorSchema,
   AppInternalServerErrorSchema,
   AppNotFoundErrorSchema,
   AppValidationErrorSchema
@@ -37,4 +38,14 @@ export const internalServerErrorDocObject = {
     }
   },
   description: 'Internal server error response'
+}
+
+// bad request error doc object
+export const badRequestDocObject = {
+  content: {
+    'application/json': {
+      schema: AppBadRequestErrorSchema
+    }
+  },
+  description: 'Bad request error response'
 }

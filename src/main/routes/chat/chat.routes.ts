@@ -5,6 +5,7 @@ import { createRoute } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { z } from 'zod'
 import {
+  badRequestDocObject,
   internalServerErrorDocObject,
   zodValidationErrorDocObject
 } from '../../constants/doc-constants'
@@ -37,7 +38,7 @@ export const streamChat = createRoute({
       },
       description: 'success response for chat route'
     },
-    // @TODO verify this
+    [HTTP_STATUS_CODES.BAD_REQUEST]: badRequestDocObject,
     [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
     [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }

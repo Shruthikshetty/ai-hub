@@ -15,13 +15,15 @@ import {
 import { useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { createIPCStreamTransport } from '@renderer/lib/custom-transports'
-import { Message, MessageContent, MessageResponse } from '@renderer/components/ai-elements/message'
+import { Message, MessageContent } from '@renderer/components/ai-elements/message'
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton
 } from '@renderer/components/ai-elements/conversation'
 import { Spinner } from '@renderer/components/ui/spinner'
+import { AppUIMessage } from '@common/schemas/messages'
+import MessageParts from '@renderer/components/message-parts'
 
 // to be removed
 const models = [
@@ -39,13 +41,16 @@ const models = [
   }
 ]
 
+// stable transport instance
+const chatTransport = createIPCStreamTransport('/api/chat')
+
 // this is the chat page contains all the chat interface
 const ChatPage = () => {
   const [text, setText] = useState('')
   const [model, setModel] = useState('gpt-4o-mini')
 
-  const { messages, sendMessage, error, status } = useChat({
-    transport: createIPCStreamTransport('/api/chat')
+  const { messages, sendMessage, error, status } = useChat<AppUIMessage>({
+    transport: chatTransport
   })
 
   const handleSubmit = (message: PromptInputMessage) => {
@@ -62,26 +67,14 @@ const ChatPage = () => {
       {/* All the conversations go here */}
       <Conversation>
         <ConversationContent>
-          {messages.map((message) => (
+          {messages.map((message, index) => (
             <Message key={message.id} from={message.role}>
               <MessageContent>
-                {/*@TODO move this since it can get large  */}
-                {message.parts.map((part, index) => {
-                  switch (part.type) {
-                    case 'text':
-                      return (
-                        <MessageResponse
-                          key={`${message.id}-${index}`}
-                          controls={true}
-                          isAnimating={status === 'streaming'}
-                        >
-                          {part.text}
-                        </MessageResponse>
-                      )
-                    default:
-                      return null
-                  }
-                })}
+                <MessageParts
+                  message={message}
+                  isStreaming={status === 'streaming'}
+                  isLastMessage={index === messages.length - 1}
+                />
               </MessageContent>
               <ConversationScrollButton />
             </Message>
@@ -90,7 +83,7 @@ const ChatPage = () => {
           {status === 'streaming' || status === 'submitted' ? <Spinner /> : null}
         </ConversationContent>
       </Conversation>
-      {error && error.message && <p className="text-red-500">{error.message}</p>}
+      {error && error.message && <p className="text-red-500 text-center">{error.message}</p>}
       {/* Prompt inputs go here */}
       <PromptInput onSubmit={handleSubmit} className="mt-4">
         {/* BODY  */}

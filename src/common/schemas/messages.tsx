@@ -10,8 +10,24 @@ export const TextUIPartSchema = z.object({
   state: z.enum(['streaming', 'done']).optional()
 })
 
-//TODO will be extended later as per use
-export const MessagePartSchema = z.discriminatedUnion('type', [TextUIPartSchema])
+// reasoning part schema
+export const ReasoningUIPartSchema = z.object({
+  type: z.enum(['reasoning']),
+  text: z.string(),
+  state: z.enum(['streaming', 'done']).optional()
+})
+
+// step-start part schema (sent by SDK between tool call rounds)
+export const StepStartUIPartSchema = z.object({
+  type: z.enum(['step-start'])
+})
+
+//added additional parts as required
+export const MessagePartSchema = z.discriminatedUnion('type', [
+  TextUIPartSchema,
+  ReasoningUIPartSchema,
+  StepStartUIPartSchema
+])
 
 // define the UI message schema used in the app
 export const UIMessageSchema = z

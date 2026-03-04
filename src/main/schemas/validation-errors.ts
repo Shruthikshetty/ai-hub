@@ -26,3 +26,11 @@ export const AppInternalServerErrorSchema = z.object({
   message: z.string(),
   success: z.boolean()
 })
+
+/**
+ * defines bad request error schema
+ */
+export const AppBadRequestErrorSchema = z.object({
+  message: z.string(),
+  success: z.boolean()
+})
