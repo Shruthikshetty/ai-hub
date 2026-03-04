@@ -46,7 +46,7 @@ function MessageParts({
               <MessageResponse
                 key={`${message.id}-${index}`}
                 controls={true}
-                isAnimating={status === 'streaming'}
+                isAnimating={isStreaming}
               >
                 {part.text}
               </MessageResponse>

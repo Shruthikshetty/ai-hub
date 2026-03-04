@@ -16,7 +16,6 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   const coreMessages = await convertToModelMessages(messages)
 
   if (coreMessages.length === 0) {
-    console.log('here')
     return c.json(
       {
         message: 'No valid messages left after conversion',

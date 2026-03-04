@@ -62,8 +62,6 @@ const ChatPage = () => {
     setText('')
   }
 
-  console.log(messages)
-
   return (
     <div className="flex flex-col h-full w-full p-5 md:p-10">
       {/* All the conversations go here */}
