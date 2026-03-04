@@ -1,7 +1,7 @@
 /**
  * contains all the constants used throughout screens
  */
-import { MessageSquare, Image, Lock, Zap } from 'lucide-react'
+import { MessageSquare, Image, Lock, Zap, Shield, User, Package, Palette } from 'lucide-react'
 
 export const SIDE_TRAY_ITEMS = [
   {
@@ -57,3 +57,22 @@ export const QUICK_PROMPTS = [
   'Analyze this',
   'Brainstorm ideas'
 ]
+
+export const SETTINGS_TABS = [
+  {
+    name: 'Profile',
+    icon: User
+  },
+  {
+    name: 'Providers',
+    icon: Package
+  },
+  {
+    name: 'Appearance',
+    icon: Palette
+  },
+  {
+    name: 'Security',
+    icon: Shield
+  }
+] as const
