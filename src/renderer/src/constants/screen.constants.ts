@@ -50,3 +50,10 @@ export const HOME_INFO_CARD_ITEMS = [
     icon: MessageSquare
   }
 ] as const
+
+export const QUICK_PROMPTS = [
+  'Explain in simple terms',
+  'Write code snippet',
+  'Analyze this',
+  'Brainstorm ideas'
+]

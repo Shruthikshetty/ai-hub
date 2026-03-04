@@ -21,9 +21,9 @@ import {
   ConversationContent,
   ConversationScrollButton
 } from '@renderer/components/ai-elements/conversation'
-import { Spinner } from '@renderer/components/ui/spinner'
 import { AppUIMessage } from '@common/schemas/messages'
 import MessageParts from '@renderer/components/message-parts'
+import ChatStarter from './chat-starter'
 
 // to be removed
 const models = [
@@ -64,6 +64,14 @@ const ChatPage = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-5 md:p-10">
+      {/* starter prompts */}
+      {messages.length === 0 ? (
+        <ChatStarter
+          onSelect={(prompt) => {
+            setText(prompt)
+          }}
+        />
+      ) : null}
       {/* All the conversations go here */}
       <Conversation>
         <ConversationContent>
@@ -72,15 +80,13 @@ const ChatPage = () => {
               <MessageContent>
                 <MessageParts
                   message={message}
-                  isStreaming={status === 'streaming'}
+                  status={status}
                   isLastMessage={index === messages.length - 1}
                 />
               </MessageContent>
               <ConversationScrollButton />
             </Message>
           ))}
-          {/*  simple spinner on loading  */}
-          {status === 'streaming' || status === 'submitted' ? <Spinner /> : null}
         </ConversationContent>
       </Conversation>
       {error && error.message && <p className="text-red-500 text-center">{error.message}</p>}
