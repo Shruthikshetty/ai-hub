@@ -1,7 +1,8 @@
 import { AppUIMessage } from '@common/schemas/messages'
 import { MessageResponse } from './ai-elements/message'
-import { Bot } from 'lucide-react'
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './ai-elements/reasoning'
+import BotIcon from './bot-icon'
+import { ChatStatus } from 'ai'
 
 /**
  *
@@ -10,11 +11,11 @@ import { Reasoning, ReasoningContent, ReasoningTrigger } from './ai-elements/rea
 function MessageParts({
   message,
   isLastMessage,
-  isStreaming
+  status
 }: {
   message: AppUIMessage
   isLastMessage: boolean
-  isStreaming: boolean
+  status: ChatStatus
 }) {
   // consolidate all the reasoning
   const reasoning = message.parts.filter((part) => part.type === 'reasoning')
@@ -23,12 +24,19 @@ function MessageParts({
   const hasReasoning = reasoningText.trim()?.length > 0
   // Check if reasoning is still streaming (last part is reasoning on last message)
   const lastPart = message.parts.at(-1)
-  const isReasoningStreaming = isLastMessage && isStreaming && lastPart?.type === 'reasoning'
+  const isReasoningStreaming =
+    isLastMessage && status === 'streaming' && lastPart?.type === 'reasoning'
 
   return (
     <>
       {/* role based icon */}
-      {message.role === 'assistant' ? <Bot className="text-foreground" /> : null}
+      {message.role === 'assistant' ? (
+        <BotIcon
+          size={20}
+          className="h-8 w-8"
+          loading={status === 'streaming' || status === 'submitted'}
+        />
+      ) : null}
 
       {/* reasoning */}
       {hasReasoning ? (
@@ -46,7 +54,7 @@ function MessageParts({
               <MessageResponse
                 key={`${message.id}-${index}`}
                 controls={true}
-                isAnimating={isStreaming}
+                isAnimating={status === 'streaming'}
               >
                 {part.text}
               </MessageResponse>
