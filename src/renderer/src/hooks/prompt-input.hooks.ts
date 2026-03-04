@@ -2,11 +2,11 @@
  * utils used in prompt input component
  */
 
-import {
+import type {
   AttachmentsContext,
   PromptInputControllerProps
 } from '@renderer/components/ai-elements/prompt-input'
-import { SourceDocumentUIPart } from 'ai'
+import type { SourceDocumentUIPart } from 'ai'
 import { createContext, useContext } from 'react'
 
 // ============================================================================

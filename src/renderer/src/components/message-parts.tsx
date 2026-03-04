@@ -34,7 +34,7 @@ function MessageParts({
         <BotIcon
           size={20}
           className="h-8 w-8"
-          loading={status === 'streaming' || status === 'submitted'}
+          loading={isLastMessage && (status === 'streaming' || status === 'submitted')}
         />
       ) : null}
 
@@ -54,7 +54,7 @@ function MessageParts({
               <MessageResponse
                 key={`${message.id}-${index}`}
                 controls={true}
-                isAnimating={status === 'streaming'}
+                isAnimating={isLastMessage && status === 'streaming'}
               >
                 {part.text}
               </MessageResponse>
