@@ -39,13 +39,16 @@ const models = [
   }
 ]
 
+// stable transport instance
+const chatTransport = createIPCStreamTransport('/api/chat')
+
 // this is the chat page contains all the chat interface
 const ChatPage = () => {
   const [text, setText] = useState('')
   const [model, setModel] = useState('gpt-4o-mini')
 
   const { messages, sendMessage, error, status } = useChat({
-    transport: createIPCStreamTransport('/api/chat')
+    transport: chatTransport
   })
 
   const handleSubmit = (message: PromptInputMessage) => {
@@ -56,6 +59,8 @@ const ChatPage = () => {
     // clear our input
     setText('')
   }
+
+  console.log(messages)
 
   return (
     <div className="flex flex-col h-full w-full p-5 md:p-10">
@@ -77,6 +82,24 @@ const ChatPage = () => {
                         >
                           {part.text}
                         </MessageResponse>
+                      )
+                    case 'reasoning':
+                      return (
+                        <div
+                          key={`${message.id}-${index}`}
+                          className="mb-4 border-l-2 border-primary/20 pl-4 text-sm italic text-muted-foreground"
+                        >
+                          <MessageResponse
+                            controls={{
+                              code: true,
+                              mermaid: true,
+                              table: true
+                            }}
+                            isAnimating={status === 'streaming'}
+                          >
+                            {part.text}
+                          </MessageResponse>
+                        </div>
                       )
                     default:
                       return null

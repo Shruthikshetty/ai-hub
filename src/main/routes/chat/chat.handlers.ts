@@ -6,33 +6,34 @@ import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { convertToModelMessages, streamText } from 'ai'
 
-//@TODO are try blocks required here? we have a global error handler // can we throw errors as objects ?
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
-  try {
-    // get the messages from request body
-    const { messages } = c.req.valid('json')
+  // get the messages from request body
+  const { messages } = c.req.valid('json')
 
-    // stream the response from ai model
-    const result = streamText({
-      model: 'alibaba/qwen-3-14b',
-      messages: await convertToModelMessages(messages)
-    })
+  // convert to core messages
+  const coreMessages = await convertToModelMessages(messages)
 
-    // stream the response using data stream protocol (required by DefaultChatTransport)
-    return result.toTextStreamResponse({
-      status: HTTP_STATUS_CODES.OK
-      // @TODO check if can remove this any cast
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any
-  } catch (error) {
-    console.log(error)
+  if (coreMessages.length === 0) {
+    console.log('here')
     return c.json(
       {
-        success: false,
-        message: 'Failed to get response from API'
+        message: 'No valid messages left after conversion',
+        success: false
       },
-      HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR
+      HTTP_STATUS_CODES.BAD_REQUEST
     )
   }
+
+  // stream the response from ai model
+  const result = streamText({
+    model: 'openai/gpt-4.1-nano',
+    messages: coreMessages
+  })
+
+  // stream the response using data stream protocol (required by DefaultChatTransport)
+  return result.toUIMessageStreamResponse({
+    sendReasoning: true
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }) as any
 }

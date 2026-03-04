@@ -1,7 +1,7 @@
 /**
  * Custom chat transports for the AI SDK that work over Electron IPC
  */
-import { TextStreamChatTransport, UIMessage } from 'ai'
+import { UIMessage, DefaultChatTransport } from 'ai'
 
 /**
  * Creates a TextStreamChatTransport that streams AI responses
@@ -11,8 +11,8 @@ import { TextStreamChatTransport, UIMessage } from 'ai'
  * and contextBridge can't serialize Response objects — so we build
  * the ReadableStream in the renderer context from IPC event callbacks.
  */
-export function createIPCStreamTransport(apiPath: string): TextStreamChatTransport<UIMessage> {
-  return new TextStreamChatTransport({
+export function createIPCStreamTransport(apiPath: string): DefaultChatTransport<UIMessage> {
+  return new DefaultChatTransport({
     api: apiPath,
     fetch: async (_url, options) => {
       const body = JSON.parse(options?.body as string)

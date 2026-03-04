@@ -16,3 +16,7 @@ test.db
 
 # temp/backup config files
 electron.vite.config.*.mjs
+
+# misc 
+backlog.txt
+
