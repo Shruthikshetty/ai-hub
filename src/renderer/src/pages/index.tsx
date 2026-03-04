@@ -76,7 +76,7 @@ function HomePage(): React.JSX.Element {
         <Button variant={'default'} className="p-5" onClick={() => navigate('/chat')}>
           Start Chatting
         </Button>
-        {/* @TODO: to be redetected to exactly provide setting */}
+        {/* @TODO: to be redirected to exactly provide setting */}
         <Button
           variant={'secondary'}
           className="p-5"

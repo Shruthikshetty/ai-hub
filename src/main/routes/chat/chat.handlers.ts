@@ -5,6 +5,7 @@ import { StreamChatRoute } from './chat.routes'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { convertToModelMessages, streamText } from 'ai'
+import { openai, OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
@@ -27,8 +28,14 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
 
   // stream the response from ai model
   const result = streamText({
-    model: 'openai/gpt-4.1-nano',
-    messages: coreMessages
+    model: openai('gpt-5-mini'),
+    messages: coreMessages,
+    providerOptions: {
+      openai: {
+        reasoningEffort: 'low',
+        reasoningSummary: 'auto'
+      } as OpenAILanguageModelResponsesOptions
+    }
   })
 
   // stream the response using data stream protocol (required by DefaultChatTransport)

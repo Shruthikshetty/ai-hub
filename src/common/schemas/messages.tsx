@@ -22,7 +22,7 @@ export const StepStartUIPartSchema = z.object({
   type: z.enum(['step-start'])
 })
 
-//TODO will be extended later as per use
+//added additional parts as required
 export const MessagePartSchema = z.discriminatedUnion('type', [
   TextUIPartSchema,
   ReasoningUIPartSchema,
