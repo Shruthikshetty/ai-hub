@@ -8,36 +8,11 @@ import { code } from '@streamdown/code'
 import { math } from '@streamdown/math'
 import { mermaid } from '@streamdown/mermaid'
 import { BrainIcon, ChevronDownIcon } from 'lucide-react'
-import {
-  createContext,
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Streamdown } from 'streamdown'
 
 import { Shimmer } from './shimmer'
-
-interface ReasoningContextValue {
-  isStreaming: boolean
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-  duration: number | undefined
-}
-
-const ReasoningContext = createContext<ReasoningContextValue | null>(null)
-
-export const useReasoning = () => {
-  const context = useContext(ReasoningContext)
-  if (!context) {
-    throw new Error('Reasoning components must be used within Reasoning')
-  }
-  return context
-}
+import { ReasoningContext, useReasoning } from '@renderer/hooks/use-reasoning'
 
 export type ReasoningProps = ComponentProps<typeof Collapsible> & {
   isStreaming?: boolean

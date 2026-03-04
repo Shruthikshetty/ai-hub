@@ -5,6 +5,7 @@ import { cn } from '../../lib/utils'
 import { ArrowDownIcon, DownloadIcon } from 'lucide-react'
 import { useCallback } from 'react'
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
+import { defaultFormatMessage, messagesToMarkdown } from '@renderer/lib/conversation.utils'
 
 export type ConversationProps = ComponentProps<typeof StickToBottom>
 
@@ -98,16 +99,6 @@ export type ConversationDownloadProps = Omit<ComponentProps<typeof Button>, 'onC
   filename?: string
   formatMessage?: (message: ConversationMessage, index: number) => string
 }
-
-const defaultFormatMessage = (message: ConversationMessage): string => {
-  const roleLabel = message.role.charAt(0).toUpperCase() + message.role.slice(1)
-  return `**${roleLabel}:** ${message.content}`
-}
-
-export const messagesToMarkdown = (
-  messages: ConversationMessage[],
-  formatMessage: (message: ConversationMessage, index: number) => string = defaultFormatMessage
-): string => messages.map((msg, i) => formatMessage(msg, i)).join('\n\n')
 
 export const ConversationDownload = ({
   messages,
