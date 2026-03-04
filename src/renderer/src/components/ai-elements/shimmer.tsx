@@ -1,5 +1,5 @@
 import type { MotionProps } from 'motion/react'
-import type { ComponentType, CSSProperties, ElementType, JSX } from 'react'
+import type { ComponentType, CSSProperties, JSX } from 'react'
 
 import { cn } from '../../lib/utils'
 import { motion } from 'motion/react'

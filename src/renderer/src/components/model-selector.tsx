@@ -6,3 +6,5 @@ function ModelSelector() {
     </div>
   )
 }
+
+export default ModelSelector
