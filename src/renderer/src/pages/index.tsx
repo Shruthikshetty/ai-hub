@@ -6,13 +6,18 @@ import {
   CardTitle
 } from '@renderer/components/ui/card'
 import AppLogo from '@renderer/components/app-logo'
-import { HOME_INFO_CARD_ITEMS, QUICK_ACCESS_CARDS } from '@renderer/constants/screen.constants'
+import {
+  HOME_INFO_CARD_ITEMS,
+  QUICK_ACCESS_CARDS,
+  SETTINGS_TRAY_ITEM,
+  SIDE_TRAY_ITEMS
+} from '@renderer/constants/screen.constants'
 import { Button } from '@renderer/components/ui/button'
-import { useNavigate } from 'react-router'
+import { useNavigateToTab } from '@renderer/state-management/use-side-tray'
 
 // this is the main page of the app
 function HomePage(): React.JSX.Element {
-  const navigate = useNavigate()
+  const navigateToTab = useNavigateToTab()
 
   return (
     <div className="flex flex-col p-5 md:p-10">
@@ -32,7 +37,7 @@ function HomePage(): React.JSX.Element {
             key={item.name}
             className="grow border-border border transition-all hover:cursor-pointer hover:border-primary active:scale-95"
             onClick={() => {
-              navigate(item.path)
+              navigateToTab(item.path)
             }}
           >
             <CardHeader>
@@ -73,7 +78,13 @@ function HomePage(): React.JSX.Element {
       </Card>
       {/* Additional buttons */}
       <div className="flex flex-row gap-2 mt-5 items-center justify-center md:mt-10">
-        <Button variant={'default'} className="p-5" onClick={() => navigate('/chat')}>
+        <Button
+          variant={'default'}
+          className="p-5"
+          onClick={() => {
+            navigateToTab(SIDE_TRAY_ITEMS[0].path)
+          }}
+        >
           Start Chatting
         </Button>
         {/* @TODO: Redirect to provider-specific settings when provider setup is selected. */}
@@ -81,7 +92,7 @@ function HomePage(): React.JSX.Element {
           variant={'secondary'}
           className="p-5"
           onClick={() => {
-            navigate('/settings')
+            navigateToTab(SETTINGS_TRAY_ITEM.path)
           }}
         >
           Configure Providers
