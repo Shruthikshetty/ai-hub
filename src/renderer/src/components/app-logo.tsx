@@ -6,6 +6,9 @@ interface AppLogoProps {
   className?: string
 }
 
+/**
+ * app logo component
+ */
 function AppLogo({ width = 40, height = 40, className }: AppLogoProps) {
   return (
     <svg
