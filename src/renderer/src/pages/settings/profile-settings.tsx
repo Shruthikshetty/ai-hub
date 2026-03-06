@@ -6,8 +6,14 @@ import { Input } from '@renderer/components/ui/input'
 import { useForm } from '@tanstack/react-form'
 import { userPatchSchema } from '@common/db-schemas/user.schema'
 import { UPDATE_USER_DEFAULT_VALUES } from '@renderer/constants/form.constants'
+import { useFetchUserProfile } from '@renderer/services/profile'
 
 function ProfileSettings() {
+  // fetch user data
+  const { data: user } = useFetchUserProfile()
+
+  console.log(user)
+
   // create a form for user profile details
   const form = useForm({
     defaultValues: UPDATE_USER_DEFAULT_VALUES,

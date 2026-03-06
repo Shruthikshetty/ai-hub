@@ -41,3 +41,4 @@ export const userPatchSchema = usersInsertSchema.partial()
 
 // export type
 export type UserPatchSchema = z.input<typeof userPatchSchema>
+export type UserGetSchema = z.input<typeof usersGetSchema>
