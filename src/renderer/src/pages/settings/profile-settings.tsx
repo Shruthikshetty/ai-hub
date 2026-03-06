@@ -4,19 +4,21 @@ import { Button } from '@renderer/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@renderer/components/ui/field'
 import { Input } from '@renderer/components/ui/input'
 import { useForm } from '@tanstack/react-form'
-import { userPatchSchema } from '@common/db-schemas/user.schema'
-import { UPDATE_USER_DEFAULT_VALUES } from '@renderer/constants/form.constants'
+import { UserPatchSchema, userPatchSchema } from '@common/db-schemas/user.schema'
 import { useFetchUserProfile } from '@renderer/services/profile'
 
 function ProfileSettings() {
   // fetch user data
-  const { data: user } = useFetchUserProfile()
-
-  console.log(user)
+  const { data: user, isLoading, error } = useFetchUserProfile()
 
   // create a form for user profile details
   const form = useForm({
-    defaultValues: UPDATE_USER_DEFAULT_VALUES,
+    defaultValues: {
+      name: user?.data?.name,
+      email: user?.data?.email,
+      age: user?.data?.age,
+      city: user?.data?.city
+    } as UserPatchSchema,
     validators: { onSubmit: userPatchSchema },
     onSubmit: async ({ value }) => {
       // TODO: update user profile
