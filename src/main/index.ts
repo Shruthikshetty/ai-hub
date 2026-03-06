@@ -84,9 +84,11 @@ app.whenReady().then(() => {
   protocol.handle('media', (request) => {
     // media://profile/avatar.png → profile/avatar.png
     const url = new URL(request.url)
-    // Combine host + pathname for the relative path
-    // media://profile/avatar.png → host="profile", pathname="/avatar.png"
-    const relativePath = (url.host + url.pathname).replace(/^\/*/, '')
+    // Combine host + pathname for the relative path and decode URI components
+    // e.g. media://profile-img/my_avatar.png → "profile-img/my_avatar.png"
+    const host = decodeURIComponent(url.host) //  decodeURIComponent  so that node js extracts correct path even with "_" and emojis
+    const pathname = decodeURIComponent(url.pathname)
+    const relativePath = (host + pathname).replace(/^\/*/, '')
 
     // Security: prevent path traversal
     if (relativePath.includes('..')) {

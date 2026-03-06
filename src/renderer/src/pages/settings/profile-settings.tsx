@@ -46,7 +46,8 @@ function ProfileSettings() {
       {
         onSuccess: (result) => {
           // Set the media URL in the form so it gets saved to DB
-          form.setFieldValue('image', result.data.mediaUrl)
+          // We append a timestamp to bust the browser's image cache so it updates instantly
+          form.setFieldValue('image', `${result.data.mediaUrl}?t=${Date.now()}`)
         }
       }
     )
