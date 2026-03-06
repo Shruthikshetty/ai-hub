@@ -1,8 +1,19 @@
 /**
  * contains all the constants used throughout screens
  */
-import { MessageSquare, Image, Lock, Zap } from 'lucide-react'
+import {
+  MessageSquare,
+  Image,
+  Lock,
+  Zap,
+  Shield,
+  User,
+  Package,
+  Palette,
+  Settings
+} from 'lucide-react'
 
+// side tray items (do not change order add new items at the end)
 export const SIDE_TRAY_ITEMS = [
   {
     name: 'Chat',
@@ -16,17 +27,23 @@ export const SIDE_TRAY_ITEMS = [
   }
 ] as const
 
+export const SETTINGS_TRAY_ITEM = {
+  name: 'Settings',
+  path: '/settings',
+  icon: Settings
+} as const
+
 export const QUICK_ACCESS_CARDS = [
   {
     name: 'AI Chat',
-    path: '/chat',
+    path: SIDE_TRAY_ITEMS[0].path,
     message:
       'Chat with multiple AI models. Switch providers instantly and maintain conversation context across different models.',
     icon: MessageSquare
   },
   {
     name: 'Image',
-    path: '/image',
+    path: SIDE_TRAY_ITEMS[1].path,
     message:
       'Generate stunning images using local models. View your generation history and refine results instantly.',
     icon: Image
@@ -57,3 +74,22 @@ export const QUICK_PROMPTS = [
   'Analyze this',
   'Brainstorm ideas'
 ]
+
+export const SETTINGS_TABS = [
+  {
+    name: 'Profile',
+    icon: User
+  },
+  {
+    name: 'Providers',
+    icon: Package
+  },
+  {
+    name: 'Appearance',
+    icon: Palette
+  },
+  {
+    name: 'Security',
+    icon: Shield
+  }
+] as const

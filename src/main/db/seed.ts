@@ -8,9 +8,7 @@ export async function seed(): Promise<void> {
     if (existingUser.length === 0) {
       console.log('Seeding default user...')
       await db.insert(users).values({
-        name: 'Default User',
-        age: 30,
-        city: 'New York'
+        name: 'Default User'
       })
       console.log('Default user seeded successfully')
     } else {
@@ -21,3 +19,16 @@ export async function seed(): Promise<void> {
     throw error
   }
 }
+
+// Allow running the script directly bunx tsx src/main/db/seed.ts
+// if (require.main === module) {
+//   seed()
+//     .then(() => {
+//       console.log('Seed execution finished')
+//       process.exit(0)
+//     })
+//     .catch((error) => {
+//       console.error('Seed execution completed with errors:', error)
+//       process.exit(1)
+//     })
+// }

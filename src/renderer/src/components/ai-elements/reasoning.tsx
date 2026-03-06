@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { ComponentProps, ReactNode } from 'react'
 
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
@@ -75,6 +76,7 @@ export const Reasoning = memo(
     }, [isStreaming, isOpen, setIsOpen, isExplicitlyClosed])
 
     // Auto-close when streaming ends (once only, and only if it ever streamed)
+    // @ts-ignore
     useEffect(() => {
       if (hasEverStreamedRef.current && !isStreaming && isOpen && !hasAutoClosed) {
         const timer = setTimeout(() => {

@@ -2,15 +2,16 @@ import { cn } from '@renderer/lib/utils'
 import AppLogo from './app-logo'
 import { Separator } from './ui/separator'
 import { Settings } from 'lucide-react'
-import { Link } from 'react-router'
-import { SIDE_TRAY_ITEMS } from '@renderer/constants/screen.constants'
-import { useState } from 'react'
+import { Link, useLocation } from 'react-router'
+import { SETTINGS_TRAY_ITEM, SIDE_TRAY_ITEMS } from '@renderer/constants/screen.constants'
 
 /**
  * contains the side tray of the app that has quick links to all the pages
  */
 const AppSideTray = ({ className }: { className?: string }) => {
-  const [selectedTab, setSelectedTab] = useState<string | null>(null)
+  // get the current path
+  const { pathname } = useLocation()
+
   return (
     <div
       className={cn(
@@ -32,9 +33,8 @@ const AppSideTray = ({ className }: { className?: string }) => {
               to={item.path}
               className={cn(
                 'hover:cursor-pointer transition-all p-2 rounded-sm hover:bg-muted',
-                selectedTab === item.path && 'bg-muted-foreground/60'
+                pathname === item.path && 'bg-muted-foreground/60'
               )}
-              onClick={() => setSelectedTab(item.path)}
             >
               <item.icon className="size-6" />
               <span className="sr-only">{item.name}</span>
@@ -46,12 +46,11 @@ const AppSideTray = ({ className }: { className?: string }) => {
       <div className="gap-2 flex flex-col w-full items-center">
         <Separator className="w-full" />
         <Link
-          to="/settings"
+          to={SETTINGS_TRAY_ITEM.path}
           className={cn(
             'hover:cursor-pointer transition-all p-2 rounded-sm hover:bg-muted',
-            selectedTab === '/settings' && 'bg-muted-foreground/60'
+            pathname === SETTINGS_TRAY_ITEM.path && 'bg-muted-foreground/60'
           )}
-          onClick={() => setSelectedTab('/settings')}
         >
           <Settings className="size-6" />
         </Link>
