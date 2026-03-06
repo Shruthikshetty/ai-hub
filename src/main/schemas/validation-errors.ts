@@ -24,7 +24,8 @@ export const AppNotFoundErrorSchema = z.object({
  */
 export const AppInternalServerErrorSchema = z.object({
   message: z.string(),
-  success: z.boolean()
+  success: z.boolean(),
+  errorInfo: z.string().optional()
 })
 
 /**

@@ -31,7 +31,7 @@ export const usersInsertSchema = createInsertSchema(users, {
   age: (field) => field.int().min(1).max(120).nullish(),
   city: (field) => field.min(1).max(255).nullish(),
   email: (field) => field.email().nullish(),
-  image: (field) => field.url().nullish()
+  image: (field) => field.min(1).nullish()
 }).omit({
   id: true,
   createdAt: true,

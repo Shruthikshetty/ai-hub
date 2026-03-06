@@ -6,5 +6,6 @@ export const QUERY_KEYS = {
 }
 
 export const MUTATION_KEYS = {
-  userUpdate: 'user-update'
+  userUpdate: 'user-update',
+  mediaUpload: 'media-upload'
 }

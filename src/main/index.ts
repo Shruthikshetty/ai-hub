@@ -1,7 +1,34 @@
-import { app, shell, BrowserWindow, ipcMain, utilityProcess, MessageChannelMain } from 'electron'
+import {
+  app,
+  shell,
+  BrowserWindow,
+  ipcMain,
+  utilityProcess,
+  MessageChannelMain,
+  protocol,
+  net
+} from 'electron'
 import { join } from 'path'
+import path from 'node:path'
+import fs from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { EXT_TO_MIME } from '../common/constants/global.constants'
 import icon from '../../resources/icon.png?asset'
+
+// Custom media:// protocol
+// Must be registered before app.ready
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'media',
+    privileges: {
+      standard: true, //Tells Chromium to parse media:// URLs the same way it parses http://URLs
+      secure: true, //Tells the browser that resources loaded from this protocol are "secure"
+      supportFetchAPI: true, //Enables to use fetch('media://...') and XMLHttpRequest on these URLs in React code
+      stream: true, //Allows the protocol handler to return a Node.js Stream (which we do internally using net.fetch). Crucial for efficiently loading large videos or images without loading them entirely into memory first.
+      bypassCSP: true //Bypasses the Content Security Policy (CSP).
+    }
+  }
+])
 
 function createWindow(): void {
   // Create the browser window.
@@ -47,6 +74,49 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
+  })
+
+  // ─── Register media:// protocol handler ────────────────────────
+  // Serves files from APP_USER_DATA/media/ so the renderer can use
+  // <img src="media://profile/avatar.png"> directly.
+  const mediaRoot = path.join(app.getPath('userData'), 'media')
+
+  protocol.handle('media', (request) => {
+    // media://profile/avatar.png → profile/avatar.png
+    const url = new URL(request.url)
+    // Combine host + pathname for the relative path
+    // media://profile/avatar.png → host="profile", pathname="/avatar.png"
+    const relativePath = (url.host + url.pathname).replace(/^\/*/, '')
+
+    // Security: prevent path traversal
+    if (relativePath.includes('..')) {
+      return new Response('Forbidden', { status: 403 })
+    }
+
+    const absolutePath = path.join(mediaRoot, relativePath)
+
+    // Verify file is within media root
+    if (!absolutePath.startsWith(mediaRoot)) {
+      return new Response('Forbidden', { status: 403 })
+    }
+
+    if (!fs.existsSync(absolutePath)) {
+      return new Response('Not found', { status: 404 })
+    }
+
+    // Serve the file using net.fetch for efficient streaming
+    const ext = path.extname(absolutePath).replace('.', '').toLowerCase()
+    const mime = EXT_TO_MIME[ext] ?? 'application/octet-stream'
+
+    return net.fetch(`file://${absolutePath}`).then((response) => {
+      return new Response(response.body, {
+        status: 200,
+        headers: {
+          'Content-Type': mime,
+          'Cache-Control': 'no-cache'
+        }
+      })
+    })
   })
 
   // Spawn worker process

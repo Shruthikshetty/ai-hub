@@ -8,7 +8,9 @@ const errorHandler: ErrorHandler = (err, c) => {
   console.error(`${err}`)
   return c.json(
     {
-      message: 'Internal server error'
+      message: 'Internal server error',
+      success: false,
+      errorInfo: `${err instanceof Error ? err.message : String(err)}`
     },
     HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR
   )
