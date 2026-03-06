@@ -8,6 +8,13 @@
       "when": 1772772397711,
       "tag": "0000_dashing_vin_gonzales",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1772813309126,
+      "tag": "0001_concerned_hobgoblin",
+      "breakpoints": true
     }
   ]
 }
