@@ -65,7 +65,7 @@ function ProfileSettings() {
               const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                   <Input
                     id={field.name}
                     name={field.name}
