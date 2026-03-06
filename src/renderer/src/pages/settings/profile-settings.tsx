@@ -4,16 +4,14 @@ import { Button } from '@renderer/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@renderer/components/ui/field'
 import { Input } from '@renderer/components/ui/input'
 import { useForm } from '@tanstack/react-form'
-import {
-  updateUserProfileDefaultValues,
-  updateUserProfileSchema
-} from '@renderer/schemas/profile-settings.schema'
+import { userPatchSchema } from '@common/db-schemas/user.schema'
+import { UPDATE_USER_DEFAULT_VALUES } from '@renderer/constants/form.constants'
 
 function ProfileSettings() {
   // create a form for user profile details
   const form = useForm({
-    defaultValues: updateUserProfileDefaultValues,
-    validators: { onSubmit: updateUserProfileSchema },
+    defaultValues: UPDATE_USER_DEFAULT_VALUES,
+    validators: { onSubmit: userPatchSchema },
     onSubmit: async ({ value }) => {
       // TODO: update user profile
       console.log(value)
@@ -51,7 +49,7 @@ function ProfileSettings() {
                   <Input
                     id={field.name}
                     name={field.name}
-                    value={field.state.value}
+                    value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
@@ -69,7 +67,7 @@ function ProfileSettings() {
                   <Input
                     id={field.name}
                     name={field.name}
-                    value={field.state.value}
+                    value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
