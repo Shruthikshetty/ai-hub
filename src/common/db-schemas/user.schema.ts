@@ -26,10 +26,10 @@ export const usersGetSchema = createSelectSchema(users)
 
 // zod schema for inserting into the users table
 export const usersInsertSchema = createInsertSchema(users, {
-  name: (field) => field.min(3).max(255).optional(),
-  age: (field) => field.min(1).max(120).optional(),
-  city: (field) => field.min(1).max(255).optional(),
-  email: (field) => field.email().optional()
+  name: (field) => field.min(3).max(255).nullish(),
+  age: (field) => field.min(1).max(120).nullish(),
+  city: (field) => field.min(1).max(255).nullish(),
+  email: (field) => field.email().nullish()
 }).omit({
   id: true,
   createdAt: true,

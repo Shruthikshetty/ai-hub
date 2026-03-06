@@ -14,7 +14,7 @@ type UseFetchUserProfileResponse = {
 }
 
 type UseUpdateUserProfileResponse = {
-  data?: UserPatchSchema
+  data?: UserGetSchema
   success: boolean
 }
 

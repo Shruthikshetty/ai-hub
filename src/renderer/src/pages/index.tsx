@@ -13,11 +13,11 @@ import {
   SIDE_TRAY_ITEMS
 } from '@renderer/constants/screen.constants'
 import { Button } from '@renderer/components/ui/button'
-import { useNavigateToTab } from '@renderer/state-management/use-side-tray'
+import { useNavigate } from 'react-router'
 
 // this is the main page of the app
 function HomePage(): React.JSX.Element {
-  const navigateToTab = useNavigateToTab()
+  const navigate = useNavigate()
 
   return (
     <div className="flex flex-col p-5 md:p-10">
@@ -37,7 +37,7 @@ function HomePage(): React.JSX.Element {
             key={item.name}
             className="grow border-border border transition-all hover:cursor-pointer hover:border-primary active:scale-95"
             onClick={() => {
-              navigateToTab(item.path)
+              navigate(item.path)
             }}
           >
             <CardHeader>
@@ -82,7 +82,7 @@ function HomePage(): React.JSX.Element {
           variant={'default'}
           className="p-5"
           onClick={() => {
-            navigateToTab(SIDE_TRAY_ITEMS[0].path)
+            navigate(SIDE_TRAY_ITEMS[0].path)
           }}
         >
           Start Chatting
@@ -92,7 +92,7 @@ function HomePage(): React.JSX.Element {
           variant={'secondary'}
           className="p-5"
           onClick={() => {
-            navigateToTab(SETTINGS_TRAY_ITEM.path)
+            navigate(SETTINGS_TRAY_ITEM.path)
           }}
         >
           Configure Providers
