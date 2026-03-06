@@ -5,11 +5,14 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@renderer/components/
 import { Input } from '@renderer/components/ui/input'
 import { useForm } from '@tanstack/react-form'
 import { UserPatchSchema, userPatchSchema } from '@common/db-schemas/user.schema'
-import { useFetchUserProfile } from '@renderer/services/profile'
+import { useFetchUserProfile, useUpdateUserProfile } from '@renderer/services/profile'
+import { Save, Trash } from 'lucide-react'
 
 function ProfileSettings() {
   // fetch user data
-  const { data: user, isLoading, error } = useFetchUserProfile()
+  const { data: user } = useFetchUserProfile()
+  // hook to update user data
+  const { mutate: updateUserProfile } = useUpdateUserProfile()
 
   // create a form for user profile details
   const form = useForm({
@@ -21,8 +24,8 @@ function ProfileSettings() {
     } as UserPatchSchema,
     validators: { onSubmit: userPatchSchema },
     onSubmit: async ({ value }) => {
-      // TODO: update user profile
-      console.log(value)
+      // update user profile
+      updateUserProfile(value)
     }
   })
 
@@ -59,6 +62,7 @@ function ProfileSettings() {
                     name={field.name}
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
+                    placeholder="user"
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -77,6 +81,7 @@ function ProfileSettings() {
                     name={field.name}
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
+                    placeholder="example.com"
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -84,7 +89,27 @@ function ProfileSettings() {
               )
             }}
           </form.Field>
-          <Button>Submit</Button>
+          <div className="flex flex-row gap-2 items-center justify-center">
+            <Button
+              type="button"
+              variant="destructive"
+              aria-label="discard changes"
+              className="p-4 min-w-[30%] md:min-w-[10%]"
+              onClick={() => form.reset()}
+            >
+              Discard
+              <Trash />
+            </Button>
+            <Button
+              type="submit"
+              variant={'secondary'}
+              aria-label="save changes"
+              className="p-4 min-w-[50%] md:min-w-[30%]"
+            >
+              Save
+              <Save />
+            </Button>
+          </div>
         </FieldGroup>
       </form>
     </div>
