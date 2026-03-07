@@ -14,6 +14,7 @@ export const users = sqliteTable('users', {
   email: text('email'),
   age: integer('age'),
   city: text('city'),
+  image: text('image'),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()
@@ -27,9 +28,10 @@ export const usersGetSchema = createSelectSchema(users)
 // zod schema for inserting into the users table
 export const usersInsertSchema = createInsertSchema(users, {
   name: (field) => field.min(3).max(255).nullish(),
-  age: (field) => field.min(1).max(120).nullish(),
+  age: (field) => field.int().min(1).max(120).nullish(),
   city: (field) => field.min(1).max(255).nullish(),
-  email: (field) => field.email().nullish()
+  email: (field) => field.email().nullish(),
+  image: (field) => field.min(1).nullish()
 }).omit({
   id: true,
   createdAt: true,

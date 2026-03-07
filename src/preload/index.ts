@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -34,7 +34,12 @@ const api = {
   // Signal to main process that stream listeners are attached and ready
   streamReady: (requestId: number): void => {
     ipcRenderer.send(`stream-ready-${requestId}`)
-  }
+  },
+
+  // Get the real filesystem path from a File object (from <input type="file">)
+  // This avoids base64 encoding — the path string is sent to the backend which
+  // does a stream copy directly.
+  getFilePath: (file: File): string => webUtils.getPathForFile(file)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

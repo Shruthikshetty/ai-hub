@@ -8,7 +8,12 @@ const errorHandler: ErrorHandler = (err, c) => {
   console.error(`${err}`)
   return c.json(
     {
-      message: 'Internal server error'
+      message: 'Internal server error',
+      success: false,
+      errorInfo:
+        process.env.NODE_ENV === 'development'
+          ? `${err instanceof Error ? err.message : String(err)}`
+          : undefined
     },
     HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR
   )
