@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: electron-hono-react-template
+productName: ai-hub
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: electron-hono-react-template
+  executableName: ai-hub
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
