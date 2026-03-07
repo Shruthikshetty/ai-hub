@@ -98,7 +98,8 @@ app.whenReady().then(() => {
     const absolutePath = path.join(mediaRoot, relativePath)
 
     // Verify file is within media root
-    if (!absolutePath.startsWith(mediaRoot)) {
+    const mediaRootWithSep = mediaRoot.endsWith(path.sep) ? mediaRoot : mediaRoot + path.sep
+    if (!absolutePath.startsWith(mediaRootWithSep) && absolutePath !== mediaRoot) {
       return new Response('Forbidden', { status: 403 })
     }
 

@@ -10,7 +10,10 @@ const errorHandler: ErrorHandler = (err, c) => {
     {
       message: 'Internal server error',
       success: false,
-      errorInfo: `${err instanceof Error ? err.message : String(err)}`
+      errorInfo:
+        process.env.NODE_ENV === 'development'
+          ? `${err instanceof Error ? err.message : String(err)}`
+          : undefined
     },
     HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR
   )

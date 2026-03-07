@@ -5,7 +5,7 @@ export const mediaUploadSchema = z.object({
   /** Absolute path to the source file on disk */
   sourcePath: z.string().min(1),
   /**category of storage for separation  */
-  category: z.enum(Object.values(FILE_STORAGE_CATEGORY))
+  category: z.enum(FILE_STORAGE_CATEGORY)
 })
 
 export const mediaUploadResponseSchema = z.object({

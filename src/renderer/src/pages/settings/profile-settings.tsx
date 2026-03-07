@@ -150,7 +150,10 @@ function ProfileSettings() {
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     placeholder="age"
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      field.handleChange(val === '' ? undefined : Number(val))
+                    }}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
