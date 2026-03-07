@@ -14,6 +14,7 @@ import fs from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { EXT_TO_MIME } from '../common/constants/global.constants'
 import icon from '../../resources/icon.png?asset'
+import { pathToFileURL } from 'node:url'
 
 // Custom media:// protocol
 // Must be registered before app.ready
@@ -111,7 +112,7 @@ app.whenReady().then(() => {
     const ext = path.extname(absolutePath).replace('.', '').toLowerCase()
     const mime = EXT_TO_MIME[ext] ?? 'application/octet-stream'
     return net
-      .fetch(`file://${absolutePath}`)
+      .fetch(pathToFileURL(absolutePath).toString())
       .then((response) => {
         return new Response(response.body, {
           status: 200,

@@ -9,6 +9,7 @@ import { useUploadMedia } from '@renderer/services/media'
 import { Save, Trash } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { FILE_STORAGE_CATEGORY } from '@common/constants/global.constants'
+import { handleNumberChange, handleStringChange } from '@renderer/lib/form.utils'
 
 function ProfileSettings() {
   // fetch user data
@@ -42,6 +43,10 @@ function ProfileSettings() {
   // handle avatar file selection
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
+    // Reset the input value so the same file can be selected again
+    e.target.value = ''
+
     if (!file) return
     // upload the to storage
     uploadMedia(
@@ -118,9 +123,7 @@ function ProfileSettings() {
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     placeholder="user"
-                    onChange={(e) =>
-                      field.handleChange(e.target.value ? e.target.value : undefined)
-                    }
+                    onChange={(e) => handleStringChange(e, field.handleChange)}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -139,9 +142,7 @@ function ProfileSettings() {
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     placeholder="example.com"
-                    onChange={(e) =>
-                      field.handleChange(e.target.value ? e.target.value : undefined)
-                    }
+                    onChange={(e) => handleStringChange(e, field.handleChange)}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -158,12 +159,11 @@ function ProfileSettings() {
                     id={field.name}
                     type="number"
                     name={field.name}
-                    value={field.state.value ?? ''}
+                    value={field.state.value?.toString() ?? ''}
                     onBlur={field.handleBlur}
                     placeholder="age"
                     onChange={(e) => {
-                      const val = e.target.value
-                      field.handleChange(val === '' ? undefined : Number(val))
+                      handleNumberChange(e, field.handleChange)
                     }}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -183,9 +183,7 @@ function ProfileSettings() {
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     placeholder="city"
-                    onChange={(e) =>
-                      field.handleChange(e.target.value ? e.target.value : undefined)
-                    }
+                    onChange={(e) => handleStringChange(e, field.handleChange)}
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
