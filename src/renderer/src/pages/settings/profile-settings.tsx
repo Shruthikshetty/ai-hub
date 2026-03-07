@@ -7,7 +7,7 @@ import { UserPatchSchema, userPatchSchema } from '@common/db-schemas/user.schema
 import { useFetchUserProfile, useUpdateUserProfile } from '@renderer/services/profile'
 import { useUploadMedia } from '@renderer/services/media'
 import { Save, Trash } from 'lucide-react'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { FILE_STORAGE_CATEGORY } from '@common/constants/global.constants'
 
 function ProfileSettings() {
@@ -19,6 +19,9 @@ function ProfileSettings() {
   const { mutate: uploadMedia } = useUploadMedia()
   //profile image ref
   const profileImageRef = useRef<HTMLInputElement>(null)
+
+  // store initial timestamp for cache busting, updated on new upload
+  const [imageTimestamp, setImageTimestamp] = useState(() => Date.now())
 
   // create a form for user profile details
   const form = useForm({
@@ -47,7 +50,8 @@ function ProfileSettings() {
         onSuccess: (result) => {
           // Set the media URL in the form so it gets saved to DB
           // We append a timestamp to bust the browser's image cache so it updates instantly
-          form.setFieldValue('image', `${result.data.mediaUrl}?t=${Date.now()}`)
+          setImageTimestamp(Date.now())
+          form.setFieldValue('image', result.data.mediaUrl)
         }
       }
     )
@@ -67,12 +71,15 @@ function ProfileSettings() {
           <form.Field name="image">
             {(field) => {
               const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+              const catchBustedImage = field.state.value
+                ? `${field.state.value}?t=${imageTimestamp}`
+                : ''
               return (
                 <Field data-invalid={isInvalid}>
                   <div className="flex flex-row items-center gap-5">
                     {/* avatar image  */}
                     <Avatar className="size-20 rounded-lg after:rounded-lg">
-                      <AvatarImage className="rounded-lg" src={field.state.value ?? ''} />
+                      <AvatarImage className="rounded-lg" src={catchBustedImage} />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
                     {/* change avatar  */}
@@ -111,7 +118,9 @@ function ProfileSettings() {
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     placeholder="user"
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) =>
+                      field.handleChange(e.target.value ? e.target.value : undefined)
+                    }
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -130,7 +139,9 @@ function ProfileSettings() {
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     placeholder="example.com"
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) =>
+                      field.handleChange(e.target.value ? e.target.value : undefined)
+                    }
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -172,7 +183,9 @@ function ProfileSettings() {
                     value={field.state.value ?? ''}
                     onBlur={field.handleBlur}
                     placeholder="city"
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) =>
+                      field.handleChange(e.target.value ? e.target.value : undefined)
+                    }
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>

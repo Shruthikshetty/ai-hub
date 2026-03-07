@@ -110,16 +110,20 @@ app.whenReady().then(() => {
     // Serve the file using net.fetch for efficient streaming
     const ext = path.extname(absolutePath).replace('.', '').toLowerCase()
     const mime = EXT_TO_MIME[ext] ?? 'application/octet-stream'
-
-    return net.fetch(`file://${absolutePath}`).then((response) => {
-      return new Response(response.body, {
-        status: 200,
-        headers: {
-          'Content-Type': mime,
-          'Cache-Control': 'no-cache'
-        }
+    return net
+      .fetch(`file://${absolutePath}`)
+      .then((response) => {
+        return new Response(response.body, {
+          status: 200,
+          headers: {
+            'Content-Type': mime,
+            'Cache-Control': 'no-cache'
+          }
+        })
       })
-    })
+      .catch(() => {
+        return new Response('Failed to read file', { status: 500 })
+      })
   })
 
   // Spawn worker process
