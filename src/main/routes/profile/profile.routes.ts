@@ -4,12 +4,16 @@
 
 import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { zodNotFoundDocObject, zodValidationErrorDocObject } from '../../constants/doc-constants'
+import {
+  internalServerErrorDocObject,
+  zodNotFoundDocObject,
+  zodValidationErrorDocObject
+} from '../../constants/doc-constants'
 import { userPatchSchema, usersGetSchema } from '../../db/schema'
 
 // route to get profile data
 export const getProfile = createRoute({
-  tags: ['profile'],
+  tags: ['Profile'],
   method: 'get',
   path: '/profile',
   responses: {
@@ -30,7 +34,7 @@ export const getProfile = createRoute({
 
 // route to update profile data
 export const updateProfile = createRoute({
-  tags: ['profile'],
+  tags: ['Profile'],
   method: 'patch',
   path: '/profile',
   request: {
@@ -57,7 +61,8 @@ export const updateProfile = createRoute({
       description: 'success response for profile route'
     },
     [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
-    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }
 })
 

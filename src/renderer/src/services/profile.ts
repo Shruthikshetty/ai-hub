@@ -6,6 +6,7 @@ import { UserGetSchema, UserPatchSchema } from '@common/db-schemas/user.schema'
 import { ApiError } from '@common/types'
 import { FETCH_USER_STALE_TIME } from '@renderer/constants/config.constants'
 import { MUTATION_KEYS, QUERY_KEYS } from '@renderer/constants/service-keys.constants'
+import { errorToast, successToast } from '@renderer/lib/toast-wrapper'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 type UseFetchUserProfileResponse = {
@@ -50,8 +51,12 @@ export function useUpdateUserProfile() {
       return response
     },
     onSuccess: () => {
+      successToast('User profile updated successfully')
       // invalidate user data fetch
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userFetch] })
+      return queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userFetch] })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to update user profile')
     }
   })
 }
