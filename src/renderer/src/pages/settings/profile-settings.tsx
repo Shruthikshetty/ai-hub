@@ -12,6 +12,9 @@ import { FILE_STORAGE_CATEGORY } from '@common/constants/global.constants'
 import { handleNumberChange, handleStringChange } from '@renderer/lib/form.utils'
 import { errorToast } from '@renderer/lib/toast-wrapper'
 
+/**
+ * renders the profile setting tab
+ */
 function ProfileSettings() {
   // fetch user data
   const { data: user, error } = useFetchUserProfile()
@@ -55,7 +58,7 @@ function ProfileSettings() {
     // Reset the input value so the same file can be selected again
     e.target.value = ''
 
-    if (!file || mediaUploadPending) return
+    if (!file || mediaUploadPending || mediaUploadPending) return
     // upload the to storage
     uploadMedia(
       { file, category: FILE_STORAGE_CATEGORY.profileImg },
@@ -214,7 +217,7 @@ function ProfileSettings() {
               variant={'secondary'}
               aria-label="save changes"
               className="p-4 min-w-[50%] md:min-w-[30%]"
-              disabled={profileUpdatePending}
+              disabled={profileUpdatePending || mediaUploadPending}
             >
               Save
               <Save />

@@ -51,9 +51,9 @@ export function useUpdateUserProfile() {
       return response
     },
     onSuccess: () => {
-      // invalidate user data fetch
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userFetch] })
       successToast('User profile updated successfully')
+      // invalidate user data fetch
+      return queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userFetch] })
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to update user profile')
