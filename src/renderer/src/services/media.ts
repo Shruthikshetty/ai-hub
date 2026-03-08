@@ -6,6 +6,7 @@ import { mediaUploadResponseSchemaType } from '@common/schemas/media.schema'
 import { ApiError, FileStorageCategory } from '@common/types'
 import { MUTATION_KEYS } from '@renderer/constants/service-keys.constants'
 import { uploadMediaFile } from '@renderer/lib/media-upload'
+import { errorToast } from '@renderer/lib/toast-wrapper'
 import { useMutation } from '@tanstack/react-query'
 
 // types
@@ -21,6 +22,9 @@ export interface UploadMediaInput {
 export function useUploadMedia() {
   return useMutation<mediaUploadResponseSchemaType, ApiError, UploadMediaInput>({
     mutationKey: [MUTATION_KEYS.mediaUpload],
-    mutationFn: async ({ file, category }) => uploadMediaFile(file, category)
+    mutationFn: async ({ file, category }) => uploadMediaFile(file, category),
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to upload media')
+    }
   })
 }

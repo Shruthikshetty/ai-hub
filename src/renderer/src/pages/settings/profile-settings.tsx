@@ -7,17 +7,18 @@ import { UserPatchSchema, userPatchSchema } from '@common/db-schemas/user.schema
 import { useFetchUserProfile, useUpdateUserProfile } from '@renderer/services/profile'
 import { useUploadMedia } from '@renderer/services/media'
 import { Save, Trash } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FILE_STORAGE_CATEGORY } from '@common/constants/global.constants'
 import { handleNumberChange, handleStringChange } from '@renderer/lib/form.utils'
+import { errorToast } from '@renderer/lib/toast-wrapper'
 
 function ProfileSettings() {
   // fetch user data
-  const { data: user } = useFetchUserProfile()
+  const { data: user, error } = useFetchUserProfile()
   // hook to update user data
-  const { mutate: updateUserProfile } = useUpdateUserProfile()
+  const { mutate: updateUserProfile, isPending: profileUpdatePending } = useUpdateUserProfile()
   // hook to upload media
-  const { mutate: uploadMedia } = useUploadMedia()
+  const { mutate: uploadMedia, isPending: mediaUploadPending } = useUploadMedia()
   //profile image ref
   const profileImageRef = useRef<HTMLInputElement>(null)
 
@@ -40,6 +41,13 @@ function ProfileSettings() {
     }
   })
 
+  // in case error on fetch of profile
+  useEffect(() => {
+    if (error) {
+      errorToast(error?.message ?? 'Failed to fetch user profile')
+    }
+  }, [error])
+
   // handle avatar file selection
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -47,7 +55,7 @@ function ProfileSettings() {
     // Reset the input value so the same file can be selected again
     e.target.value = ''
 
-    if (!file) return
+    if (!file || mediaUploadPending) return
     // upload the to storage
     uploadMedia(
       { file, category: FILE_STORAGE_CATEGORY.profileImg },
@@ -102,6 +110,7 @@ function ProfileSettings() {
                       className="hidden"
                       ref={profileImageRef}
                       onBlur={field.handleBlur}
+                      disabled={mediaUploadPending}
                       onChange={handleAvatarChange}
                     />
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -205,6 +214,7 @@ function ProfileSettings() {
               variant={'secondary'}
               aria-label="save changes"
               className="p-4 min-w-[50%] md:min-w-[30%]"
+              disabled={profileUpdatePending}
             >
               Save
               <Save />

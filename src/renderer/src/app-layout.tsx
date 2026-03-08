@@ -19,8 +19,8 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="h-screen w-screen flex flex-row justify-baseline">
             <AppSideTray />
             <div className="bg-background overflow-auto w-full">{children}</div>
-            <Toaster />
           </div>
+          <Toaster position="bottom-right" />
           {/* for debugging */}
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
