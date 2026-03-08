@@ -3,12 +3,25 @@ import { SETTINGS_TABS } from '@renderer/constants/screen.constants'
 import { cn } from '@renderer/lib/utils'
 import { useState } from 'react'
 import ProfileSettings from './profile-settings'
+import { ProviderSettingsTab } from './provider-settings'
 
 /**
  * Settings page
  */
 function Settings(): React.JSX.Element {
   const [selectedTab, setSelectedTab] = useState<string>(SETTINGS_TABS[0].name)
+
+  // render tab content all tabs to be added here
+  const renderTabContent = () => {
+    switch (selectedTab) {
+      case 'Profile':
+        return <ProfileSettings />
+      case 'Providers':
+        return <ProviderSettingsTab />
+      default:
+        return <div className="text-2xl h-full w-full">In Progress</div>
+    }
+  }
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -42,11 +55,7 @@ function Settings(): React.JSX.Element {
             ))}
           </div>
         </div>
-        {/* all tab content go here */}
-        <div className="h-full w-full grow">
-          {selectedTab === 'Profile' && <ProfileSettings />}
-          {selectedTab !== 'Profile' && <div className="text-2xl h-full w-full">In Progress</div>}
-        </div>
+        <div className="h-full w-full grow">{renderTabContent()}</div>
       </div>
     </div>
   )
