@@ -93,3 +93,18 @@ export const SETTINGS_TABS = [
     icon: Shield
   }
 ] as const
+
+export const SPINNER_COLORS = [
+  '#fb7185', // rose-400
+  '#f43f5e', // rose-500
+  '#e11d48', // rose-600
+  '#db2777', // pink-600
+  '#c026d3', // fuchsia-600
+  '#9333ea', // purple-600
+  '#7c3aed', // violet-600
+  '#6d28d9', // violet-700
+  '#4f46e5', // indigo-600
+  '#4338ca', // indigo-700
+  '#3730a3', // indigo-800
+  '#312e81' // indigo-900
+]
