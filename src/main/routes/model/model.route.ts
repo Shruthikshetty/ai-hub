@@ -4,7 +4,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { internalServerErrorDocObject } from '../../constants/doc-constants'
-import { modelSchema } from '../../../common/schemas/model.schema'
+import { modelResponseSchema } from '../../../common/schemas/model.schema'
 
 // route to get all the list of models available
 export const getModels = createRoute({
@@ -16,7 +16,7 @@ export const getModels = createRoute({
     [HTTP_STATUS_CODES.OK]: {
       content: {
         'application/json': {
-          schema: modelSchema.array()
+          schema: modelResponseSchema
         }
       },
       description: 'Success response of get all models'

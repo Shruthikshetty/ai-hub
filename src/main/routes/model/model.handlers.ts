@@ -14,16 +14,19 @@ export const getModels: AppRouteHandler<GetModelsRoute> = async (c) => {
     headers: { Authorization: `Bearer ${process.env?.OPENAI_API_KEY}` }
   })
   return c.json(
-    response?.data?.data
-      ? response.data.data.map(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (model: any) => ({
-            id: model.id,
-            name: model?.name ?? model.id,
-            provider: 'openai'
-          })
-        )
-      : [],
+    {
+      success: true,
+      data: response?.data?.data
+        ? response.data.data.map(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (model: any) => ({
+              id: model.id,
+              name: model?.name ?? model.id,
+              provider: 'openai'
+            })
+          )
+        : []
+    },
     HTTP_STATUS_CODES.OK
   )
 }

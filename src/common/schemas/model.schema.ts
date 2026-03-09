@@ -15,5 +15,11 @@ export const modelSchema = z.object({
     .nullish()
 })
 
+export const modelResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(modelSchema)
+})
+
 // extract the type
 export type ModelSchemaType = z.infer<typeof modelSchema>
+export type ModelResponseSchemaType = z.infer<typeof modelResponseSchema>

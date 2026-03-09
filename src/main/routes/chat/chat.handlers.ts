@@ -10,7 +10,7 @@ import { openai, OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   // get the messages from request body
-  const { messages } = c.req.valid('json')
+  const { messages, model } = c.req.valid('json')
 
   // convert to core messages
   const coreMessages = await convertToModelMessages(messages)
@@ -24,10 +24,10 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
       HTTP_STATUS_CODES.BAD_REQUEST
     )
   }
-
+  console.log(model)
   // stream the response from ai model
   const result = streamText({
-    model: openai('gpt-5-mini'),
+    model: openai(model.id),
     messages: coreMessages,
     providerOptions: {
       openai: {

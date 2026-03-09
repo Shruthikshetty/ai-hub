@@ -2,7 +2,8 @@
  * This file contains all the query / mutation keys
  */
 export const QUERY_KEYS = {
-  userFetch: 'user-fetch'
+  userFetch: 'user-fetch',
+  modelsFetch: 'models-fetch'
 }
 
 export const MUTATION_KEYS = {
