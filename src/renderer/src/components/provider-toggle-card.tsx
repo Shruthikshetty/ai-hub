@@ -8,6 +8,7 @@ import { Separator } from './ui/separator'
 import { Switch } from './ui/switch'
 import { cn } from '@renderer/lib/utils'
 import { useUpdateProviderById } from '@renderer/services/provider'
+import { hiddenText } from '@renderer/lib/format.utils'
 
 export default function ProviderToggleCard({ provider }: { provider: ProviderGetSchema }) {
   const defaultValue = provider.server ? provider.serverUrl : provider.apiKey || ''
@@ -90,22 +91,28 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
             onChange={(e) => setValue(e.target.value)}
             id={`${provider.provider}-value`}
             disabled={!!provider?.enabled || isPending}
+            type={provider.server ? 'text' : 'password'}
           />
           <Separator className="mt-1" />
           {provider.enabled ? (
-            <div className="flex flex-row justify-between">
-              <p className="text-base">
+            <div className="flex flex-row justify-between items-start gap-4">
+              <p className="text-base break-all">
                 {provider.server ? (
-                  <>
+                  <span>
                     connected to : <b>{provider?.serverUrl}</b>
-                  </>
+                  </span>
                 ) : (
-                  <>
-                    connected using : <b>{provider?.apiKey}</b>
-                  </>
+                  <span>
+                    connected using :{' '}
+                    <b>{provider?.apiKey ? hiddenText(provider?.apiKey) : 'N/A'}</b>
+                  </span>
                 )}
               </p>
-              <Switch checked={!!provider.enabled} onCheckedChange={disableProvider} />
+              <Switch
+                className="shrink-0"
+                checked={!!provider.enabled}
+                onCheckedChange={disableProvider}
+              />
             </div>
           ) : (
             <div className="flex flex-row justify-start gap-2">

@@ -32,7 +32,7 @@ export const providersGetSchema = createSelectSchema(providers)
 // zod schema for inserting provider
 export const providersInsertSchema = createInsertSchema(providers, {
   provider: (field) => field.max(255).nullish(),
-  apiKey: (field) => field.max(1000).nullish(),
+  apiKey: (field) => field.max(10000).nullish(),
   description: (field) => field.max(5000).nullish(),
   serverUrl: (field) => field.max(1000).nullish(),
   name: (field) => field.max(255).nullish()

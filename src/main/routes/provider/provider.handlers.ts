@@ -8,6 +8,7 @@ import { GetProvidersRoute, PatchProviderByIdRoute } from './provider.routes'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { providers } from '../../db/schema'
 import { eq } from 'drizzle-orm'
+import { decryptText, encryptText } from '../../../common/utils/encryption.util'
 
 // handler to get all the list of providers
 export const getProviders: AppRouteHandler<GetProvidersRoute> = async (c) => {
@@ -29,7 +30,10 @@ export const getProviders: AppRouteHandler<GetProvidersRoute> = async (c) => {
   return c.json(
     {
       success: true,
-      data: providers
+      data: providers.map((provider) => ({
+        ...provider,
+        apiKey: provider.apiKey ? decryptText(provider.apiKey) : ''
+      }))
     },
     HTTP_STATUS_CODES.OK
   )
@@ -39,6 +43,11 @@ export const getProviders: AppRouteHandler<GetProvidersRoute> = async (c) => {
 export const patchProviderById: AppRouteHandler<PatchProviderByIdRoute> = async (c) => {
   // get the provider updated data
   const newData = c.req.valid('json')
+
+  // Encrypt the apiKey if it's being updated and is not empty
+  if (newData.apiKey) {
+    newData.apiKey = encryptText(newData.apiKey)
+  }
 
   // get the provider id from the params
   const { id } = c.req.param()

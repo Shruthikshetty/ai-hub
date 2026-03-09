@@ -21,6 +21,9 @@ export const EXT_TO_MIME: Record<string, string> = {
   ico: 'image/x-icon'
 }
 
+// For AES, this is always 16 bytes
+export const IV_LENGTH = 16
+
 //All Providers configured in app
 export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
   {
