@@ -16,12 +16,34 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
   // hook used to update provider
   const { mutate, isPending } = useUpdateProviderById()
 
+  // enable a provider
   const applySettings = () => {
-    // update the provider details
     mutate({
-      data: provider.server ? { serverUrl: value } : { apiKey: value },
+      data: {
+        enabled: true,
+        ...(provider.server ? { serverUrl: value } : { apiKey: value })
+      },
       id: provider.id
     })
+  }
+
+  // disable a provider
+  const disableProvider = () => {
+    mutate(
+      {
+        data: {
+          enabled: false,
+          apiKey: '',
+          serverUrl: ''
+        },
+        id: provider.id
+      },
+      {
+        onSuccess: () => {
+          setValue('')
+        }
+      }
+    )
   }
 
   return (
@@ -83,7 +105,7 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
                   </>
                 )}
               </p>
-              <Switch checked={!!provider.enabled} />
+              <Switch checked={!!provider.enabled} onCheckedChange={disableProvider} />
             </div>
           ) : (
             <div className="flex flex-row justify-start gap-2">
