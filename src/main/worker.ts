@@ -11,6 +11,7 @@ import { serve } from '@hono/node-server'
 import chat from './routes/chat/chat.index'
 import media from './routes/media/media.index'
 import model from './routes/model/model.index'
+import provider from './routes/provider/provider.index'
 
 import { runMigrations } from './db/migrate'
 import { seed } from './db/seed'
@@ -33,7 +34,7 @@ const migrationPromise =
 configureOpenApi(app)
 
 // all routes go here
-const routes = [base, profile, chat, media, model]
+const routes = [base, profile, chat, media, model, provider]
 
 routes.forEach((route) => {
   if (route === base) {

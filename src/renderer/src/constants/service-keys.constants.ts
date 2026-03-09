@@ -3,7 +3,8 @@
  */
 export const QUERY_KEYS = {
   userFetch: 'user-fetch',
-  modelsFetch: 'models-fetch'
+  modelsFetch: 'models-fetch',
+  providersFetch: 'providers-fetch'
 }
 
 export const MUTATION_KEYS = {
