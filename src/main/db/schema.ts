@@ -5,6 +5,7 @@
  */
 
 export * from '../../common/db-schemas/user.schema'
+export * from '../../common/db-schemas/provider.schema'
 
 // When you add more tables, just add more re-exports here:
 // export * from '../../common/db-schemas/messages.schema'
