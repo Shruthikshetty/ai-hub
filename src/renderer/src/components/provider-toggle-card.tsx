@@ -7,14 +7,21 @@ import { ProviderGetSchema } from '@common/db-schemas/provider.schema'
 import { Separator } from './ui/separator'
 import { Switch } from './ui/switch'
 import { cn } from '@renderer/lib/utils'
+import { useUpdateProviderById } from '@renderer/services/provider'
 
 export default function ProviderToggleCard({ provider }: { provider: ProviderGetSchema }) {
   const defaultValue = provider.server ? provider.serverUrl : provider.apiKey || ''
   // store the input
   const [value, setValue] = useState(defaultValue)
+  // hook used to update provider
+  const { mutate, isPending } = useUpdateProviderById()
 
   const applySettings = () => {
-    //inprogress
+    // update the provider details
+    mutate({
+      data: provider.server ? { serverUrl: value } : { apiKey: value },
+      id: provider.id
+    })
   }
 
   return (
@@ -60,7 +67,7 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
             value={value ?? ''}
             onChange={(e) => setValue(e.target.value)}
             id={`${provider.provider}-value`}
-            disabled={!!provider?.enabled}
+            disabled={!!provider?.enabled || isPending}
           />
           <Separator className="mt-1" />
           {provider.enabled ? (
@@ -88,6 +95,7 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
                 onClick={() => {
                   setValue(defaultValue)
                 }}
+                disabled={isPending}
               >
                 Reset
               </Button>

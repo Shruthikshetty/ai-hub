@@ -4,7 +4,9 @@ import * as handlers from './provider.handlers'
 import * as routes from './provider.routes'
 
 // create the router
-const router = createRouter().openapi(routes.getProviders, handlers.getProviders)
+const router = createRouter()
+  .openapi(routes.getProviders, handlers.getProviders)
+  .openapi(routes.patchProviderById, handlers.patchProviderById)
 
 //export the router
 export default router

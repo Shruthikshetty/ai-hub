@@ -7,5 +7,12 @@ export const fetchAllProvidersResponseSchema = z.object({
   data: providersGetSchema.array()
 })
 
+// response schema for patching a single provider
+export const patchProviderResponseSchema = z.object({
+  success: z.boolean(),
+  data: providersGetSchema
+})
+
 //extract the type
 export type fetchAllProvidersResponseSchemaType = z.infer<typeof fetchAllProvidersResponseSchema>
+export type patchProviderResponseSchemaType = z.infer<typeof patchProviderResponseSchema>

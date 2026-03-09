@@ -4,8 +4,10 @@
 
 import db from '../../db'
 import { AppRouteHandler } from '../../types'
-import { GetProvidersRoute } from './provider.routes'
+import { GetProvidersRoute, PatchProviderByIdRoute } from './provider.routes'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
+import { providers } from '../../db/schema'
+import { eq } from 'drizzle-orm'
 
 // handler to get all the list of providers
 export const getProviders: AppRouteHandler<GetProvidersRoute> = async (c) => {
@@ -28,6 +30,42 @@ export const getProviders: AppRouteHandler<GetProvidersRoute> = async (c) => {
     {
       success: true,
       data: providers
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+// handler to update provider by id
+export const patchProviderById: AppRouteHandler<PatchProviderByIdRoute> = async (c) => {
+  // get the provider updated data
+  const newData = c.req.valid('json')
+
+  // get the provider id from the params
+  const { id } = c.req.param()
+
+  // update the provider in db
+  const [updatedProvider] = await db
+    .update(providers)
+    .set(newData)
+    .where(eq(providers.id, Number(id)))
+    .returning()
+
+  // if provider is not found
+  if (!updatedProvider) {
+    return c.json(
+      {
+        success: false,
+        message: 'Provider not found'
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+
+  // return the updated provider
+  return c.json(
+    {
+      success: true,
+      data: updatedProvider
     },
     HTTP_STATUS_CODES.OK
   )

@@ -24,7 +24,7 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
       HTTP_STATUS_CODES.BAD_REQUEST
     )
   }
-  console.log(model)
+
   // stream the response from ai model
   const result = streamText({
     model: openai(model.id),

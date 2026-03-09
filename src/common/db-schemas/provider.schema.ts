@@ -42,7 +42,7 @@ export const providersInsertSchema = createInsertSchema(providers, {
   updatedAt: true
 })
 // zod schema for updating the provider table
-export const providerPatchTable = providersInsertSchema.partial()
+export const providerPatchSchema = providersInsertSchema.partial()
 
 //export types
 export type ProviderGetSchema = z.infer<typeof providersGetSchema>
