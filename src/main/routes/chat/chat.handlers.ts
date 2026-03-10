@@ -5,12 +5,13 @@ import { StreamChatRoute } from './chat.routes'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { convertToModelMessages, streamText } from 'ai'
-import { openai, OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
+import { OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
+import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   // get the messages from request body
-  const { messages } = c.req.valid('json')
+  const { messages, model } = c.req.valid('json')
 
   // convert to core messages
   const coreMessages = await convertToModelMessages(messages)
@@ -25,9 +26,12 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
     )
   }
 
+  // const get the provider as per user model
+  const modelProvider = await getProviderInstanceModel({ model })
+
   // stream the response from ai model
   const result = streamText({
-    model: openai('gpt-5-mini'),
+    model: modelProvider(model.id),
     messages: coreMessages,
     providerOptions: {
       openai: {

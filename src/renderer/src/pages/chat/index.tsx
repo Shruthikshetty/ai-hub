@@ -3,11 +3,6 @@ import {
   PromptInputBody,
   PromptInputFooter,
   PromptInputMessage,
-  PromptInputSelect,
-  PromptInputSelectContent,
-  PromptInputSelectItem,
-  PromptInputSelectTrigger,
-  PromptInputSelectValue,
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTools
@@ -24,22 +19,8 @@ import {
 import { AppUIMessage } from '@common/schemas/messages'
 import MessageParts from '@renderer/components/message-parts'
 import ChatStarter from './chat-starter'
-
-// to be removed
-const models = [
-  {
-    id: 'gpt-4o-mini',
-    name: 'GPT-4o-mini'
-  },
-  {
-    id: 'gpt-4o',
-    name: 'GPT-4o'
-  },
-  {
-    id: 'gpt-4.1',
-    name: 'GPT-4.1'
-  }
-]
+import AppModelSelector from '@renderer/components/model-selector'
+import useSelectedModel from '@renderer/state-management/use-selected-model'
 
 // stable transport instance
 const chatTransport = createIPCStreamTransport('/api/chat')
@@ -47,17 +28,23 @@ const chatTransport = createIPCStreamTransport('/api/chat')
 // this is the chat page contains all the chat interface
 const ChatPage = () => {
   const [text, setText] = useState('')
-  const [model, setModel] = useState('gpt-4o-mini')
-
+  const selectedModel = useSelectedModel((state) => state.model)
   const { messages, sendMessage, error, status } = useChat<AppUIMessage>({
     transport: chatTransport
   })
 
   const handleSubmit = (message: PromptInputMessage) => {
-    if (!message.text.trim()) return
-    sendMessage({
-      text: message.text
-    })
+    if (!message.text.trim() || !selectedModel?.id) return
+    sendMessage(
+      {
+        text: message.text
+      },
+      {
+        body: {
+          model: selectedModel
+        }
+      }
+    )
     // clear our input
     setText('')
   }
@@ -100,27 +87,13 @@ const ChatPage = () => {
         <PromptInputFooter>
           {/* All tools go here */}
           <PromptInputTools>
-            {/*@TODO dummy selector for model later to be changed */}
-            <PromptInputSelect
-              onValueChange={(value) => {
-                setModel(value)
-              }}
-              value={model}
-            >
-              <PromptInputSelectTrigger>
-                <PromptInputSelectValue />
-              </PromptInputSelectTrigger>
-              <PromptInputSelectContent>
-                {models.map((model) => (
-                  <PromptInputSelectItem key={model.id} value={model.id}>
-                    {model.name}
-                  </PromptInputSelectItem>
-                ))}
-              </PromptInputSelectContent>
-            </PromptInputSelect>
+            <AppModelSelector output="text" />
           </PromptInputTools>
           {/* submit button */}
-          <PromptInputSubmit disabled={!text.trim() || status === 'submitted'} status={status} />
+          <PromptInputSubmit
+            disabled={!text.trim() || status === 'submitted' || !selectedModel?.id}
+            status={status}
+          />
         </PromptInputFooter>
       </PromptInput>
     </div>

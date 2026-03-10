@@ -58,7 +58,7 @@ function ProfileSettings() {
     // Reset the input value so the same file can be selected again
     e.target.value = ''
 
-    if (!file || mediaUploadPending || mediaUploadPending) return
+    if (!file || mediaUploadPending) return
     // upload the to storage
     uploadMedia(
       { file, category: FILE_STORAGE_CATEGORY.profileImg },
