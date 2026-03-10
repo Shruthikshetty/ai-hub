@@ -107,6 +107,7 @@ export async function getModelListFromProvider(
     }
 
     // map the response to standard format as per the provider
+    // @TODO catch the data and then access from db
     if (response?.data?.data) {
       switch (provider.provider) {
         case 'openai':
