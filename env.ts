@@ -15,7 +15,7 @@ expand(
 const EnvSchema = z.object({
   PORT: z.coerce.number().default(3000),
   NODE_ENV: z.string().default('development'),
-  DATABASE_URL: z.url('').default('file:dev.db'),
+  DATABASE_URL: z.url().default('file:dev.db'),
   ENCRYPTION_KEY: z.string()
 })
 

@@ -6,7 +6,7 @@ import db from '../../db'
 import { AppRouteHandler } from '../../types'
 import { GetProvidersRoute, PatchProviderByIdRoute } from './provider.routes'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { providers } from '../../db/schema'
+import { providers as providerSchema } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { decryptText, encryptText } from '../../../common/utils/encryption.util'
 
@@ -54,9 +54,9 @@ export const patchProviderById: AppRouteHandler<PatchProviderByIdRoute> = async 
 
   // update the provider in db
   const [updatedProvider] = await db
-    .update(providers)
+    .update(providerSchema)
     .set(newData)
-    .where(eq(providers.id, Number(id)))
+    .where(eq(providerSchema.id, Number(id)))
     .returning()
 
   // if provider is not found

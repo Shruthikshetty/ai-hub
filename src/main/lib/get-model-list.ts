@@ -21,7 +21,7 @@ function inferOpenAiCapabilities(modelId: string): Partial<ModelSchemaType> {
   const isVideo = modelId.includes('sora')
 
   // Vision inputs for newer multimodal textual models NOTE: this might not be accurate
-  const isVison =
+  const isVision =
     modelId.includes('vision') ||
     modelId.startsWith('gpt-4o') ||
     modelId.startsWith('o1') ||
@@ -31,7 +31,7 @@ function inferOpenAiCapabilities(modelId: string): Partial<ModelSchemaType> {
   const outputs: ModelIOType[] = []
 
   // Set Inputs
-  if (isVison) inputs.push('image')
+  if (isVision) inputs.push('image')
   if (isWhisper) {
     // Whisper takes audio and returns text
     inputs.push('audio')
@@ -63,7 +63,7 @@ function inferOpenAiCapabilities(modelId: string): Partial<ModelSchemaType> {
     inputs,
     outputs,
     capabilities: {
-      vision: isVison,
+      vision: isVision,
       videoReasoning: false, // @ TODO No clear distinction for now
       realtime: modelId.includes('realtime')
     }

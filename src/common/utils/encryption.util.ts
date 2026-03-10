@@ -49,7 +49,7 @@ export function decryptText(text: string): string {
 
     return decrypted.toString('utf8')
   } catch (error) {
-    console.error('Failed to decrypt text:', error, text)
+    console.error('Failed to decrypt text:', error)
     // If decryption fails (e.g., text wasn't encrypted), return the original text
     // This provides backward compatibility if the database currently has unencrypted keys
     return text
