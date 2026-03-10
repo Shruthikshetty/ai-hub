@@ -87,7 +87,7 @@ const ChatPage = () => {
         <PromptInputFooter>
           {/* All tools go here */}
           <PromptInputTools>
-            <AppModelSelector />
+            <AppModelSelector output="text" />
           </PromptInputTools>
           {/* submit button */}
           <PromptInputSubmit disabled={!text.trim() || status === 'submitted'} status={status} />

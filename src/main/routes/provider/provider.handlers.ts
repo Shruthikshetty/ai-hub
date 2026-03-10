@@ -50,7 +50,7 @@ export const patchProviderById: AppRouteHandler<PatchProviderByIdRoute> = async 
   }
 
   // get the provider id from the params
-  const { id } = c.req.param()
+  const { id } = c.req.valid('param')
 
   // update the provider in db
   const [updatedProvider] = await db

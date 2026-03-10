@@ -156,9 +156,7 @@
       "indexes": {
         "providers_provider_unique": {
           "name": "providers_provider_unique",
-          "columns": [
-            "provider"
-          ],
+          "columns": ["provider"],
           "isUnique": true
         }
       },

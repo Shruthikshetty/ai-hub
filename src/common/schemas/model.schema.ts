@@ -1,11 +1,13 @@
 import { z } from 'zod'
 
+export const ModelIOSchema = z.enum(['text', 'image', 'audio', 'video', 'embedding', 'realtime'])
+
 export const modelSchema = z.object({
   id: z.string(),
   name: z.string(),
   provider: z.string().default('unknown'),
-  inputs: z.array(z.string()).default(['text']),
-  outputs: z.array(z.string()).default(['text']),
+  inputs: z.array(ModelIOSchema).default(['text']),
+  outputs: z.array(ModelIOSchema).default(['text']),
   capabilities: z
     .object({
       vision: z.boolean().nullish(),
@@ -23,3 +25,4 @@ export const modelResponseSchema = z.object({
 // extract the type
 export type ModelSchemaType = z.infer<typeof modelSchema>
 export type ModelResponseSchemaType = z.infer<typeof modelResponseSchema>
+export type ModelIOType = z.infer<typeof ModelIOSchema>

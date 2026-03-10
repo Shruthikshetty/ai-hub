@@ -14,14 +14,15 @@ import { PromptInputButton } from './ai-elements/prompt-input'
 import ModelItem from './model-item'
 import { useFetchModels } from '@renderer/services/model'
 import useSelectedModel from '@renderer/state-management/use-selected-model'
+import { ModelIOType } from '@common/schemas/model.schema'
 
-// provider list
+// @TODO remove this
 const chefList = ['openai', 'ollama', 'openrouter']
 
 // lets you select the various models from all the available providers
-function AppModelSelector() {
+function AppModelSelector({ output }: { output?: ModelIOType }) {
   // fetch all the model list
-  const { data: modelsData } = useFetchModels()
+  const { data: modelsData } = useFetchModels({ output })
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
   // selected model
   const { model, setModel } = useSelectedModel()
