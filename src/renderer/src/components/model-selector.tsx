@@ -15,12 +15,11 @@ import ModelItem from './model-item'
 import { useFetchModels } from '@renderer/services/model'
 import useSelectedModel from '@renderer/state-management/use-selected-model'
 import { ModelIOType } from '@common/schemas/model.schema'
-
-// @TODO remove this
-const chefList = ['openai', 'ollama', 'openrouter']
+import { AVAILABLE_PROVIDER_LIST } from '@common/constants/global.constants'
 
 // lets you select the various models from all the available providers
 function AppModelSelector({ output }: { output?: ModelIOType }) {
+  //@TODO show error message if no models are not loaded
   // fetch all the model list
   const { data: modelsData } = useFetchModels({ output })
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
@@ -48,7 +47,7 @@ function AppModelSelector({ output }: { output?: ModelIOType }) {
         <ModelSelectorInput placeholder="Search models..." />
         <ModelSelectorList>
           <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
-          {chefList.map((chef) => (
+          {AVAILABLE_PROVIDER_LIST.map((chef) => (
             <ModelSelectorGroup heading={chef} key={chef}>
               {modelsData?.data
                 ?.filter((m) => m.provider === chef)

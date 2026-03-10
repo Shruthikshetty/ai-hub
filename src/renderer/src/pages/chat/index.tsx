@@ -21,6 +21,9 @@ import MessageParts from '@renderer/components/message-parts'
 import ChatStarter from './chat-starter'
 import AppModelSelector from '@renderer/components/model-selector'
 import useSelectedModel from '@renderer/state-management/use-selected-model'
+import ChatConversationsHistory from './conversation-panal'
+import { ResizablePanel, ResizablePanelGroup } from '@renderer/components/ui/resizable'
+import PanelTrigger from '@renderer/components/panel-tigger'
 
 // stable transport instance
 const chatTransport = createIPCStreamTransport('/api/chat')
@@ -32,6 +35,8 @@ const ChatPage = () => {
   const { messages, sendMessage, error, status } = useChat<AppUIMessage>({
     transport: chatTransport
   })
+  const [conversationPanelOpen, setConversationPanelOpen] = useState(true)
+  console.log(conversationPanelOpen)
 
   const handleSubmit = (message: PromptInputMessage) => {
     if (!message.text.trim() || !selectedModel?.id) return
@@ -50,53 +55,61 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-full w-full p-5 md:p-10">
-      {/* starter prompts */}
-      {messages.length === 0 ? (
-        <ChatStarter
-          onSelect={(prompt) => {
-            setText(prompt)
-          }}
-        />
-      ) : null}
-      {/* All the conversations go here */}
-      <Conversation>
-        <ConversationContent>
-          {messages.map((message, index) => (
-            <Message key={message.id} from={message.role}>
-              <MessageContent>
-                <MessageParts
-                  message={message}
-                  status={status}
-                  isLastMessage={index === messages.length - 1}
-                />
-              </MessageContent>
-              <ConversationScrollButton />
-            </Message>
-          ))}
-        </ConversationContent>
-      </Conversation>
-      {error && error.message && <p className="text-red-500 text-center">{error.message}</p>}
-      {/* Prompt inputs go here */}
-      <PromptInput onSubmit={handleSubmit} className="mt-4">
-        {/* BODY  */}
-        <PromptInputBody>
-          <PromptInputTextarea onChange={(e) => setText(e.target.value)} value={text} />
-        </PromptInputBody>
-        {/* FOOTER */}
-        <PromptInputFooter>
-          {/* All tools go here */}
-          <PromptInputTools>
-            <AppModelSelector output="text" />
-          </PromptInputTools>
-          {/* submit button */}
-          <PromptInputSubmit
-            disabled={!text.trim() || status === 'submitted' || !selectedModel?.id}
-            status={status}
-          />
-        </PromptInputFooter>
-      </PromptInput>
-    </div>
+    <ResizablePanelGroup className="flex flex-row h-full w-full">
+      {/* left side conversations tray */}
+      <ChatConversationsHistory isOpen={conversationPanelOpen} />
+      {/*  main chat interface */}
+      <ResizablePanel className="flex flex-col h-full w-full">
+        <PanelTrigger value={conversationPanelOpen} toggle={setConversationPanelOpen} />
+        <div className="flex flex-col p-5 md:p-10 h-full">
+          {/* starter prompts */}
+          {messages.length === 0 ? (
+            <ChatStarter
+              onSelect={(prompt) => {
+                setText(prompt)
+              }}
+            />
+          ) : null}
+          {/* All the conversations go here */}
+          <Conversation>
+            <ConversationContent>
+              {messages.map((message, index) => (
+                <Message key={message.id} from={message.role}>
+                  <MessageContent>
+                    <MessageParts
+                      message={message}
+                      status={status}
+                      isLastMessage={index === messages.length - 1}
+                    />
+                  </MessageContent>
+                  <ConversationScrollButton />
+                </Message>
+              ))}
+            </ConversationContent>
+          </Conversation>
+          {error && error.message && <p className="text-red-500 text-center">{error.message}</p>}
+          {/* Prompt inputs go here */}
+          <PromptInput onSubmit={handleSubmit} className="mt-4">
+            {/* BODY  */}
+            <PromptInputBody>
+              <PromptInputTextarea onChange={(e) => setText(e.target.value)} value={text} />
+            </PromptInputBody>
+            {/* FOOTER */}
+            <PromptInputFooter>
+              {/* All tools go here */}
+              <PromptInputTools>
+                <AppModelSelector output="text" />
+              </PromptInputTools>
+              {/* submit button */}
+              <PromptInputSubmit
+                disabled={!text.trim() || status === 'submitted' || !selectedModel?.id}
+                status={status}
+              />
+            </PromptInputFooter>
+          </PromptInput>
+        </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   )
 }
 
