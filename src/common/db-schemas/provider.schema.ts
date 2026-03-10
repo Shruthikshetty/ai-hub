@@ -10,7 +10,7 @@ import { z } from 'zod'
 //providers table
 export const providers = sqliteTable('providers', {
   id: integer().primaryKey({ autoIncrement: true }),
-  provider: text().unique(),
+  provider: text().unique().notNull(),
   name: text(),
   apiKey: text(),
   description: text(),
@@ -31,7 +31,7 @@ export const providers = sqliteTable('providers', {
 export const providersGetSchema = createSelectSchema(providers)
 // zod schema for inserting provider
 export const providersInsertSchema = createInsertSchema(providers, {
-  provider: (field) => field.max(255).nullish(),
+  provider: (field) => field.max(255),
   apiKey: (field) => field.max(10000).nullish(),
   description: (field) => field.max(5000).nullish(),
   serverUrl: (field) => field.max(1000).nullish(),
@@ -46,4 +46,4 @@ export const providerPatchSchema = providersInsertSchema.partial()
 
 //export types
 export type ProviderGetSchema = z.infer<typeof providersGetSchema>
-export type ProviderPatchSchema = z.infer<typeof providersInsertSchema>
+export type ProviderPatchSchema = z.infer<typeof providerPatchSchema>

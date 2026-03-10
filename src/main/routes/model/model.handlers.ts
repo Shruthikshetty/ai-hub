@@ -4,41 +4,29 @@
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { GetModelsRoute } from './model.route'
-import axios from 'axios'
 import db from '../../db'
-import { decryptText } from '../../../common/utils/encryption.util'
+import { getModelListFromProvider } from '../../lib/get-model-list'
 
 // handler to get all the list of models available
 export const getModels: AppRouteHandler<GetModelsRoute> = async (c) => {
-  // Fetch openai provider from db
-  const openaiProvider = await db.query.providers.findFirst({
-    where: (providers, { eq }) => eq(providers.provider, 'openai')
+  // get all the providers that are enabled
+  const enabledProviders = await db.query.providers.findMany({
+    where: (providers, { eq }) => eq(providers.enabled, true)
   })
 
-  // decrypt the api key if one exists
-  let apiKey = ''
-  if (openaiProvider?.apiKey) {
-    apiKey = decryptText(openaiProvider.apiKey)
-  }
-
-  //@TODO THIS IS TEMP FOR UI TESTING
-  // fetch open ai models from https://api.openai.com/v1/models
-  const response = await axios.get('https://api.openai.com/v1/models', {
-    headers: { Authorization: `Bearer ${apiKey}` }
+  // map over providers and fetch the model list concurrently
+  const modelPromises = enabledProviders.map(async (provider) => {
+    return await getModelListFromProvider(provider)
   })
+
+  // wait for all promises to resolve and flatten the array
+  const nestedModels = await Promise.all(modelPromises)
+  const models = nestedModels.flat()
+
   return c.json(
     {
       success: true,
-      data: response?.data?.data
-        ? response.data.data.map(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (model: any) => ({
-              id: model.id,
-              name: model?.name ?? model.id,
-              provider: 'openai'
-            })
-          )
-        : []
+      data: models
     },
     HTTP_STATUS_CODES.OK
   )

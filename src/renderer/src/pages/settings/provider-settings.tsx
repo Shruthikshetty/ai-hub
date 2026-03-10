@@ -7,7 +7,6 @@ import { useFetchProviders } from '@renderer/services/provider'
 export function ProviderSettingsTab() {
   //  get all the providers from qpi
   const { data: providers } = useFetchProviders()
-
   return (
     <div className="h-full w-full px-[5%] py-5 flex flex-col gap-5">
       {providers?.data.map((provider) => (

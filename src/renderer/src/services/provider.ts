@@ -43,7 +43,6 @@ export function useUpdateProviderById() {
     mutationKey: [MUTATION_KEYS.providerUpdateById],
     mutationFn: async ({ id, data }): Promise<patchProviderResponseSchemaType> => {
       const response = await window.api.request('/api/providers/' + id, 'PATCH', data)
-      console.log(response)
       if (!response.success) {
         throw response
       }

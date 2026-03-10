@@ -34,7 +34,7 @@ const ChatPage = () => {
   })
 
   const handleSubmit = (message: PromptInputMessage) => {
-    if (!message.text.trim()) return
+    if (!message.text.trim() || !selectedModel?.id) return
     sendMessage(
       {
         text: message.text

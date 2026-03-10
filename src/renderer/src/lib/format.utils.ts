@@ -1,12 +1,19 @@
 /**
  * Formats a string to be partially hidden (e.g., "sk-a...5f21")
  */
-export const hiddenText = (str: string, maxVisibleLength: number = 8) => {
+export const hiddenText = (
+  str: string,
+  maxVisibleLength: number = 8,
+  minHiddenLength: number = 4
+) => {
   if (!str) return ''
-  if (str.length <= maxVisibleLength) return '********' // Too short to safely show parts
 
-  const start = str.slice(0, 4)
-  const end = str.slice(-4)
+  // handle smaller text
+  const visiblePerSide = Math.floor(maxVisibleLength / 2)
+  if (str.length <= maxVisibleLength + minHiddenLength) return '********'
+
+  const start = str.slice(0, visiblePerSide)
+  const end = str.slice(-visiblePerSide)
 
   return `${start}••••••••${end}`
 }

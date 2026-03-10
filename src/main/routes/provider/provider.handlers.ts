@@ -16,7 +16,7 @@ export const getProviders: AppRouteHandler<GetProvidersRoute> = async (c) => {
   const providers = await db.query.providers.findMany()
 
   // incases no providers found (this should not happen still keeping here n case the providers are ot seeded properly)
-  if (!providers) {
+  if (!providers.length) {
     return c.json(
       {
         success: false,
@@ -32,7 +32,7 @@ export const getProviders: AppRouteHandler<GetProvidersRoute> = async (c) => {
       success: true,
       data: providers.map((provider) => ({
         ...provider,
-        apiKey: provider.apiKey ? decryptText(provider.apiKey) : ''
+        apiKey: provider?.apiKey ? decryptText(provider.apiKey) : ''
       }))
     },
     HTTP_STATUS_CODES.OK

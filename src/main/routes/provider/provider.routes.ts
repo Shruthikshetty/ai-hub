@@ -2,7 +2,7 @@
  * @file contains all the routes related to provider with Zod Open Api support
  */
 
-import { createRoute } from '@hono/zod-openapi'
+import { createRoute, z } from '@hono/zod-openapi'
 import {
   fetchAllProvidersResponseSchema,
   patchProviderResponseSchema
@@ -34,10 +34,21 @@ export const getProviders = createRoute({
 // route to patch a provider by id
 export const patchProviderById = createRoute({
   method: 'patch',
-  path: '/providers/:id',
+  path: '/providers/{id}',
   description: 'Update provider by id',
   tags: ['Provider'],
   request: {
+    params: z.object({
+      id: z.coerce.number().openapi({
+        param: {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'provider id'
+        },
+        example: 2
+      })
+    }),
     body: {
       required: true,
       content: {
