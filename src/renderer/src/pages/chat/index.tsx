@@ -57,7 +57,10 @@ const ChatPage = () => {
   return (
     <ResizablePanelGroup className="flex flex-row h-full w-full">
       {/* left side conversations tray */}
-      <ChatConversationsHistory isOpen={conversationPanelOpen} />
+      <ChatConversationsHistory
+        isOpen={conversationPanelOpen}
+        setIsOpen={setConversationPanelOpen}
+      />
       {/*  main chat interface */}
       <ResizablePanel className="flex flex-col h-full w-full">
         <PanelTrigger value={conversationPanelOpen} toggle={setConversationPanelOpen} />
