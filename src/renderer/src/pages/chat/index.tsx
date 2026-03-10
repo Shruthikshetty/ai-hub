@@ -22,7 +22,11 @@ import ChatStarter from './chat-starter'
 import AppModelSelector from '@renderer/components/model-selector'
 import useSelectedModel from '@renderer/state-management/use-selected-model'
 import ChatConversationsHistory from './conversation-panal'
-import { ResizablePanel, ResizablePanelGroup } from '@renderer/components/ui/resizable'
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup
+} from '@renderer/components/ui/resizable'
 import PanelTrigger from '@renderer/components/panel-tigger'
 
 // stable transport instance
@@ -55,12 +59,13 @@ const ChatPage = () => {
   }
 
   return (
-    <ResizablePanelGroup className="flex flex-row h-full w-full">
+    <ResizablePanelGroup className="flex flex-row h-full w-full" orientation="horizontal">
       {/* left side conversations tray */}
       <ChatConversationsHistory
         isOpen={conversationPanelOpen}
         setIsOpen={setConversationPanelOpen}
       />
+      <ResizableHandle withHandle />
       {/*  main chat interface */}
       <ResizablePanel className="flex flex-col h-full w-full">
         <PanelTrigger value={conversationPanelOpen} toggle={setConversationPanelOpen} />

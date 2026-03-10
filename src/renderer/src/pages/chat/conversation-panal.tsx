@@ -36,10 +36,10 @@ const ChatConversationsHistory = ({
           setIsOpen(true)
         }
       }}
-      className={`bg-sidebar border-white/10 transition-all ${isOpen ? 'border-r' : ''}`}
-      defaultSize={150}
+      className={`bg-sidebar border-white/10 transition-all`}
+      defaultSize={'20%'}
       minSize={0}
-      maxSize={300}
+      maxSize={'33%'}
     >
       <div
         className={`flex flex-col h-full p-4 transition-opacity duration-200 ${!isOpen ? 'opacity-0 overflow-hidden' : 'opacity-100'}`}
