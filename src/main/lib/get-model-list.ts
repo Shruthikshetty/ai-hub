@@ -3,7 +3,14 @@ import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType } from '../../common/schemas/model.schema'
 
-//@TODO in progress with type safety and proper data extraction
+// types
+type OpenAiModel = {
+  id: string
+  object: string
+  created: number
+  owned_by: string
+}
+
 /**
  * This function fetches and return the list of models for a given provider
  * @param provider ProviderGetSchema
@@ -22,7 +29,7 @@ export async function getModelListFromProvider(
     // handel the fetching logic separately for all the providers
     switch (provider.provider) {
       case 'openai':
-        response = await axios.get('https://api.openai.com/v1/models', {
+        response = await axios.get<OpenAiModel>('https://api.openai.com/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 15000 //15 seconds
         })
@@ -30,10 +37,12 @@ export async function getModelListFromProvider(
       default:
         // For other providers (like ollama) or generic OpenAI-compatible endpoints
         if (provider.serverUrl) {
-          response = await axios.get(`${provider.serverUrl}/v1/models`, {
+          response = await axios.get<OpenAiModel>(`${provider.serverUrl}/v1/models`, {
             headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
             timeout: 15000 //15 seconds
           })
+
+          console.log(response.data)
         } else {
           return []
         }
@@ -44,15 +53,15 @@ export async function getModelListFromProvider(
     if (response?.data?.data) {
       switch (provider.provider) {
         case 'openai':
-          return response.data.data.map((model: { id: string; name?: string }) => ({
+          return response.data.data.map((model: OpenAiModel) => ({
             id: model.id,
-            name: model?.name ?? model.id,
+            name: model.id,
             provider: provider.provider
           }))
         default:
-          return response.data.data.map((model: { id: string; name?: string }) => ({
+          return response.data.data.map((model: OpenAiModel) => ({
             id: model.id,
-            name: model?.name ?? model.id,
+            name: model.id,
             provider: provider.provider
           }))
       }

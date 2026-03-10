@@ -48,10 +48,13 @@ export function useUpdateProviderById() {
       }
       return response
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       successToast('Provider updated successfully')
       // invalidate the providers query
-      return queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.providersFetch] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.modelsFetch] }),
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.providersFetch] })
+      ])
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to update provider')
