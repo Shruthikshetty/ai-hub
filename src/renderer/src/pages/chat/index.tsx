@@ -20,7 +20,7 @@ import { AppUIMessage } from '@common/schemas/messages'
 import MessageParts from '@renderer/components/message-parts'
 import ChatStarter from './chat-starter'
 import AppModelSelector from '@renderer/components/model-selector'
-import useSelectedModel from '@renderer/state-management/use-selected-model'
+import useSelectedModel from '@renderer/state-management/selected-model.store'
 import ChatConversationsHistory from './conversation-panel'
 import {
   ResizableHandle,

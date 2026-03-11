@@ -10,7 +10,8 @@ import {
   useFetchConversations
 } from '@renderer/services/conversation'
 import { formatRelativeDateLabel } from '@renderer/lib/date.utils'
-import useSelectedModel from '@renderer/state-management/use-selected-model'
+import useSelectedModel from '@renderer/state-management/selected-model.store'
+import useSelectedConversation from '@renderer/state-management/selected-conversation.store'
 
 /**
  * This component contain the history of all the conversations
@@ -32,6 +33,8 @@ const ChatConversationsHistory = ({
   const { mutate: deleteConversation } = useDeleteConversationById()
   // get selected model
   const selectedModel = useSelectedModel((state) => state.model)
+  // get selected conversation
+  const setSelectedConversation = useSelectedConversation((state) => state.setConversation)
 
   // handel the toggle state
   useEffect(() => {
@@ -104,7 +107,13 @@ const ChatConversationsHistory = ({
           <div className="flex flex-col overflow-auto">
             {conversations?.data?.map((conversation) => (
               <div key={conversation.id} className="relative group w-full">
-                <button className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all pr-8">
+                <button
+                  className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all pr-8"
+                  aria-label="select chat"
+                  onClick={() => {
+                    setSelectedConversation(conversation)
+                  }}
+                >
                   <div className="px-3 pb-1 flex flex-col gap-0.5">
                     <p className="text-foreground text-sm font-medium line-clamp-2 overflow-hidden text-start">
                       {conversation.title}

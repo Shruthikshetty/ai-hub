@@ -13,7 +13,7 @@ import {
 import { PromptInputButton } from './ai-elements/prompt-input'
 import ModelItem from './model-item'
 import { useFetchModels } from '@renderer/services/model'
-import useSelectedModel from '@renderer/state-management/use-selected-model'
+import useSelectedModel from '@renderer/state-management/selected-model.store'
 import { ModelIOType } from '@common/schemas/model.schema'
 import { AVAILABLE_PROVIDER_LIST } from '@common/constants/global.constants'
 
