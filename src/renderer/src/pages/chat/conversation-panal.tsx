@@ -1,6 +1,9 @@
 import { ResizablePanel } from '@renderer/components/ui/resizable'
 import { PanelImperativeHandle } from 'react-resizable-panels'
 import { useRef, useEffect } from 'react'
+import { Separator } from '@renderer/components/ui/separator'
+import { Button } from '@renderer/components/ui/button'
+import { Plus } from 'lucide-react'
 
 /**
  * This component contain the history of all the conversations
@@ -42,12 +45,46 @@ const ChatConversationsHistory = ({
       maxSize={'33%'}
     >
       <div
-        className={`flex flex-col h-full p-4 transition-opacity duration-200 ${!isOpen ? 'opacity-0 overflow-hidden' : 'opacity-100'}`}
+        className={`flex flex-col h-full transition-opacity duration-200 justify-between ${!isOpen ? 'opacity-0 overflow-hidden' : 'opacity-100'}`}
       >
-        <div className="flex justify-between items-center mb-4 text-[10px] font-bold text-gray-500">
-          HISTORY
+        {/* Header */}
+        <div className="overflow-hidden">
+          <h1 className="text-foreground/80 font-semibold p-4">HISTORY</h1>
+          <Separator />
         </div>
-        {/* Chat History List */}
+        {/* Message list */}
+        <div className="flex-1 overflow-auto ">
+          {/* New chat button */}
+          <div className="p-3">
+            <Button className="w-full bg-foreground/20 text-foreground transition-all active:scale-95 overflow-hidden">
+              <Plus />
+              New chat
+            </Button>
+          </div>
+          <Separator />
+          {/* All the conversations go here */}
+          <div className="flex flex-col overflow-auto">
+            <button className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all">
+              <div className="px-3 pb-1  flex flex-col gap-0.5">
+                <p className="text-foreground text-sm font-medium line-clamp-2 overflow-hidden">
+                  New Chat
+                </p>
+                <p className="text-xs text-muted-foreground">2026-03-11</p>
+              </div>
+              <Separator />
+            </button>
+          </div>
+        </div>
+        {/* Footer */}
+        <div className="overflow-hidden">
+          <Separator />
+          <Button
+            variant={'ghost'}
+            className="text-muted-foreground hover:bg-transparent! text-xs p-4 text-center w-full"
+          >
+            Clear all history
+          </Button>
+        </div>
       </div>
     </ResizablePanel>
   )
