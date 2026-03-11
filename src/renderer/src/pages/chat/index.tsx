@@ -68,7 +68,7 @@ const ChatPage = () => {
       {/*  main chat interface */}
       <ResizablePanel className="flex flex-col h-full w-full">
         <PanelTrigger value={conversationPanelOpen} toggle={setConversationPanelOpen} />
-        <div className="flex flex-col p-5 md:p-10 h-full">
+        <div className="flex flex-col p-5 md:p-10 flex-1 overflow-hidden">
           {/* starter prompts */}
           {messages.length === 0 ? (
             <ChatStarter
