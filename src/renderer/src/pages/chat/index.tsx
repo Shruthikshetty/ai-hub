@@ -40,7 +40,6 @@ const ChatPage = () => {
     transport: chatTransport
   })
   const [conversationPanelOpen, setConversationPanelOpen] = useState(true)
-  console.log(conversationPanelOpen)
 
   const handleSubmit = (message: PromptInputMessage) => {
     if (!message.text.trim() || !selectedModel?.id) return

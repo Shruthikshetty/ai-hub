@@ -8,7 +8,7 @@ import { conversations } from '../../../common/db-schemas/conversation.schema'
 import { desc } from 'drizzle-orm'
 import db from '../../db'
 
-// handler for get conversation route
+// handler for get conversation route @TODO pagination should be added
 export const getConversation: AppRouteHandler<GetConversationRoute> = async (c) => {
   // get all the conservation from the db
   const allConversations = await db.query.conversations.findMany({
