@@ -12,6 +12,7 @@ import {
 import { formatRelativeDateLabel } from '@renderer/lib/date.utils'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import useSelectedConversation from '@renderer/state-management/selected-conversation.store'
+import { Virtuoso } from 'react-virtuoso'
 
 /**
  * This component contain the history of all the conversations
@@ -89,7 +90,7 @@ const ChatConversationsHistory = ({
           <Separator />
         </div>
         {/* Message list */}
-        <div className="flex-1 overflow-auto ">
+        <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
           {/* New chat button */}
           <div className="p-3">
             <Button
@@ -104,8 +105,10 @@ const ChatConversationsHistory = ({
           </div>
           <Separator />
           {/* All the conversations go here */}
-          <div className="flex flex-col overflow-auto">
-            {conversations?.data?.map((conversation) => (
+          <Virtuoso
+            className="flex-1"
+            data={conversations?.data}
+            itemContent={(_index, conversation) => (
               <div key={conversation.id} className="relative group w-full">
                 <button
                   className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all pr-8"
@@ -134,8 +137,8 @@ const ChatConversationsHistory = ({
                 </button>
                 <Separator />
               </div>
-            ))}
-          </div>
+            )}
+          />
         </div>
         {/* Footer */}
         <div className="overflow-hidden">
