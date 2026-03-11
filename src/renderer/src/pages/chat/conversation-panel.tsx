@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react'
 import { Separator } from '@renderer/components/ui/separator'
 import { Button } from '@renderer/components/ui/button'
 import { Plus } from 'lucide-react'
+import { useFetchConversations } from '@renderer/services/conversation'
 
 /**
  * This component contain the history of all the conversations
@@ -17,6 +18,8 @@ const ChatConversationsHistory = ({
 }) => {
   // store the panel ref
   const panelRef = useRef<PanelImperativeHandle>(null)
+  // fetch all the conversations
+  const { data: conversations } = useFetchConversations()
 
   // handel the toggle state
   useEffect(() => {
@@ -26,6 +29,10 @@ const ChatConversationsHistory = ({
       panelRef.current?.collapse()
     }
   }, [isOpen])
+
+  function getRelativeDateLabel(createdAt: Date): import('react').ReactNode {
+    throw new Error('Function not implemented.')
+  }
 
   return (
     <ResizablePanel
@@ -64,15 +71,24 @@ const ChatConversationsHistory = ({
           <Separator />
           {/* All the conversations go here */}
           <div className="flex flex-col overflow-auto">
-            <button className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all">
-              <div className="px-3 pb-1  flex flex-col gap-0.5">
-                <p className="text-foreground text-sm font-medium line-clamp-2 overflow-hidden">
-                  New Chat
-                </p>
-                <p className="text-xs text-muted-foreground">2026-03-11</p>
-              </div>
-              <Separator />
-            </button>
+            {conversations?.data?.map((conversation) => (
+              <button
+                className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all"
+                key={conversation.id}
+              >
+                <div className="px-3 pb-1  flex flex-col gap-0.5">
+                  <p className="text-foreground text-sm font-medium line-clamp-2 overflow-hidden text-start">
+                    {conversation.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground text-start">
+                    {conversation?.createdAt
+                      ? getRelativeDateLabel(conversation?.createdAt)
+                      : 'Unknown'}
+                  </p>
+                </div>
+                <Separator />
+              </button>
+            ))}
           </div>
         </div>
         {/* Footer */}

@@ -4,8 +4,8 @@
 
 import { ProviderPatchSchema } from '@common/db-schemas/provider.schema'
 import {
-  fetchAllProvidersResponseSchemaType,
-  patchProviderResponseSchemaType
+  FetchAllProvidersResponseSchemaType,
+  PatchProviderResponseSchemaType
 } from '@common/schemas/providers.schema'
 import { ApiError } from '@common/types'
 import { FETCH_PROVIDERS_STALE_TIME } from '@renderer/constants/config.constants'
@@ -17,10 +17,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
  * service to fetch all the provider data
  */
 export function useFetchProviders() {
-  return useQuery<fetchAllProvidersResponseSchemaType, ApiError>({
+  return useQuery<FetchAllProvidersResponseSchemaType, ApiError>({
     queryKey: [QUERY_KEYS.providersFetch],
     queryFn: async () => {
-      const response = await window.api.request('/api/providers', 'GET')
+      const response = await window.api.request('/api/provider', 'GET')
       if (!response.success) {
         throw response
       }
@@ -36,13 +36,13 @@ export function useFetchProviders() {
 export function useUpdateProviderById() {
   const queryClient = useQueryClient()
   return useMutation<
-    patchProviderResponseSchemaType,
+    PatchProviderResponseSchemaType,
     ApiError,
     { id: number; data: ProviderPatchSchema }
   >({
     mutationKey: [MUTATION_KEYS.providerUpdateById],
-    mutationFn: async ({ id, data }): Promise<patchProviderResponseSchemaType> => {
-      const response = await window.api.request('/api/providers/' + id, 'PATCH', data)
+    mutationFn: async ({ id, data }): Promise<PatchProviderResponseSchemaType> => {
+      const response = await window.api.request('/api/provider/' + id, 'PATCH', data)
       if (!response.success) {
         throw response
       }

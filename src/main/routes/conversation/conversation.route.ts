@@ -3,9 +3,8 @@
  */
 import { createRoute } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { z } from 'zod'
 import { internalServerErrorDocObject } from '../../constants/doc-constants'
-import { conversationsSchema } from '../../../common/db-schemas/conversation.schema'
+import { fetchAllConversationsResponseSchema } from '../../../common/schemas/conversation'
 
 export const getConversation = createRoute({
   tags: ['Conversation'],
@@ -16,10 +15,7 @@ export const getConversation = createRoute({
     [HTTP_STATUS_CODES.OK]: {
       content: {
         'application/json': {
-          schema: z.object({
-            success: z.boolean(),
-            data: conversationsSchema.array()
-          })
+          schema: fetchAllConversationsResponseSchema
         }
       },
       description: 'success response for getting all conversations'

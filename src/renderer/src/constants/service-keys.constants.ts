@@ -4,7 +4,8 @@
 export const QUERY_KEYS = {
   userFetch: 'user-fetch',
   modelsFetch: 'models-fetch',
-  providersFetch: 'providers-fetch'
+  providersFetch: 'providers-fetch',
+  conversationsFetch: 'conversations-fetch'
 }
 
 export const MUTATION_KEYS = {

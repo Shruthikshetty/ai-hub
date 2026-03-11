@@ -14,5 +14,5 @@ export const patchProviderResponseSchema = z.object({
 })
 
 //extract the type
-export type fetchAllProvidersResponseSchemaType = z.infer<typeof fetchAllProvidersResponseSchema>
-export type patchProviderResponseSchemaType = z.infer<typeof patchProviderResponseSchema>
+export type FetchAllProvidersResponseSchemaType = z.infer<typeof fetchAllProvidersResponseSchema>
+export type PatchProviderResponseSchemaType = z.infer<typeof patchProviderResponseSchema>

@@ -21,7 +21,7 @@ import MessageParts from '@renderer/components/message-parts'
 import ChatStarter from './chat-starter'
 import AppModelSelector from '@renderer/components/model-selector'
 import useSelectedModel from '@renderer/state-management/use-selected-model'
-import ChatConversationsHistory from './conversation-panal'
+import ChatConversationsHistory from './conversation-panel'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -39,8 +39,10 @@ const ChatPage = () => {
   const { messages, sendMessage, error, status } = useChat<AppUIMessage>({
     transport: chatTransport
   })
+  // this is the conversation panel state shows all chat history
   const [conversationPanelOpen, setConversationPanelOpen] = useState(true)
 
+  // function to handle submit of the prompt input
   const handleSubmit = (message: PromptInputMessage) => {
     if (!message.text.trim() || !selectedModel?.id) return
     sendMessage(

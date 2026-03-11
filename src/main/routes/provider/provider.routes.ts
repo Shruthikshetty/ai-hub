@@ -14,7 +14,7 @@ import { providerPatchSchema } from '../../../common/db-schemas/provider.schema'
 // route to get all providers
 export const getProviders = createRoute({
   method: 'get',
-  path: '/providers',
+  path: '/provider',
   description: 'Get all providers',
   tags: ['Provider'],
   responses: {
@@ -34,7 +34,7 @@ export const getProviders = createRoute({
 // route to patch a provider by id
 export const patchProviderById = createRoute({
   method: 'patch',
-  path: '/providers/{id}',
+  path: '/provider/{id}',
   description: 'Update provider by id',
   tags: ['Provider'],
   request: {
