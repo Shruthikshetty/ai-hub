@@ -11,5 +11,6 @@ export const QUERY_KEYS = {
 export const MUTATION_KEYS = {
   userUpdate: 'user-update',
   mediaUpload: 'media-upload',
-  providerUpdateById: 'provider-update-by-id'
+  providerUpdateById: 'provider-update-by-id',
+  conversationAdd: 'conversation-add'
 }

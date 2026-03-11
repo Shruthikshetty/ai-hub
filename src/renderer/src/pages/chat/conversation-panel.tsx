@@ -4,8 +4,9 @@ import { useRef, useEffect } from 'react'
 import { Separator } from '@renderer/components/ui/separator'
 import { Button } from '@renderer/components/ui/button'
 import { Plus } from 'lucide-react'
-import { useFetchConversations } from '@renderer/services/conversation'
+import { useAddConversation, useFetchConversations } from '@renderer/services/conversation'
 import { formatRelativeDateLabel } from '@renderer/lib/date.utils'
+import useSelectedModel from '@renderer/state-management/use-selected-model'
 
 /**
  * This component contain the history of all the conversations
@@ -21,6 +22,10 @@ const ChatConversationsHistory = ({
   const panelRef = useRef<PanelImperativeHandle>(null)
   // fetch all the conversations
   const { data: conversations } = useFetchConversations()
+  // hook to create a new conversations
+  const { mutate: newConversation } = useAddConversation()
+  // get selected model
+  const selectedModel = useSelectedModel((state) => state.model)
 
   // handel the toggle state
   useEffect(() => {
@@ -30,6 +35,19 @@ const ChatConversationsHistory = ({
       panelRef.current?.collapse()
     }
   }, [isOpen])
+
+  // handle new conversation
+  const handleNewChat = () => {
+    // in case model is not selected
+    if (!selectedModel?.id || !selectedModel?.provider) return
+    // create new conversation
+    newConversation({
+      title: 'New chat',
+      modelId: selectedModel?.id,
+      provider: selectedModel?.provider
+    })
+  }
+  console.log(conversations)
 
   return (
     <ResizablePanel
@@ -60,7 +78,12 @@ const ChatConversationsHistory = ({
         <div className="flex-1 overflow-auto ">
           {/* New chat button */}
           <div className="p-3">
-            <Button className="w-full bg-foreground/20 text-foreground transition-all active:scale-95 overflow-hidden">
+            <Button
+              className="w-full bg-foreground/20 text-foreground transition-all active:scale-95 overflow-hidden"
+              type="button"
+              aria-label="New chat"
+              onClick={handleNewChat}
+            >
               <Plus />
               New chat
             </Button>
@@ -79,7 +102,7 @@ const ChatConversationsHistory = ({
                   </p>
                   <p className="text-xs text-muted-foreground text-start">
                     {conversation?.createdAt
-                      ? formatRelativeDateLabel(conversation?.createdAt?.toISOString())
+                      ? formatRelativeDateLabel(conversation?.createdAt as unknown as string)
                       : 'Unknown'}
                   </p>
                 </div>

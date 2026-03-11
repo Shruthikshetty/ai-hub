@@ -10,7 +10,7 @@ import {
 import {
   createConversationResponseSchema,
   fetchAllConversationsResponseSchema
-} from '../../../common/schemas/conversation'
+} from '../../../common/schemas/conversation.schema'
 import { conversationsInsertSchema } from '../../../common/db-schemas/conversation.schema'
 
 export const getConversation = createRoute({
