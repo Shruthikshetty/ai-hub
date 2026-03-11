@@ -29,7 +29,7 @@ export const uploadMedia = createRoute({
     }
   },
   responses: {
-    [HTTP_STATUS_CODES.OK]: {
+    [HTTP_STATUS_CODES.CREATED]: {
       content: {
         'application/json': {
           schema: mediaUploadResponseSchema

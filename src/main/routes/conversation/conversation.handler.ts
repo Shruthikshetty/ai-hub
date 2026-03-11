@@ -1,11 +1,15 @@
 /**
  * @file contains all the handlers for conversation routes
  */
-import { GetConversationRoute, CreateConversationRoute } from './conversation.route'
+import {
+  GetConversationRoute,
+  CreateConversationRoute,
+  DeleteConversationRoute
+} from './conversation.route'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { conversations } from '../../../common/db-schemas/conversation.schema'
-import { desc } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import db from '../../db'
 
 // handler for get conversation route @TODO pagination should be added
@@ -37,5 +41,34 @@ export const createConversation: AppRouteHandler<CreateConversationRoute> = asyn
       data: created
     },
     HTTP_STATUS_CODES.CREATED
+  )
+}
+
+// handler for deleting a conversation by id
+export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = async (c) => {
+  // get id from params
+  const { id } = c.req.valid('param')
+
+  // delete the conversation
+  const [deleted] = await db.delete(conversations).where(eq(conversations.id, id)).returning()
+
+  // in case not deleted
+  if (!deleted) {
+    return c.json(
+      {
+        success: true,
+        message: 'Conversation not found'
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+  // return success
+  return c.json(
+    {
+      success: true,
+      data: deleted,
+      message: 'Conversation deleted successfully'
+    },
+    HTTP_STATUS_CODES.OK
   )
 }

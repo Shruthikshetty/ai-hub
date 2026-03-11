@@ -5,6 +5,7 @@
 import { ConversationAddSchema } from '@common/db-schemas/conversation.schema'
 import {
   CreateConversationResponseSchemaType,
+  DeleteConversationResponseType,
   FetchAllConversationsResponseSchemaType
 } from '@common/schemas/conversation.schema'
 import { ApiError } from '@common/types'
@@ -49,6 +50,29 @@ export const useAddConversation = () => {
     },
     onError: () => {
       errorToast('Failed to add conversation')
+    }
+  })
+}
+
+/**
+ * const delete a conversation by id
+ */
+export const useDeleteConversationById = () => {
+  const queryClient = useQueryClient()
+  return useMutation<DeleteConversationResponseType, ApiError, { id: number }>({
+    mutationKey: [MUTATION_KEYS.deleteConversationById],
+    mutationFn: async ({ id }) => {
+      const response = await window.api.request('/api/conversation/' + id, 'DELETE')
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    onSuccess: () => {
+      return queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.conversationsFetch] })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to delete conversation')
     }
   })
 }

@@ -3,8 +3,12 @@ import { PanelImperativeHandle } from 'react-resizable-panels'
 import { useRef, useEffect } from 'react'
 import { Separator } from '@renderer/components/ui/separator'
 import { Button } from '@renderer/components/ui/button'
-import { Plus } from 'lucide-react'
-import { useAddConversation, useFetchConversations } from '@renderer/services/conversation'
+import { Plus, Trash2 } from 'lucide-react'
+import {
+  useAddConversation,
+  useDeleteConversationById,
+  useFetchConversations
+} from '@renderer/services/conversation'
 import { formatRelativeDateLabel } from '@renderer/lib/date.utils'
 import useSelectedModel from '@renderer/state-management/use-selected-model'
 
@@ -24,6 +28,8 @@ const ChatConversationsHistory = ({
   const { data: conversations } = useFetchConversations()
   // hook to create a new conversations
   const { mutate: newConversation } = useAddConversation()
+  // hooke to delete a conversation
+  const { mutate: deleteConversation } = useDeleteConversationById()
   // get selected model
   const selectedModel = useSelectedModel((state) => state.model)
 
@@ -47,7 +53,12 @@ const ChatConversationsHistory = ({
       provider: selectedModel?.provider
     })
   }
-  console.log(conversations)
+
+  // handle conversation delete
+  const handleDelete = (id?: number) => {
+    if (!id) return
+    deleteConversation({ id })
+  }
 
   return (
     <ResizablePanel
@@ -92,28 +103,35 @@ const ChatConversationsHistory = ({
           {/* All the conversations go here */}
           <div className="flex flex-col overflow-auto">
             {conversations?.data?.map((conversation) => (
-              <button
-                className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all"
-                key={conversation.id}
-              >
-                <div className="px-3 pb-1  flex flex-col gap-0.5">
-                  <p className="text-foreground text-sm font-medium line-clamp-2 overflow-hidden text-start">
-                    {conversation.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground text-start">
-                    {conversation?.createdAt
-                      ? formatRelativeDateLabel(conversation?.createdAt as unknown as string)
-                      : 'Unknown'}
-                  </p>
-                </div>
+              <div key={conversation.id} className="relative group w-full">
+                <button className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all pr-8">
+                  <div className="px-3 pb-1 flex flex-col gap-0.5">
+                    <p className="text-foreground text-sm font-medium line-clamp-2 overflow-hidden text-start">
+                      {conversation.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground text-start">
+                      {conversation?.createdAt
+                        ? formatRelativeDateLabel(conversation?.createdAt as unknown as string)
+                        : 'Unknown'}
+                    </p>
+                  </div>
+                </button>
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600"
+                  aria-label="Delete conversation"
+                  onClick={handleDelete.bind(null, conversation.id)}
+                >
+                  <Trash2 className="size-4" />
+                </button>
                 <Separator />
-              </button>
+              </div>
             ))}
           </div>
         </div>
         {/* Footer */}
         <div className="overflow-hidden">
           <Separator />
+          {/*@TODO IN PROGRESS will be implemented later */}
           <Button
             variant={'ghost'}
             className="text-muted-foreground hover:bg-transparent! text-xs p-4 text-center w-full"
