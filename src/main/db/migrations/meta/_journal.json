@@ -29,6 +29,13 @@
       "when": 1773110919570,
       "tag": "0003_condemned_veda",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1773204818384,
+      "tag": "0004_plain_war_machine",
+      "breakpoints": true
     }
   ]
 }

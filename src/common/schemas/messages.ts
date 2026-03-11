@@ -29,7 +29,7 @@ export const MessagePartSchema = z.discriminatedUnion('type', [
   StepStartUIPartSchema
 ])
 
-// define the UI message schema used in the app
+// define the UI message schema used in the app @TODO type tp be taken from db schema file
 export const UIMessageSchema = z
   .object({
     id: z.string(),
@@ -41,3 +41,4 @@ export const UIMessageSchema = z
 
 // export the type of the UI message schema
 export type AppUIMessage = z.infer<typeof UIMessageSchema>
+export type MessagePartsType = z.infer<typeof MessagePartSchema>

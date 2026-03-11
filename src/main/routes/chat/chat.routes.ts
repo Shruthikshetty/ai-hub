@@ -14,7 +14,7 @@ import { modelSchema } from '../../../common/schemas/model.schema'
 
 // route to stream chat response
 export const streamChat = createRoute({
-  tags: ['chat'],
+  tags: ['Chat'],
   method: 'post',
   path: '/chat',
   request: {
