@@ -7,7 +7,14 @@ export const fetchAllConversationsResponseSchema = z.object({
   data: conversationsSchema.array()
 })
 
-// extract the type
+// response schema for creating a conversation
+export const createConversationResponseSchema = z.object({
+  success: z.boolean(),
+  data: conversationsSchema
+})
+
+// extract types
 export type FetchAllConversationsResponseSchemaType = z.infer<
   typeof fetchAllConversationsResponseSchema
 >
+export type CreateConversationResponseSchemaType = z.infer<typeof createConversationResponseSchema>

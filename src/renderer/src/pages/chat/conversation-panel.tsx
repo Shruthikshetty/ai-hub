@@ -5,6 +5,7 @@ import { Separator } from '@renderer/components/ui/separator'
 import { Button } from '@renderer/components/ui/button'
 import { Plus } from 'lucide-react'
 import { useFetchConversations } from '@renderer/services/conversation'
+import { formatRelativeDateLabel } from '@renderer/lib/date.utils'
 
 /**
  * This component contain the history of all the conversations
@@ -29,10 +30,6 @@ const ChatConversationsHistory = ({
       panelRef.current?.collapse()
     }
   }, [isOpen])
-
-  function getRelativeDateLabel(createdAt: Date): import('react').ReactNode {
-    throw new Error('Function not implemented.')
-  }
 
   return (
     <ResizablePanel
@@ -82,7 +79,7 @@ const ChatConversationsHistory = ({
                   </p>
                   <p className="text-xs text-muted-foreground text-start">
                     {conversation?.createdAt
-                      ? getRelativeDateLabel(conversation?.createdAt)
+                      ? formatRelativeDateLabel(conversation?.createdAt?.toISOString())
                       : 'Unknown'}
                   </p>
                 </div>
