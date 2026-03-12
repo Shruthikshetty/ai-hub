@@ -78,7 +78,21 @@ const ChatConversationsHistory = ({
   // handle conversation delete
   const handleDelete = (id?: number) => {
     if (!id) return
-    deleteConversation({ id })
+    deleteConversation(
+      { id },
+      {
+        onSuccess: () => {
+          // if the deleted conversation was selected then set it to null
+          if (selectedConversation?.id === id) {
+            setSelectedConversation(null)
+          }
+          // if all conversations are append a new chat
+          if (conversations?.data?.length === 1) {
+            handleNewChat()
+          }
+        }
+      }
+    )
   }
 
   return (
