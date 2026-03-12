@@ -1,5 +1,5 @@
 import GradientLoader from './gradient-loader'
-import { useScreenLoader } from '@renderer/state-management/screen-loader'
+import { useScreenLoader } from '@renderer/state-management/screen-loader.store'
 
 /**
  * This wraps the app with a overlay screen loader

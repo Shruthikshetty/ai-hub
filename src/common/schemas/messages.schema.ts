@@ -2,6 +2,7 @@
  * @file contains all the schemas related to messages
  */
 import { z } from 'zod'
+import { messagesSchema } from '../db-schemas/message.schema'
 
 // text part schema
 export const TextUIPartSchema = z.object({
@@ -29,7 +30,7 @@ export const MessagePartSchema = z.discriminatedUnion('type', [
   StepStartUIPartSchema
 ])
 
-// define the UI message schema used in the app
+// define the UI message schema used in the app @TODO type tp be taken from db schema file
 export const UIMessageSchema = z
   .object({
     id: z.string(),
@@ -39,5 +40,20 @@ export const UIMessageSchema = z
   })
   .loose()
 
+// schema for response of getting a new message by id
+export const getMessageByIdResponseSchema = z.object({
+  success: z.boolean(),
+  data: messagesSchema
+})
+
+// schema for response of adding a new message
+export const addMessageResponseSchema = z.object({
+  success: z.boolean(),
+  data: messagesSchema
+})
+
 // export the type of the UI message schema
 export type AppUIMessage = z.infer<typeof UIMessageSchema>
+export type MessagePartsType = z.infer<typeof MessagePartSchema>
+export type GetMessageByIdResponseType = z.infer<typeof getMessageByIdResponseSchema>
+export type AddMessageResponseType = z.infer<typeof addMessageResponseSchema>

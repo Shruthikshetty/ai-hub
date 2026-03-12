@@ -22,7 +22,7 @@ export function useFetchModels({ output }: { output?: ModelIOType } = {}) {
       }
       // query params
       const queryString = params.toString() ? `?${params.toString()}` : ''
-      const response = await window.api.request(`/api/models${queryString}`, 'GET')
+      const response = await window.api.request(`/api/model${queryString}`, 'GET')
       if (!response.success) {
         throw response
       }

@@ -175,6 +175,7 @@ export const ReasoningContent = memo(({ className, children, ...props }: Reasoni
     )}
     {...props}
   >
+    {/*@ts-ignore */}
     <Streamdown plugins={streamdownPlugins} {...props}>
       {children}
     </Streamdown>

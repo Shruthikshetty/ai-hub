@@ -30,7 +30,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     provider: 'openai',
     name: 'Open AI',
     icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai.svg',
-    enabled: true,
+    enabled: false,
     apiKey: '',
     server: false,
     description: 'Open AI provider models'

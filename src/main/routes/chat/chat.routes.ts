@@ -9,12 +9,12 @@ import {
   internalServerErrorDocObject,
   zodValidationErrorDocObject
 } from '../../constants/doc-constants'
-import { UIMessageSchema } from '../../../common/schemas/messages'
+import { UIMessageSchema } from '../../../common/schemas/messages.schema'
 import { modelSchema } from '../../../common/schemas/model.schema'
 
 // route to stream chat response
 export const streamChat = createRoute({
-  tags: ['chat'],
+  tags: ['Chat'],
   method: 'post',
   path: '/chat',
   request: {
@@ -24,7 +24,8 @@ export const streamChat = createRoute({
         'application/json': {
           schema: z.object({
             messages: UIMessageSchema.array(),
-            model: modelSchema
+            model: modelSchema,
+            conversationId: z.number()
           })
         }
       },

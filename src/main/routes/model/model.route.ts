@@ -9,7 +9,7 @@ import { ModelIOSchema, modelResponseSchema } from '../../../common/schemas/mode
 // route to get all the list of models available
 export const getModels = createRoute({
   method: 'get',
-  path: '/models',
+  path: '/model',
   tags: ['Model'],
   summary: 'Get all the list of models available',
   request: {
