@@ -12,6 +12,7 @@ import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { conversations } from '../../../common/db-schemas/conversation.schema'
 import { desc, eq } from 'drizzle-orm'
 import db from '../../db'
+import { messages } from '../../db/schema'
 
 // handler for get conversation route @TODO pagination should be added
 export const getConversation: AppRouteHandler<GetConversationRoute> = async (c) => {
@@ -52,6 +53,8 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
 
   // delete the conversation
   const [deleted] = await db.delete(conversations).where(eq(conversations.id, id)).returning()
+  // delete all associated messages
+  await db.delete(messages).where(eq(messages.conversationId, id))
 
   // in case not deleted
   if (!deleted) {
