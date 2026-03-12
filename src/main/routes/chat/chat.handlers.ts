@@ -71,12 +71,15 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
 
         // store assistant message
         if (assistantMessage) {
-          await db.insert(messageSchema).values({
-            id: assistantMessage.id,
-            role: assistantMessage.role,
-            parts: assistantMessage.parts,
-            conversationId
-          })
+          await db
+            .insert(messageSchema)
+            .values({
+              id: assistantMessage.id,
+              role: assistantMessage.role,
+              parts: assistantMessage.parts,
+              conversationId
+            })
+            .onConflictDoNothing()
         }
       } catch (error) {
         // silent fail

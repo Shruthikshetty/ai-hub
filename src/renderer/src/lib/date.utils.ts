@@ -7,7 +7,7 @@
  * @param dateString - An ISO 8601 or otherwise parseable date string.
  * @returns A relative date label.
  */
-export function formatRelativeDateLabel(dateString: string): string {
+export function formatRelativeDateLabel(dateString: string | Date): string {
   const now = new Date()
   const target = new Date(dateString)
   // check if valid date

@@ -64,7 +64,7 @@ const ChatPage = () => {
 
   // function to handle submit of the prompt input
   const handleSubmit = (message: PromptInputMessage) => {
-    if (!message.text.trim() || !selectedModel?.id) return
+    if (!message.text.trim() || !selectedModel?.id || !selectedConversation?.id) return
     sendMessage(
       {
         text: message.text
@@ -112,9 +112,9 @@ const ChatPage = () => {
                       isLastMessage={index === messages.length - 1}
                     />
                   </MessageContent>
-                  <ConversationScrollButton />
                 </Message>
               ))}
+              <ConversationScrollButton />
             </ConversationContent>
           </Conversation>
           {error && error.message && <p className="text-red-500 text-center">{error.message}</p>}
@@ -132,7 +132,12 @@ const ChatPage = () => {
               </PromptInputTools>
               {/* submit button */}
               <PromptInputSubmit
-                disabled={!text.trim() || status === 'submitted' || !selectedModel?.id}
+                disabled={
+                  !text.trim() ||
+                  status === 'submitted' ||
+                  !selectedModel?.id ||
+                  !selectedConversation?.id
+                }
                 status={status}
               />
             </PromptInputFooter>

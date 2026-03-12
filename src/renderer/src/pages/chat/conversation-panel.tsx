@@ -60,11 +60,19 @@ const ChatConversationsHistory = ({
     // in case model is not selected
     if (!selectedModel?.id || !selectedModel?.provider) return
     // create new conversation
-    newConversation({
-      title: 'New chat',
-      modelId: selectedModel?.id,
-      provider: selectedModel?.provider
-    })
+    newConversation(
+      {
+        title: 'New chat',
+        modelId: selectedModel?.id,
+        provider: selectedModel?.provider
+      },
+      {
+        onSuccess: () => {
+          // set the selected conversation to null so that it displays the new chat
+          setSelectedConversation(null)
+        }
+      }
+    )
   }
 
   // handle conversation delete
@@ -139,7 +147,7 @@ const ChatConversationsHistory = ({
                     </p>
                     <p className="text-xs text-muted-foreground text-start">
                       {conversation?.createdAt
-                        ? formatRelativeDateLabel(conversation?.createdAt as unknown as string)
+                        ? formatRelativeDateLabel(conversation?.createdAt)
                         : 'Unknown'}
                     </p>
                   </div>

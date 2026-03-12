@@ -92,7 +92,7 @@ export const deleteConversation = createRoute({
           schema: deleteConversationByIdSchema
         }
       },
-      description: 'success response for creating a conversation'
+      description: 'success response for deleting a conversation'
     },
     [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
     [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
