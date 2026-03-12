@@ -1,3 +1,4 @@
+import { messagesSchema } from '../db-schemas/message.schema'
 import { conversationsSchema } from '../db-schemas/conversation.schema'
 import { z } from 'zod'
 
@@ -12,6 +13,14 @@ export const deleteConversationByIdSchema = z.object({
   success: z.boolean(),
   data: conversationsSchema,
   message: z.string()
+})
+
+// response to get all messages by conversation
+export const getMessagesByConversation = z.object({
+  success: z.boolean(),
+  data: conversationsSchema.extend({
+    messages: z.array(messagesSchema)
+  })
 })
 
 // response schema for creating a conversation

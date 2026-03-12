@@ -5,7 +5,8 @@ export const QUERY_KEYS = {
   userFetch: 'user-fetch',
   modelsFetch: 'models-fetch',
   providersFetch: 'providers-fetch',
-  conversationsFetch: 'conversations-fetch'
+  conversationsFetch: 'conversations-fetch',
+  messageFetch: 'message-fetch'
 }
 
 export const MUTATION_KEYS = {
@@ -13,5 +14,6 @@ export const MUTATION_KEYS = {
   mediaUpload: 'media-upload',
   providerUpdateById: 'provider-update-by-id',
   conversationAdd: 'conversation-add',
-  deleteConversationById: 'delete-conversation-by-id'
+  deleteConversationById: 'delete-conversation-by-id',
+  messageAdd: 'message-add'
 }

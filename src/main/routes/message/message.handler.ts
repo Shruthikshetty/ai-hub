@@ -1,7 +1,7 @@
 /**
  * @file contains all the handlers for message routes
  */
-import { GetMessageRoute } from './message.route'
+import { AddMessageRoute, GetMessageRoute } from './message.route'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { messages } from '../../../common/db-schemas/message.schema'
@@ -35,5 +35,20 @@ export const getMessage: AppRouteHandler<GetMessageRoute> = async (c) => {
       data: message
     },
     HTTP_STATUS_CODES.OK
+  )
+}
+
+// route to handle the addition of a new message
+export const addMessage: AppRouteHandler<AddMessageRoute> = async (c) => {
+  const values = c.req.valid('json')
+  // insert into database
+  const [newMessage] = await db.insert(messages).values(values).returning()
+  // return the success response
+  return c.json(
+    {
+      success: true,
+      data: newMessage
+    },
+    HTTP_STATUS_CODES.CREATED
   )
 }

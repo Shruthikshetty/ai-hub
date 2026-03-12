@@ -8,6 +8,7 @@ const router = createRouter()
   .openapi(routes.getConversation, handlers.getConversation)
   .openapi(routes.createConversation, handlers.createConversation)
   .openapi(routes.deleteConversation, handlers.deleteConversationById)
+  .openapi(routes.getConversationMessages, handlers.getConversationMessages)
 
 // add all the routes
 export default router

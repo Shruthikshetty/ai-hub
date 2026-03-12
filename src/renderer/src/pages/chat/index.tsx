@@ -16,7 +16,7 @@ import {
   ConversationContent,
   ConversationScrollButton
 } from '@renderer/components/ai-elements/conversation'
-import { AppUIMessage } from '@common/schemas/messages'
+import { AppUIMessage } from '@common/schemas/messages.schema'
 import MessageParts from '@renderer/components/message-parts'
 import ChatStarter from './chat-starter'
 import AppModelSelector from '@renderer/components/model-selector'

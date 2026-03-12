@@ -11,10 +11,12 @@ import {
 import {
   createConversationResponseSchema,
   deleteConversationByIdSchema,
-  fetchAllConversationsResponseSchema
+  fetchAllConversationsResponseSchema,
+  getMessagesByConversation
 } from '../../../common/schemas/conversation.schema'
 import { conversationsInsertSchema } from '../../../common/db-schemas/conversation.schema'
 
+// route to get all conversations
 export const getConversation = createRoute({
   tags: ['Conversation'],
   method: 'get',
@@ -33,6 +35,7 @@ export const getConversation = createRoute({
   }
 })
 
+// route to add a new conversation
 export const createConversation = createRoute({
   tags: ['Conversation'],
   method: 'post',
@@ -94,7 +97,39 @@ export const deleteConversation = createRoute({
   }
 })
 
+//get all the messages for a conversation
+export const getConversationMessages = createRoute({
+  tags: ['Conversation'],
+  method: 'get',
+  path: '/conversation/messages/{id}',
+  request: {
+    params: z.object({
+      id: z.coerce.number().openapi({
+        param: {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'conversation id'
+        },
+        example: 2
+      })
+    })
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: getMessagesByConversation
+        }
+      },
+      description: 'success response for getting all messages in a conversation'
+    },
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
 // export all types
 export type GetConversationRoute = typeof getConversation
 export type CreateConversationRoute = typeof createConversation
 export type DeleteConversationRoute = typeof deleteConversation
+export type GetConversationMessagesRoute = typeof getConversationMessages

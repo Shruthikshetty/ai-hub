@@ -13,6 +13,7 @@ import { formatRelativeDateLabel } from '@renderer/lib/date.utils'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import useSelectedConversation from '@renderer/state-management/selected-conversation.store'
 import { Virtuoso } from 'react-virtuoso'
+import { cn } from '@renderer/lib/utils'
 
 /**
  * This component contain the history of all the conversations
@@ -35,7 +36,15 @@ const ChatConversationsHistory = ({
   // get selected model
   const selectedModel = useSelectedModel((state) => state.model)
   // get selected conversation
-  const setSelectedConversation = useSelectedConversation((state) => state.setConversation)
+  const { conversation: selectedConversation, setConversation: setSelectedConversation } =
+    useSelectedConversation()
+
+  // by default select the first conversation
+  useEffect(() => {
+    if (!selectedConversation && conversations?.data?.length) {
+      setSelectedConversation(conversations?.data[0])
+    }
+  }, [conversations?.data, selectedConversation, setSelectedConversation])
 
   // handel the toggle state
   useEffect(() => {
@@ -109,11 +118,18 @@ const ChatConversationsHistory = ({
             className="flex-1"
             data={conversations?.data}
             itemContent={(_index, conversation) => (
-              <div key={conversation.id} className="relative group w-full">
+              <div
+                key={conversation.id}
+                className={cn(
+                  'relative group w-full',
+                  selectedConversation?.id === conversation.id && 'bg-accent-foreground/10'
+                )}
+              >
                 <button
                   className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all pr-8"
                   aria-label="select chat"
                   onClick={() => {
+                    //@TODO the time to be updated as well so that it appears on top ??
                     setSelectedConversation(conversation)
                   }}
                 >

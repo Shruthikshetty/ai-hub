@@ -3,9 +3,18 @@
  */
 import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { internalServerErrorDocObject, zodNotFoundDocObject } from '../../constants/doc-constants'
-import { messagesSchema } from '../../../common/db-schemas/message.schema'
+import {
+  internalServerErrorDocObject,
+  zodNotFoundDocObject,
+  zodValidationErrorDocObject
+} from '../../constants/doc-constants'
+import {
+  addMessageResponseSchema,
+  getMessageByIdResponseSchema
+} from '../../../common/schemas/messages.schema'
+import { messagesInsertSchema } from '../../../common/db-schemas/message.schema'
 
+// route to get message by id
 export const getMessage = createRoute({
   tags: ['Message'],
   method: 'get',
@@ -27,10 +36,7 @@ export const getMessage = createRoute({
     [HTTP_STATUS_CODES.OK]: {
       content: {
         'application/json': {
-          schema: z.object({
-            success: z.boolean(),
-            data: messagesSchema
-          })
+          schema: getMessageByIdResponseSchema
         }
       },
       description: 'success response for getting a message by id'
@@ -40,5 +46,35 @@ export const getMessage = createRoute({
   }
 })
 
+//route to add messages
+export const addMessage = createRoute({
+  tags: ['Message'],
+  method: 'post',
+  path: '/message',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: messagesInsertSchema
+        }
+      },
+      required: true
+    }
+  },
+  responses: {
+    [HTTP_STATUS_CODES.CREATED]: {
+      content: {
+        'application/json': {
+          schema: addMessageResponseSchema
+        }
+      },
+      description: 'success response for adding a message'
+    },
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export all types
 export type GetMessageRoute = typeof getMessage
+export type AddMessageRoute = typeof addMessage

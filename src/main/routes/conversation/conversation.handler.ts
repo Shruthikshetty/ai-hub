@@ -4,7 +4,8 @@
 import {
   GetConversationRoute,
   CreateConversationRoute,
-  DeleteConversationRoute
+  DeleteConversationRoute,
+  GetConversationMessagesRoute
 } from './conversation.route'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
@@ -33,12 +34,12 @@ export const getConversation: AppRouteHandler<GetConversationRoute> = async (c) 
 export const createConversation: AppRouteHandler<CreateConversationRoute> = async (c) => {
   const body = c.req.valid('json')
 
-  const [created] = await db.insert(conversations).values(body).returning()
+  const [newConversation] = await db.insert(conversations).values(body).returning()
 
   return c.json(
     {
       success: true,
-      data: created
+      data: newConversation
     },
     HTTP_STATUS_CODES.CREATED
   )
@@ -68,6 +69,36 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
       success: true,
       data: deleted,
       message: 'Conversation deleted successfully'
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+// handler for getting a conversation with all its messages
+export const getConversationMessages: AppRouteHandler<GetConversationMessagesRoute> = async (c) => {
+  const { id } = c.req.valid('param')
+
+  const conversation = await db.query.conversations.findFirst({
+    where: eq(conversations.id, id),
+    with: {
+      messages: true
+    }
+  })
+
+  if (!conversation) {
+    return c.json(
+      {
+        success: false,
+        message: 'Conversation not found'
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+
+  return c.json(
+    {
+      success: true,
+      data: conversation
     },
     HTTP_STATUS_CODES.OK
   )
