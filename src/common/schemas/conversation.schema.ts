@@ -35,3 +35,4 @@ export type FetchAllConversationsResponseSchemaType = z.infer<
 >
 export type CreateConversationResponseSchemaType = z.infer<typeof createConversationResponseSchema>
 export type DeleteConversationResponseType = z.infer<typeof deleteConversationByIdSchema>
+export type FetchConversationWithMessagesResponseType = z.infer<typeof getMessagesByConversation>

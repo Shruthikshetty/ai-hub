@@ -6,6 +6,7 @@ export const QUERY_KEYS = {
   modelsFetch: 'models-fetch',
   providersFetch: 'providers-fetch',
   conversationsFetch: 'conversations-fetch',
+  conversationMessagesFetch: 'conversation-messages-fetch',
   messageFetch: 'message-fetch'
 }
 

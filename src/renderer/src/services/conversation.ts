@@ -6,7 +6,8 @@ import { ConversationAddSchema } from '@common/db-schemas/conversation.schema'
 import {
   CreateConversationResponseSchemaType,
   DeleteConversationResponseType,
-  FetchAllConversationsResponseSchemaType
+  FetchAllConversationsResponseSchemaType,
+  FetchConversationWithMessagesResponseType
 } from '@common/schemas/conversation.schema'
 import { ApiError } from '@common/types'
 import { FETCH_CONVERSATIONS_STALE_TIME } from '@renderer/constants/config.constants'
@@ -28,6 +29,23 @@ export const useFetchConversations = () => {
       return response
     },
     staleTime: FETCH_CONVERSATIONS_STALE_TIME
+  })
+}
+
+/**
+ * hook to fetch all conversation messages
+ */
+export const useFetchConversationsMessages = (id?: number) => {
+  return useQuery<FetchConversationWithMessagesResponseType, ApiError>({
+    queryKey: [QUERY_KEYS.conversationMessagesFetch, id],
+    queryFn: async () => {
+      const response = await window.api.request('/api/conversation/messages/' + id, 'GET')
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    enabled: !!id
   })
 }
 

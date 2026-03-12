@@ -24,7 +24,8 @@ export const streamChat = createRoute({
         'application/json': {
           schema: z.object({
             messages: UIMessageSchema.array(),
-            model: modelSchema
+            model: modelSchema,
+            conversationId: z.number()
           })
         }
       },

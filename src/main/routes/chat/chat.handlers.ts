@@ -4,14 +4,16 @@
 import { StreamChatRoute } from './chat.routes'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { convertToModelMessages, streamText } from 'ai'
+import { createIdGenerator, convertToModelMessages, streamText } from 'ai'
 import { OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
 import { getProviderInstanceModel } from '../../lib/get-provider-instance'
+import db from '../../db'
+import { messages as messageSchema } from '../../../common/db-schemas/message.schema'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   // get the messages from request body
-  const { messages, model } = c.req.valid('json')
+  const { messages, model, conversationId } = c.req.valid('json')
 
   // convert to core messages
   const coreMessages = await convertToModelMessages(messages)
@@ -43,7 +45,44 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
 
   // stream the response using data stream protocol (required by DefaultChatTransport)
   return result.toUIMessageStreamResponse({
-    sendReasoning: true
+    originalMessages: messages,
+    sendReasoning: true,
+    generateMessageId: createIdGenerator({
+      prefix: 'msg',
+      size: 16
+    }),
+    onFinish: async ({ messages }) => {
+      try {
+        const userMessage = messages.at(-2) // previous message
+        const assistantMessage = messages.at(-1) // final AI message
+
+        // store user message
+        if (userMessage) {
+          await db
+            .insert(messageSchema)
+            .values({
+              id: userMessage.id,
+              role: userMessage.role,
+              parts: userMessage.parts,
+              conversationId
+            })
+            .onConflictDoNothing() // Prevent errors if the user message was already saved (e.g. regenerations)
+        }
+
+        // store assistant message
+        if (assistantMessage) {
+          await db.insert(messageSchema).values({
+            id: assistantMessage.id,
+            role: assistantMessage.role,
+            parts: assistantMessage.parts,
+            conversationId
+          })
+        }
+      } catch (error) {
+        // silent fail
+        console.error('Failed to save messages', error)
+      }
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) as any
 }
