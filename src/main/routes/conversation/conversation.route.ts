@@ -71,15 +71,18 @@ export const deleteConversation = createRoute({
   path: '/conversation/{id}',
   request: {
     params: z.object({
-      id: z.coerce.number().openapi({
-        param: {
-          name: 'id',
-          in: 'path',
-          required: true,
-          description: 'conversation id'
-        },
-        example: 2
-      })
+      id: z.coerce
+        .number()
+        .positive()
+        .openapi({
+          param: {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'conversation id'
+          },
+          example: 2
+        })
     })
   },
   responses: {
@@ -125,6 +128,7 @@ export const getConversationMessages = createRoute({
       description: 'success response for getting all messages in a conversation'
     },
     [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
     [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }
 })

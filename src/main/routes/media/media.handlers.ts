@@ -24,6 +24,6 @@ export const uploadMedia: AppRouteHandler<UploadMediaRoute> = async (c) => {
         mediaUrl: result.mediaUrl
       }
     },
-    HTTP_STATUS_CODES.OK
+    HTTP_STATUS_CODES.CREATED
   )
 }

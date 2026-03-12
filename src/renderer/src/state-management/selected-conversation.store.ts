@@ -11,7 +11,7 @@ const initialState = {
 // type
 type UseSelectedConversation = {
   conversation: ConversationsGetSchema | null
-  setConversation: (conversation: ConversationsGetSchema) => void
+  setConversation: (conversation: ConversationsGetSchema | null) => void
 }
 
 // hook to access the state

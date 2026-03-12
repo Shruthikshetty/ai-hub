@@ -27,7 +27,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup
 } from '@renderer/components/ui/resizable'
-import PanelTrigger from '@renderer/components/panel-tigger'
+import PanelTrigger from '@renderer/components/panel-trigger'
 import useSelectedConversation from '@renderer/state-management/selected-conversation.store'
 import { useFetchConversationsMessages } from '@renderer/services/conversation'
 

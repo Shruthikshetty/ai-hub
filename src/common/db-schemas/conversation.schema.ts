@@ -1,11 +1,9 @@
 /**
  * @file contains the conversation schema with zod validation
  */
-import { relations } from 'drizzle-orm'
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { messages } from './message.schema'
 
 //tables ----------->
 //@TODO setting or option will be later added
@@ -21,10 +19,6 @@ export const conversations = sqliteTable('conversations', {
     .$onUpdate(() => new Date())
 })
 
-// relation one conversation can have multiple messages
-export const conversationsRelations = relations(conversations, ({ many }) => ({
-  messages: many(messages)
-}))
 // zod schema for inserting conversation
 export const conversationsInsertSchema = createInsertSchema(conversations, {
   provider: (field) => field.max(255),

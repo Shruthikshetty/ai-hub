@@ -127,7 +127,7 @@ const ChatConversationsHistory = ({
               >
                 <button
                   className="w-full items-start flex flex-col hover:bg-accent-foreground/10 transition-all pr-8"
-                  aria-label="select chat"
+                  aria-label={`select chat ${conversation.title}`}
                   onClick={() => {
                     //@TODO the time to be updated as well so that it appears on top ??
                     setSelectedConversation(conversation)
@@ -146,7 +146,7 @@ const ChatConversationsHistory = ({
                 </button>
                 <button
                   className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600"
-                  aria-label="Delete conversation"
+                  aria-label={`Delete conversation ${conversation.title}`}
                   onClick={handleDelete.bind(null, conversation.id)}
                 >
                   <Trash2 className="size-4" />

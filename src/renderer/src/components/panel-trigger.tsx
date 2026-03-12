@@ -21,7 +21,7 @@ const PanelTrigger = ({
       onClick={() => {
         toggle((s) => !s)
       }}
-      className={cn('px-2 py-4', className)}
+      className={cn('px-2 py-4 group', className)}
     >
       {value ? (
         <SquareChevronLeft className="size-5 text-muted-foreground group-hover:text-foreground" />

@@ -25,8 +25,17 @@ if (!process.env.ENCRYPTION_KEY && process.env.APP_USER_DATA) {
     } else {
       const generatedKey = crypto.randomBytes(32).toString('hex')
       fs.mkdirSync(path.dirname(keyFilePath), { recursive: true })
-      fs.writeFileSync(keyFilePath, generatedKey, { mode: 0o600 })
-      process.env.ENCRYPTION_KEY = generatedKey
+      try {
+        fs.writeFileSync(keyFilePath, generatedKey, { flag: 'wx', mode: 0o600 }) // write-exclusive -> wx
+        process.env.ENCRYPTION_KEY = generatedKey
+      } catch (writeErr) {
+        if ((writeErr as NodeJS.ErrnoException).code === 'EEXIST') {
+          // use same key if another process generated and wrote the key just before we did
+          process.env.ENCRYPTION_KEY = fs.readFileSync(keyFilePath, 'utf-8').trim()
+        } else {
+          throw writeErr
+        }
+      }
     }
   } catch (err) {
     console.error('Failed to load/generate encryption key:', err)

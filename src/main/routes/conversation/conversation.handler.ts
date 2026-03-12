@@ -60,7 +60,7 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
   if (!deleted) {
     return c.json(
       {
-        success: true,
+        success: false,
         message: 'Conversation not found'
       },
       HTTP_STATUS_CODES.NOT_FOUND
@@ -77,6 +77,7 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
   )
 }
 
+//@TODO Pagination will be implemented later
 // handler for getting a conversation with all its messages
 export const getConversationMessages: AppRouteHandler<GetConversationMessagesRoute> = async (c) => {
   const { id } = c.req.valid('param')
@@ -84,7 +85,9 @@ export const getConversationMessages: AppRouteHandler<GetConversationMessagesRou
   const conversation = await db.query.conversations.findFirst({
     where: eq(conversations.id, id),
     with: {
-      messages: true
+      messages: {
+        orderBy: (messages, { asc }) => [asc(messages.createdAt)]
+      }
     }
   })
 

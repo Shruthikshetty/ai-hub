@@ -8,6 +8,7 @@ export * from '../../common/db-schemas/user.schema'
 export * from '../../common/db-schemas/provider.schema'
 export * from '../../common/db-schemas/conversation.schema'
 export * from '../../common/db-schemas/message.schema'
+export * from '../../common/db-schemas/relations.schema'
 
 // When you add more tables, just add more re-exports here:
 // export * from '../../common/db-schemas/messages.schema'

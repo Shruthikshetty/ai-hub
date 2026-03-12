@@ -10,12 +10,16 @@
 export function formatRelativeDateLabel(dateString: string): string {
   const now = new Date()
   const target = new Date(dateString)
+  // check if valid date
+  if (isNaN(target.getTime())) {
+    return 'Unknown date'
+  }
 
   // Zero-out time for day-level comparison without mutating originals
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
   const targetStart = new Date(target.getFullYear(), target.getMonth(), target.getDate()).getTime()
 
-  const diffInDays = Math.round((todayStart - targetStart) / 86_400_000)
+  const diffInDays = Math.floor((todayStart - targetStart) / 86_400_000)
 
   if (diffInDays === 0) return 'TODAY'
   if (diffInDays === 1) return 'YESTERDAY'
