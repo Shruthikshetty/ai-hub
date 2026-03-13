@@ -9,6 +9,7 @@ import { OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
 import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 import db from '../../db'
 import { messages as messageSchema } from '../../../common/db-schemas/message.schema'
+import { generateTitle } from '../../lib/generate-title'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
@@ -52,6 +53,14 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
       size: 16
     }),
     onFinish: async ({ messages }) => {
+      if (messages.length <= 2) {
+        // do not wait for this to complete
+        generateTitle({
+          model,
+          message: messages[0].parts.find((part) => part.type === 'text')?.text || '',
+          conversationId
+        })
+      }
       try {
         const userMessage = messages.at(-2) // previous message
         const assistantMessage = messages.at(-1) // final AI message
