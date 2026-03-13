@@ -35,4 +35,4 @@ export const modelResponseSchema = z.object({
 export type ModelSchemaType = z.infer<typeof modelSchema>
 export type ModelResponseSchemaType = z.infer<typeof modelResponseSchema>
 export type ModelIOType = z.infer<typeof ModelIOSchema>
-export type ModelProviderType = z.infer<typeof AVAILABLE_PROVIDER_LIST>
+export type ModelProviderType = (typeof AVAILABLE_PROVIDER_LIST)[number]

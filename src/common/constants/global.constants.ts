@@ -66,4 +66,4 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
   }
 ]
 
-export const AVAILABLE_PROVIDER_LIST = ['openai', 'ollama', 'openrouter', 'google']
+export const AVAILABLE_PROVIDER_LIST = ['openai', 'ollama', 'openrouter', 'google'] as const

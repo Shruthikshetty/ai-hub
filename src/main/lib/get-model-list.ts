@@ -262,7 +262,7 @@ export async function getModelListFromProvider(
         return models.map((model: GoogleModel) => {
           const capabilities = inferGoogleCapabilities(model)
           return {
-            id: model.name.split('/')?.[1],
+            id: model.name.split('/')?.[1] ?? model.name,
             name: model.displayName,
             provider: provider.provider,
             inputs: capabilities.inputs,
