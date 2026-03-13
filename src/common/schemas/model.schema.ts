@@ -1,7 +1,15 @@
 import { z } from 'zod'
 import { AVAILABLE_PROVIDER_LIST } from '../constants/global.constants'
 
-export const ModelIOSchema = z.enum(['text', 'image', 'audio', 'video', 'embedding', 'realtime'])
+export const ModelIOSchema = z.enum([
+  'text',
+  'image',
+  'audio',
+  'video',
+  'embedding',
+  'realtime',
+  'file'
+])
 
 export const modelSchema = z.object({
   id: z.string(),
@@ -27,4 +35,4 @@ export const modelResponseSchema = z.object({
 export type ModelSchemaType = z.infer<typeof modelSchema>
 export type ModelResponseSchemaType = z.infer<typeof modelResponseSchema>
 export type ModelIOType = z.infer<typeof ModelIOSchema>
-export type ModelProviderType = z.infer<typeof AVAILABLE_PROVIDER_LIST>
+export type ModelProviderType = (typeof AVAILABLE_PROVIDER_LIST)[number]

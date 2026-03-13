@@ -8,7 +8,7 @@ const validationErrorHandler: Hook<any, any, any, any> = (result, c) => {
   if (!result.success) {
     return c.json(
       {
-        success: result.success,
+        success: false,
         error: flattenError(result.error)
       },
       HTTP_STATUS_CODES.BAD_REQUEST

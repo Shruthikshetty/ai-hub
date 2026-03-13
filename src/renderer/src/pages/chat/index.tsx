@@ -30,6 +30,8 @@ import {
 import PanelTrigger from '@renderer/components/panel-trigger'
 import useSelectedConversation from '@renderer/state-management/selected-conversation.store'
 import { useFetchConversationsMessages } from '@renderer/services/conversation'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
 
 //@TODO still in progress the conversation meta data also to be updated will be done later like restore selected model etc
 // stable transport instance
@@ -43,13 +45,21 @@ const ChatPage = () => {
   const [conversationPanelOpen, setConversationPanelOpen] = useState(true)
   // get the selected conversation
   const selectedConversation = useSelectedConversation((state) => state.conversation)
+  // get the query client
+  const queryClient = useQueryClient()
   // hook to get the messages of the selected conversation
   const { data: defaultMessages } = useFetchConversationsMessages(selectedConversation?.id)
   // hook to manage chat
   const chatId = selectedConversation?.id?.toString()
   const { messages, sendMessage, error, status, setMessages } = useChat<AppUIMessage>({
     id: chatId,
-    transport: chatTransport
+    transport: chatTransport,
+    onFinish: () => {
+      // invalidate the query on 2'nd user message so that the generated title is reflected in the conversation list
+      if (messages.length === 4) {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.conversationsFetch] })
+      }
+    }
   })
 
   // Keep track of the last loaded conversation ID to prevent React Query background refetch from overwriting active UI messages
