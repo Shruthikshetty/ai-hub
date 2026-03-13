@@ -140,7 +140,7 @@ function inferGoogleCapabilities(
   // Gemini is multimodal by default unless it's an embedding model
   const inputs: ModelIOType[] = ['text']
   if (!name.includes('embedding')) {
-    inputs.push('image', 'video', 'audio', 'pdf')
+    inputs.push('image', 'video', 'audio', 'file')
   }
 
   // Determine Output Types
@@ -245,6 +245,7 @@ export async function getModelListFromProvider(
           id: model.id,
           name: model.id,
           provider: provider.provider,
+          //@TODO the modularity to be handled specially all case https://openrouter.ai/docs/guides/overview/models#output_modality
           inputs: (model?.architecture?.input_modalities ?? ['text']) as ModelIOType[],
           outputs: (model?.architecture?.output_modalities ?? ['text']) as ModelIOType[],
           capabilities: {

@@ -8,7 +8,7 @@ export const ModelIOSchema = z.enum([
   'video',
   'embedding',
   'realtime',
-  'pdf'
+  'file'
 ])
 
 export const modelSchema = z.object({
