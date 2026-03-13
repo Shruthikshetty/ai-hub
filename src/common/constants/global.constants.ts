@@ -24,7 +24,7 @@ export const EXT_TO_MIME: Record<string, string> = {
 // For AES, this is always 16 bytes
 export const IV_LENGTH = 16
 
-//All Providers configured in app
+//All Providers configured in app this is loaded in the app on first launch
 export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
   {
     provider: 'openai',
@@ -44,7 +44,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: true,
     serverUrl: 'http://localhost:11434',
     description: 'Your local models running using ollama please add the exact server url'
+  },
+  {
+    provider: 'openrouter',
+    name: 'Open Router',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openrouter.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    description: 'Open Router provider models'
   }
 ]
 
-export const AVAILABLE_PROVIDER_LIST = ['openai', 'ollama']
+export const AVAILABLE_PROVIDER_LIST = ['openai', 'ollama', 'openrouter']

@@ -11,6 +11,30 @@ type OpenAiModel = {
   owned_by: string
 }
 
+/**
+ * this is partially type safe as required for the app
+ * check doc for all the exact types https://openrouter.ai/docs/guides/overview/models
+ */
+type OpenRouterModel = {
+  id: string
+  hugging_face_id: string
+  name: string
+  created: number
+  description: string
+  context_length: number
+  architecture: {
+    modality: string
+    input_modalities: string[]
+    output_modalities: string[]
+    tokenizer: string
+    instruct_type: string | null
+  }
+  pricing: {
+    prompt?: string
+    completion?: string
+  }
+}
+
 // helper function to infer capabilities of OpenAI models from their IDs
 function inferOpenAiCapabilities(modelId: string): Partial<ModelSchemaType> {
   const isImage = modelId.includes('dall-e') || modelId.includes('image')
@@ -90,25 +114,32 @@ export async function getModelListFromProvider(
       case 'openai':
         response = await axios.get<OpenAiModel>('https://api.openai.com/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
-          timeout: 15000 //15 seconds
+          timeout: 2000 //2 seconds
         })
         break
+      case 'openrouter': {
+        response = await axios.get<OpenAiModel>('https://openrouter.ai/api/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        break
+      }
       default:
         // For other providers (like ollama) or generic OpenAI-compatible endpoints
         if (provider.serverUrl) {
           response = await axios.get<OpenAiModel>(`${provider.serverUrl}/v1/models`, {
             headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
-            timeout: 15000 //15 seconds
+            timeout: 2000 //2 seconds
           })
         } else {
           return []
         }
         break
     }
-
     // map the response to standard format as per the provider
     // @TODO catch the data and then access from db
     if (response?.data?.data) {
+      console.log(response?.data?.data)
       switch (provider.provider) {
         case 'openai':
           return response.data.data.map((model: OpenAiModel) => {
@@ -120,6 +151,21 @@ export async function getModelListFromProvider(
               ...capabilities
             }
           })
+        case 'openrouter': {
+          return response.data.data.map((model: OpenRouterModel) => ({
+            id: model.id,
+            name: model.id,
+            provider: provider.provider,
+            inputs: model?.architecture?.input_modalities ?? ['text'],
+            outputs: model?.architecture?.output_modalities ?? ['text'],
+            capabilities: {
+              vision: model?.architecture?.input_modalities?.includes('image') ?? false,
+              // currently not supported or not stable
+              videoReasoning: false,
+              realtime: false
+            }
+          }))
+        }
         default:
           return response.data.data.map((model: OpenAiModel) => ({
             id: model.id,

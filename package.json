@@ -1,6 +1,6 @@
 {
   "name": "ai-hub",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "AI Hub - Your Personal AI aggregator",
   "main": "./out/main/index.js",
   "author": "shruthik shetty",
@@ -33,6 +33,7 @@
     "@hono/node-server": "^1.19.9",
     "@hono/zod-openapi": "^1.2.2",
     "@libsql/client": "^0.17.0",
+    "@openrouter/ai-sdk-provider": "^2.3.0",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
     "@scalar/hono-api-reference": "^0.9.41",
     "@streamdown/cjk": "^1.0.2",

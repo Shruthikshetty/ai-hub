@@ -1,4 +1,4 @@
-import { AppUIMessage } from '@common/schemas/messages'
+import { AppUIMessage } from '@common/schemas/messages.schema'
 import { MessageResponse } from './ai-elements/message'
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './ai-elements/reasoning'
 import BotIcon from './bot-icon'
