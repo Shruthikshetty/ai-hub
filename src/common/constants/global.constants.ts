@@ -24,6 +24,7 @@ export const EXT_TO_MIME: Record<string, string> = {
 // For AES, this is always 16 bytes
 export const IV_LENGTH = 16
 
+//@TODO get the icons locally
 //All Providers configured in app this is loaded in the app on first launch
 export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
   {
@@ -53,7 +54,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     apiKey: '',
     server: false,
     description: 'Open Router provider models'
+  },
+  {
+    provider: 'google',
+    name: 'Google Ai Studio',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/google.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    description: 'Google ai studio models'
   }
 ]
 
-export const AVAILABLE_PROVIDER_LIST = ['openai', 'ollama', 'openrouter']
+export const AVAILABLE_PROVIDER_LIST = ['openai', 'ollama', 'openrouter', 'google']

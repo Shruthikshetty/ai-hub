@@ -1,7 +1,15 @@
 import { z } from 'zod'
 import { AVAILABLE_PROVIDER_LIST } from '../constants/global.constants'
 
-export const ModelIOSchema = z.enum(['text', 'image', 'audio', 'video', 'embedding', 'realtime'])
+export const ModelIOSchema = z.enum([
+  'text',
+  'image',
+  'audio',
+  'video',
+  'embedding',
+  'realtime',
+  'pdf'
+])
 
 export const modelSchema = z.object({
   id: z.string(),

@@ -6,6 +6,7 @@ import { gateway } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
 import { normalizeProviderUrl } from '../../common/utils/url.util'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({ model }: { model: ModelSchemaType }) {
@@ -40,6 +41,12 @@ export async function getProviderInstanceModel({ model }: { model: ModelSchemaTy
         apiKey
       })
       return openrouterInstance
+    }
+    case 'google': {
+      const googleInstance = createGoogleGenerativeAI({
+        apiKey
+      })
+      return googleInstance
     }
     default:
       return gateway

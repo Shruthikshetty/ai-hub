@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType } from '../../common/schemas/model.schema'
@@ -35,8 +35,43 @@ type OpenRouterModel = {
   }
 }
 
+/**
+ * google ai studio mode object
+ * doc: https://ai.google.dev/api/models#Model
+ */
+type GoogleModel = {
+  name: string
+  version: string
+  displayName: string
+  description: string
+  inputTokenLimit: number
+  outputTokenLimit: number
+  supportedGenerationMethods: string[]
+  thinking?: boolean
+  temperature?: number
+  maxTemperature?: number
+  topP?: number
+  topK?: number
+}
+
+/**
+ * google ai studio response for models endpoint
+ */
+type GoogleResponse = {
+  models: GoogleModel[]
+}
+
+/**
+ * open AI type response for models endpoint
+ */
+type OpenAiResponse<T> = {
+  data: T[]
+}
+//@TODO move out the helpers
 // helper function to infer capabilities of OpenAI models from their IDs
-function inferOpenAiCapabilities(modelId: string): Partial<ModelSchemaType> {
+function inferOpenAiCapabilities(
+  modelId: string
+): Pick<ModelSchemaType, 'capabilities' | 'inputs' | 'outputs'> {
   const isImage = modelId.includes('dall-e') || modelId.includes('image')
   const isEmbedding = modelId.includes('embedding')
   const isTTS = modelId.includes('tts') || modelId.includes('audio')
@@ -94,6 +129,45 @@ function inferOpenAiCapabilities(modelId: string): Partial<ModelSchemaType> {
   }
 }
 
+// helper function to infer capabilities of google ai studio model from the model name
+function inferGoogleCapabilities(
+  model: GoogleModel
+): Pick<ModelSchemaType, 'capabilities' | 'inputs' | 'outputs'> {
+  const name = model.name.toLowerCase()
+  const methods = model.supportedGenerationMethods || []
+
+  // Determine Input Types
+  // Gemini is multimodal by default unless it's an embedding model
+  const inputs: ModelIOType[] = ['text']
+  if (!name.includes('embedding')) {
+    inputs.push('image', 'video', 'audio', 'pdf')
+  }
+
+  // Determine Output Types
+  const outputs: ModelIOType[] = []
+  if (methods.includes('embedContent')) {
+    outputs.push('embedding')
+  } else if (name.includes('image') || name.includes('banana')) {
+    outputs.push('image')
+  } else if (name.includes('veo')) {
+    outputs.push('video')
+  } else if (name.includes('audio')) {
+    outputs.push('audio')
+  } else {
+    outputs.push('text')
+  }
+
+  // return the capabilities
+  return {
+    inputs,
+    outputs,
+    capabilities: {
+      vision: !name.includes('embedding'), // All modern Gemini models have vision
+      videoReasoning: name.includes('pro') || name.includes('flash')
+    }
+  }
+}
+
 /**
  * This function fetches and return the list of models for a given provider
  * @param provider ProviderGetSchema
@@ -107,27 +181,37 @@ export async function getModelListFromProvider(
       apiKey = decryptText(provider.apiKey)
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let response: any
+    let response:
+      | AxiosResponse<OpenAiResponse<OpenRouterModel>>
+      | AxiosResponse<OpenAiResponse<OpenAiModel>>
+      | AxiosResponse<GoogleResponse>
+
     // handel the fetching logic separately for all the providers
     switch (provider.provider) {
       case 'openai':
-        response = await axios.get<OpenAiModel>('https://api.openai.com/v1/models', {
+        response = await axios.get('https://api.openai.com/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
         })
         break
       case 'openrouter': {
-        response = await axios.get<OpenAiModel>('https://openrouter.ai/api/v1/models', {
+        response = await axios.get('https://openrouter.ai/api/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
+        })
+        break
+      }
+      case 'google': {
+        response = await axios.get('https://generativelanguage.googleapis.com/v1beta/models', {
+          params: { key: apiKey },
+          timeout: 2000
         })
         break
       }
       default:
         // For other providers (like ollama) or generic OpenAI-compatible endpoints
         if (provider.serverUrl) {
-          response = await axios.get<OpenAiModel>(`${provider.serverUrl}/v1/models`, {
+          response = await axios.get(`${provider.serverUrl}/v1/models`, {
             headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
             timeout: 2000 //2 seconds
           })
@@ -138,42 +222,64 @@ export async function getModelListFromProvider(
     }
     // map the response to standard format as per the provider
     // @TODO catch the data and then access from db
-    if (response?.data?.data) {
-      console.log(response?.data?.data)
-      switch (provider.provider) {
-        case 'openai':
-          return response.data.data.map((model: OpenAiModel) => {
-            const capabilities = inferOpenAiCapabilities(model.id)
-            return {
-              id: model.id,
-              name: model.id,
-              provider: provider.provider,
-              ...capabilities
-            }
-          })
-        case 'openrouter': {
-          return response.data.data.map((model: OpenRouterModel) => ({
+    switch (provider.provider) {
+      case 'openai': {
+        const data = (response.data as OpenAiResponse<OpenAiModel>).data
+        if (!data) return []
+        return data.map((model: OpenAiModel) => {
+          const capabilities = inferOpenAiCapabilities(model.id)
+          return {
             id: model.id,
             name: model.id,
             provider: provider.provider,
-            inputs: model?.architecture?.input_modalities ?? ['text'],
-            outputs: model?.architecture?.output_modalities ?? ['text'],
-            capabilities: {
-              vision: model?.architecture?.input_modalities?.includes('image') ?? false,
-              // currently not supported or not stable
-              videoReasoning: false,
-              realtime: false
-            }
-          }))
-        }
-        default:
-          return response.data.data.map((model: OpenAiModel) => ({
-            id: model.id,
-            name: model.id,
+            inputs: capabilities.inputs,
+            outputs: capabilities.outputs,
+            capabilities: capabilities.capabilities
+          }
+        })
+      }
+      case 'openrouter': {
+        const data = (response.data as OpenAiResponse<OpenRouterModel>).data
+        if (!data) return []
+        return data.map((model: OpenRouterModel) => ({
+          id: model.id,
+          name: model.id,
+          provider: provider.provider,
+          inputs: (model?.architecture?.input_modalities ?? ['text']) as ModelIOType[],
+          outputs: (model?.architecture?.output_modalities ?? ['text']) as ModelIOType[],
+          capabilities: {
+            vision: model?.architecture?.input_modalities?.includes('image') ?? false,
+            // currently not supported or not stable
+            videoReasoning: false,
+            realtime: false
+          }
+        }))
+      }
+      case 'google': {
+        const models = (response.data as GoogleResponse).models
+        if (!models) return []
+        return models.map((model: GoogleModel) => {
+          const capabilities = inferGoogleCapabilities(model)
+          return {
+            id: model.name.split('/')?.[1],
+            name: model.displayName,
             provider: provider.provider,
-            inputs: ['text'],
-            outputs: ['text']
-          }))
+            inputs: capabilities.inputs,
+            outputs: capabilities.outputs,
+            capabilities: capabilities.capabilities
+          }
+        })
+      }
+      default: {
+        const data = (response.data as OpenAiResponse<OpenAiModel>).data
+        if (!data || !Array.isArray(data)) return []
+        return data.map((model: OpenAiModel) => ({
+          id: model.id,
+          name: model.id,
+          provider: provider.provider,
+          inputs: ['text'],
+          outputs: ['text']
+        }))
       }
     }
     return []
