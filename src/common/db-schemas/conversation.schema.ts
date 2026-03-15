@@ -43,7 +43,9 @@ export const conversationsInsertSchema = createInsertSchema(conversations, {
 })
 
 // zod schema for updating  the conversation
-export const conversationsUpdateSchema = conversationsInsertSchema.partial()
+export const conversationsUpdateSchema = conversationsInsertSchema.partial().extend({
+  title: z.string().optional()
+})
 
 // schemas ------------>
 

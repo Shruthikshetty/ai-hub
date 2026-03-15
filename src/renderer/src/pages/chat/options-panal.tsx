@@ -15,6 +15,7 @@ import {
 import { useUpdateConversationById } from '@renderer/services/conversation'
 import { useForm } from '@tanstack/react-form'
 import { Save, Trash } from 'lucide-react'
+import { useEffect } from 'react'
 
 //@TODO add the rest of the options later
 /**
@@ -42,6 +43,12 @@ function ChatOptionsPanel({
       updateConversationById({ id: conversation.id, data: value })
     }
   })
+  // reset the form when the conversation changes this is important to sync the form with the conversation
+  useEffect(() => {
+    form.reset({
+      systemPrompt: conversation?.systemPrompt ?? null
+    })
+  }, [conversation, form])
 
   return (
     <ResizableSidePanel {...rest}>

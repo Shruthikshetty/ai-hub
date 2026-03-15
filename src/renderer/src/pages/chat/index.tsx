@@ -90,13 +90,14 @@ const ChatPage = () => {
     // if the loaded chat id is same as the chat id then return
     if (loadedChatId.current === chatId) return
     // if the default messages are not available then return
-    if (isDefaultMessagesError) {
+    if (isDefaultMessagesError) return
+    // if the default messages are undefined then return
+    if (defaultMessages === undefined) return
+    // local chat state already won the race, don't let the initial fetch overwrite it
+    if (messages.length > 0) {
       loadedChatId.current = chatId
       return
     }
-    // if the default messages are undefined then return
-    if (defaultMessages === undefined) return
-
     // set the messages
     if (defaultMessages?.data?.messages) {
       setMessages(defaultMessages.data.messages)
@@ -105,7 +106,7 @@ const ChatPage = () => {
       setMessages([])
       loadedChatId.current = chatId
     }
-  }, [chatId, defaultMessages, isDefaultMessagesError, setMessages])
+  }, [chatId, defaultMessages, isDefaultMessagesError, setMessages, messages.length])
 
   //Restore the model when switching conversations (independent of message loading)
   useEffect(() => {
