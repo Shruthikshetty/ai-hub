@@ -32,6 +32,7 @@ import useSelectedConversation from '@renderer/state-management/selected-convers
 import { useFetchConversationsMessages } from '@renderer/services/conversation'
 import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
+import { useFetchModels } from '@renderer/services/model'
 
 //@TODO still in progress the conversation meta data also to be updated will be done later like restore selected model etc
 // stable transport instance
@@ -40,9 +41,11 @@ const chatTransport = createIPCStreamTransport('/api/chat')
 // this is the chat page contains all the chat interface
 const ChatPage = () => {
   const [text, setText] = useState('')
-  const selectedModel = useSelectedModel((state) => state.model)
+  const { model: selectedModel, setModel: setSelectedModel } = useSelectedModel()
   // this is the conversation panel state shows all chat history
   const [conversationPanelOpen, setConversationPanelOpen] = useState(true)
+  // fetch all my models list
+  const { data: modelData } = useFetchModels({ output: 'text' })
   // get the selected conversation
   const selectedConversation = useSelectedConversation((state) => state.conversation)
   // get the query client
@@ -64,13 +67,36 @@ const ChatPage = () => {
 
   // Keep track of the last loaded conversation ID to prevent React Query background refetch from overwriting active UI messages
   const loadedChatId = useRef<string | null>(null)
-
+  console.log(modelData?.data?.[0])
   useEffect(() => {
     if (chatId && loadedChatId.current !== chatId && defaultMessages?.data?.messages) {
       setMessages(defaultMessages.data.messages)
       loadedChatId.current = chatId
+      // get the model set in conversation
+      const model = modelData?.data?.find((m) => m.id === selectedConversation?.modelId)
+      // set the selected model
+      const modelToSet = model ?? modelData?.data?.[0]
+      if (modelToSet) {
+        setSelectedModel(modelToSet)
+      }
+    } else if (
+      chatId &&
+      loadedChatId.current === chatId &&
+      modelData?.data?.length &&
+      !selectedModel?.id
+    ) {
+      // in case the model was not preset or selected
+      setSelectedModel(modelData?.data?.[0])
     }
-  }, [chatId, defaultMessages?.data?.messages, setMessages])
+  }, [
+    chatId,
+    defaultMessages?.data.messages,
+    modelData,
+    selectedConversation?.modelId,
+    selectedModel?.id,
+    setMessages,
+    setSelectedModel
+  ])
 
   // function to handle submit of the prompt input
   const handleSubmit = (message: PromptInputMessage) => {
@@ -138,7 +164,7 @@ const ChatPage = () => {
             <PromptInputFooter>
               {/* All tools go here */}
               <PromptInputTools>
-                <AppModelSelector output="text" />
+                <AppModelSelector output="text" disableDefaultSelection />
               </PromptInputTools>
               {/* submit button */}
               <PromptInputSubmit

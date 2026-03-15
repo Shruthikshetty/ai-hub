@@ -18,7 +18,13 @@ import { ModelIOType } from '@common/schemas/model.schema'
 import { AVAILABLE_PROVIDER_LIST } from '@common/constants/global.constants'
 
 // lets you select the various models from all the available providers
-function AppModelSelector({ output }: { output?: ModelIOType }) {
+function AppModelSelector({
+  output,
+  disableDefaultSelection = false
+}: {
+  output?: ModelIOType
+  disableDefaultSelection?: boolean
+}) {
   //@TODO show error message if no models are not loaded
   // fetch all the model list
   const { data: modelsData } = useFetchModels({ output })
@@ -28,11 +34,14 @@ function AppModelSelector({ output }: { output?: ModelIOType }) {
 
   // set the model to the first model of the first provider
   useEffect(() => {
+    // in case default selection is disabled
+    if (disableDefaultSelection) return
+    // set the model to the first model of the first provider
     if (modelsData?.data?.length && !model) {
       setModel(modelsData?.data?.[0])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modelsData])
+  }, [modelsData, disableDefaultSelection])
 
   return (
     <ModelSelector onOpenChange={setModelSelectorOpen} open={modelSelectorOpen}>
@@ -40,7 +49,11 @@ function AppModelSelector({ output }: { output?: ModelIOType }) {
         <PromptInputButton className="border">
           <ModelSelectorLogo provider={model?.provider ?? ''} />
 
-          {model?.name && <ModelSelectorName>{model?.name}</ModelSelectorName>}
+          {model?.name ? (
+            <ModelSelectorName>{model?.name}</ModelSelectorName>
+          ) : (
+            <ModelSelectorName>Select a Model</ModelSelectorName>
+          )}
         </PromptInputButton>
       </ModelSelectorTrigger>
       <ModelSelectorContent>

@@ -11,8 +11,12 @@ import { useQuery } from '@tanstack/react-query'
 /**
  * Fetches the list of models from the backend
  */
-export function useFetchModels({ output }: { output?: ModelIOType } = {}) {
+export function useFetchModels({
+  output,
+  fetchEnabled = true
+}: { output?: ModelIOType; fetchEnabled?: boolean } = {}) {
   return useQuery<ModelResponseSchemaType, ApiError>({
+    enabled: fetchEnabled,
     queryKey: [QUERY_KEYS.modelsFetch, output],
     queryFn: async (): Promise<ModelResponseSchemaType> => {
       // generate search params
