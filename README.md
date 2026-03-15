@@ -130,3 +130,33 @@ The packaged application will be available in the `dist/` directory.
 
 - **Environment Variables**: Manage `.env` files for sensitive configs.
 - **Electron Builder**: Modify `electron-builder.yml` to change app metadata, icons, and build settings.
+
+## ✨ App Showcase
+
+### Dashboard
+
+The central hub for all AI-powered modules.
+![Dashboard](./resources/app-dashboard.png)
+
+### Chat Interface
+
+Intuitive conversational experience with multi-model support.
+![Chat Main](./resources/chat-main.png)
+
+Modify the model options.
+![Chat Options](./resources/chat-reasoning.png)
+
+### Personal Profile
+
+Manage your identity and app-wide preferences.
+![User Profile](./resources/user-profile.png)
+
+### AI Providers
+
+Securely manage and switch between various AI service providers.
+![AI Providers](./resources/ai-providers.png)
+
+### Themes
+
+switch between light and dark themes.
+![Themes](./resources/themes.png)
