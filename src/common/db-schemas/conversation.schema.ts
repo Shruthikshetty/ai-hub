@@ -4,7 +4,7 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import {
+import type {
   ConversationMetadataSchemaType,
   ConversationToolsSchemaType
 } from '../schemas/conversation.schema'

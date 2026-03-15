@@ -54,7 +54,9 @@ const ChatPage = () => {
   // get the query client
   const queryClient = useQueryClient()
   // hook to get the messages of the selected conversation
-  const { data: defaultMessages } = useFetchConversationsMessages(selectedConversation?.id)
+  const { data: defaultMessages, isError: isDefaultMessagesError } = useFetchConversationsMessages(
+    selectedConversation?.id
+  )
   // hook to manage chat
   const chatId = selectedConversation?.id?.toString()
   // Keep track of the last loaded conversation ID to prevent React Query background refetch from overwriting active UI messages
@@ -75,20 +77,35 @@ const ChatPage = () => {
 
   // Load messages when switching conversations
   useEffect(() => {
-    if (!chatId) return
+    // if there is no chat id then clear the messages
+    if (!chatId) {
+      setMessages([])
+      loadedChatId.current = null
+      return
+    }
+    // if the chat id is different from the loaded chat id then clear the messages
+    if (loadedChatId.current !== chatId) {
+      setMessages([])
+    }
+    // if the loaded chat id is same as the chat id then return
     if (loadedChatId.current === chatId) return
+    // if the default messages are not available then return
+    if (isDefaultMessagesError) {
+      loadedChatId.current = chatId
+      return
+    }
+    // if the default messages are undefined then return
+    if (defaultMessages === undefined) return
 
-    // If messages are available from DB, load them
+    // set the messages
     if (defaultMessages?.data?.messages) {
       setMessages(defaultMessages.data.messages)
       loadedChatId.current = chatId
-    } else if (defaultMessages !== undefined) {
-      // Query has resolved but there are no messages (new/empty chat)
+    } else {
       setMessages([])
       loadedChatId.current = chatId
     }
-    // If defaultMessages is undefined, query is still loading — wait for next render
-  }, [chatId, defaultMessages, setMessages])
+  }, [chatId, defaultMessages, isDefaultMessagesError, setMessages])
 
   //Restore the model when switching conversations (independent of message loading)
   useEffect(() => {

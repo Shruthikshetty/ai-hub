@@ -158,5 +158,5 @@ Securely manage and switch between various AI service providers.
 
 ### Themes
 
-switch between light and dark themes.
+Switch between light and dark themes.
 ![Themes](./resources/themes.png)

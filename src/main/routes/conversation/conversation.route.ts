@@ -160,7 +160,10 @@ export const updateConversation = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: conversationsUpdateSchema
+          schema: conversationsUpdateSchema.refine(
+            (value) => Object.values(value).some((field) => field !== undefined),
+            'At least one field must be provided'
+          )
         }
       },
       required: true
