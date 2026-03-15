@@ -57,7 +57,7 @@ function ChatOptionsPanel({
           e.preventDefault()
           form.handleSubmit()
         }}
-        className="h-full w-full flex flex-col justify-between"
+        className="h-full w-full flex flex-col justify-between overflow-hidden"
       >
         {/* heading */}
         <div>
