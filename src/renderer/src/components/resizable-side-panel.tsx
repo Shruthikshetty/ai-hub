@@ -59,7 +59,7 @@ export default function ResizableSidePanel({
     >
       <div
         className={cn(
-          'transition-opacity duration-200 h-full flex flex-col justify-between',
+          'transition-opacity duration-200 h-full flex flex-col',
           !isOpen ? 'opacity-0 overflow-hidden' : 'opacity-100',
           classNames.container
         )}
