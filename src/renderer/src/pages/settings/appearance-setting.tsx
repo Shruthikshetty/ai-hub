@@ -13,7 +13,11 @@ const AppearanceTab = () => {
       <h1 className="text-2xl font-semibold">Appearance</h1>
       <h2>Theme preferences</h2>
       <div className="flex flex-row gap-3">
-        <ToggleGroup type="single" value={theme} onValueChange={(value: Theme) => setTheme(value)}>
+        <ToggleGroup
+          type="single"
+          value={theme}
+          onValueChange={(value: Theme | '') => value && setTheme(value)}
+        >
           {THEME_OPTIONS.map((option) => (
             <ToggleGroupItem
               key={option.value}
