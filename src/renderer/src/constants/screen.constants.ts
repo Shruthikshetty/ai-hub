@@ -14,7 +14,8 @@ import {
   Settings,
   Sun,
   Moon,
-  Monitor
+  Monitor,
+  LucideIcon
 } from 'lucide-react'
 
 // side tray items (do not change order add new items at the end)
