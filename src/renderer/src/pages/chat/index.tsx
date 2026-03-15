@@ -33,6 +33,7 @@ import { useFetchConversationsMessages } from '@renderer/services/conversation'
 import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
 import { useFetchModels } from '@renderer/services/model'
+import ChatOptionsPanel from './options-panal'
 
 //@TODO conversation metadata like system prompt, tools, reasoning etc. still need to be restored on switch
 // stable transport instance
@@ -44,6 +45,8 @@ const ChatPage = () => {
   const { model: selectedModel, setModel: setSelectedModel } = useSelectedModel()
   // this is the conversation panel state shows all chat history
   const [conversationPanelOpen, setConversationPanelOpen] = useState(true)
+  // this is the options panel state to show the model options
+  const [optionsPanelOpen, setOptionsPanelOpen] = useState(true)
   // fetch all my models list
   const { data: modelData } = useFetchModels({ output: 'text' })
   // get the selected conversation
@@ -130,7 +133,19 @@ const ChatPage = () => {
       <ResizableHandle withHandle />
       {/*  main chat interface */}
       <ResizablePanel className="flex flex-col h-full w-full">
-        <PanelTrigger value={conversationPanelOpen} toggle={setConversationPanelOpen} />
+        <div className="flex flex-row items-center justify-between pt-2">
+          <PanelTrigger
+            value={conversationPanelOpen}
+            toggle={setConversationPanelOpen}
+            title="HISTORY"
+          />
+          <PanelTrigger
+            value={optionsPanelOpen}
+            toggle={setOptionsPanelOpen}
+            invert
+            title="OPTIONS"
+          />
+        </div>
         <div className="flex flex-col p-5 md:p-10 flex-1 overflow-hidden">
           {/* starter prompts */}
           {messages.length === 0 ? (
@@ -184,6 +199,9 @@ const ChatPage = () => {
           </PromptInput>
         </div>
       </ResizablePanel>
+      {/* right side options panel */}
+      <ResizableHandle withHandle />
+      <ChatOptionsPanel isOpen={optionsPanelOpen} setIsOpen={setOptionsPanelOpen} />
     </ResizablePanelGroup>
   )
 }
