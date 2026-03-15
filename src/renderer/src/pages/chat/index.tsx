@@ -34,7 +34,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
 import { useFetchModels } from '@renderer/services/model'
 
-//@TODO still in progress the conversation meta data also to be updated will be done later like restore selected model etc
+//@TODO conversation metadata like system prompt, tools, reasoning etc. still need to be restored on switch
 // stable transport instance
 const chatTransport = createIPCStreamTransport('/api/chat')
 
@@ -54,6 +54,11 @@ const ChatPage = () => {
   const { data: defaultMessages } = useFetchConversationsMessages(selectedConversation?.id)
   // hook to manage chat
   const chatId = selectedConversation?.id?.toString()
+  // Keep track of the last loaded conversation ID to prevent React Query background refetch from overwriting active UI messages
+  const loadedChatId = useRef<string | null>(null)
+  // Track the last conversation ID for which the model was restored
+  const modelRestoredForChatId = useRef<string | null>(null)
+  // hook to manage chat
   const { messages, sendMessage, error, status, setMessages } = useChat<AppUIMessage>({
     id: chatId,
     transport: chatTransport,
@@ -65,38 +70,37 @@ const ChatPage = () => {
     }
   })
 
-  // Keep track of the last loaded conversation ID to prevent React Query background refetch from overwriting active UI messages
-  const loadedChatId = useRef<string | null>(null)
-  console.log(modelData?.data?.[0])
+  // Load messages when switching conversations
   useEffect(() => {
-    if (chatId && loadedChatId.current !== chatId && defaultMessages?.data?.messages) {
+    if (!chatId) return
+    if (loadedChatId.current === chatId) return
+
+    // If messages are available from DB, load them
+    if (defaultMessages?.data?.messages) {
       setMessages(defaultMessages.data.messages)
       loadedChatId.current = chatId
-      // get the model set in conversation
-      const model = modelData?.data?.find((m) => m.id === selectedConversation?.modelId)
-      // set the selected model
-      const modelToSet = model ?? modelData?.data?.[0]
-      if (modelToSet) {
-        setSelectedModel(modelToSet)
-      }
-    } else if (
-      chatId &&
-      loadedChatId.current === chatId &&
-      modelData?.data?.length &&
-      !selectedModel?.id
-    ) {
-      // in case the model was not preset or selected
-      setSelectedModel(modelData?.data?.[0])
+    } else if (defaultMessages !== undefined) {
+      // Query has resolved but there are no messages (new/empty chat)
+      setMessages([])
+      loadedChatId.current = chatId
     }
-  }, [
-    chatId,
-    defaultMessages?.data.messages,
-    modelData,
-    selectedConversation?.modelId,
-    selectedModel?.id,
-    setMessages,
-    setSelectedModel
-  ])
+    // If defaultMessages is undefined, query is still loading — wait for next render
+  }, [chatId, defaultMessages, setMessages])
+
+  //Restore the model when switching conversations (independent of message loading)
+  useEffect(() => {
+    if (!chatId || !modelData?.data?.length) return
+    if (modelRestoredForChatId.current === chatId) return
+
+    // get the model set in conversation
+    const model = modelData.data.find((m) => m.id === selectedConversation?.modelId)
+    // set the selected model (fallback to first available model)
+    const modelToSet = model ?? modelData.data[0]
+    if (modelToSet) {
+      setSelectedModel(modelToSet)
+      modelRestoredForChatId.current = chatId
+    }
+  }, [chatId, modelData, selectedConversation?.modelId, setSelectedModel])
 
   // function to handle submit of the prompt input
   const handleSubmit = (message: PromptInputMessage) => {
