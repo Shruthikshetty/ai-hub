@@ -18,7 +18,6 @@ const ModelItem = ({
 }) => {
   const handleSelect = useCallback(() => onSelect(model), [onSelect, model])
 
-  if (!selectedModel) return null
   return (
     <ModelSelectorItem key={model.id} onSelect={handleSelect} value={model.id}>
       <ModelSelectorLogo provider={model.provider} />

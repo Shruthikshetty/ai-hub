@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c73b5057-24fd-4c06-93b7-4300b9810b0e",
-  "prevId": "494d9db9-7e05-4c02-8a2d-d3bf1c37436d",
+  "id": "b5f0c26c-6260-416f-b7e5-558ee353f51e",
+  "prevId": "c73b5057-24fd-4c06-93b7-4300b9810b0e",
   "tables": {
     "users": {
       "name": "users",
@@ -203,6 +203,37 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "reasoning": {
+          "name": "reasoning",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'none'"
+        },
+        "systemPrompt": {
+          "name": "systemPrompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'{}'"
+        },
+        "tools": {
+          "name": "tools",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'{\"search\":false,\"imageGeneration\":false}'"
         },
         "created_at": {
           "name": "created_at",

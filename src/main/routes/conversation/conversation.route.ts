@@ -12,9 +12,13 @@ import {
   createConversationResponseSchema,
   deleteConversationByIdSchema,
   fetchAllConversationsResponseSchema,
-  getMessagesByConversation
+  getMessagesByConversation,
+  updateConversationResponseSchema
 } from '../../../common/schemas/conversation.schema'
-import { conversationsInsertSchema } from '../../../common/db-schemas/conversation.schema'
+import {
+  conversationsInsertSchema,
+  conversationsUpdateSchema
+} from '../../../common/db-schemas/conversation.schema'
 
 // route to get all conversations
 export const getConversation = createRoute({
@@ -132,8 +136,57 @@ export const getConversationMessages = createRoute({
     [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }
 })
+
+// route to update a conversation
+export const updateConversation = createRoute({
+  tags: ['Conversation'],
+  method: 'patch',
+  path: '/conversation/{id}',
+  request: {
+    params: z.object({
+      id: z.coerce
+        .number()
+        .positive()
+        .openapi({
+          param: {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'conversation id'
+          },
+          example: 2
+        })
+    }),
+    body: {
+      content: {
+        'application/json': {
+          schema: conversationsUpdateSchema.refine(
+            (value) => Object.values(value).some((field) => field !== undefined),
+            'At least one field must be provided'
+          )
+        }
+      },
+      required: true
+    }
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: updateConversationResponseSchema
+        }
+      },
+      description: 'success response for updating a conversation'
+    },
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export all types
 export type GetConversationRoute = typeof getConversation
 export type CreateConversationRoute = typeof createConversation
 export type DeleteConversationRoute = typeof deleteConversation
 export type GetConversationMessagesRoute = typeof getConversationMessages
+export type UpdateConversationRoute = typeof updateConversation

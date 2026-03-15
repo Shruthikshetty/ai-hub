@@ -5,7 +5,8 @@ import {
   GetConversationRoute,
   CreateConversationRoute,
   DeleteConversationRoute,
-  GetConversationMessagesRoute
+  GetConversationMessagesRoute,
+  UpdateConversationRoute
 } from './conversation.route'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
@@ -34,6 +35,7 @@ export const getConversation: AppRouteHandler<GetConversationRoute> = async (c) 
 export const createConversation: AppRouteHandler<CreateConversationRoute> = async (c) => {
   const body = c.req.valid('json')
 
+  // add a new conversation to db
   const [newConversation] = await db.insert(conversations).values(body).returning()
 
   return c.json(
@@ -79,6 +81,7 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
 export const getConversationMessages: AppRouteHandler<GetConversationMessagesRoute> = async (c) => {
   const { id } = c.req.valid('param')
 
+  // find the conversation by id
   const conversation = await db.query.conversations.findFirst({
     where: eq(conversations.id, id),
     with: {
@@ -88,6 +91,7 @@ export const getConversationMessages: AppRouteHandler<GetConversationMessagesRou
     }
   })
 
+  // in case conversation is not found
   if (!conversation) {
     return c.json(
       {
@@ -98,10 +102,44 @@ export const getConversationMessages: AppRouteHandler<GetConversationMessagesRou
     )
   }
 
+  // return the success with conversation and messages
   return c.json(
     {
       success: true,
       data: conversation
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+// handler for updating a conversation
+export const updateConversationById: AppRouteHandler<UpdateConversationRoute> = async (c) => {
+  const { id } = c.req.valid('param')
+  const body = c.req.valid('json')
+
+  // update the conversation
+  const [updated] = await db
+    .update(conversations)
+    .set(body)
+    .where(eq(conversations.id, id))
+    .returning()
+
+  // in case conversation is not found
+  if (!updated) {
+    return c.json(
+      {
+        success: false,
+        message: 'Conversation not found'
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+
+  // return success with updated conversation
+  return c.json(
+    {
+      success: true,
+      data: updated
     },
     HTTP_STATUS_CODES.OK
   )

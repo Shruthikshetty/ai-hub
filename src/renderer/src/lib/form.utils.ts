@@ -15,7 +15,7 @@ export const handleNumberChange = (
  */
 
 export const handleStringChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   fn: (value: string | undefined) => void
 ) => {
   const val = e.target?.value
