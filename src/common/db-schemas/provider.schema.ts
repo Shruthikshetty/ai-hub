@@ -18,6 +18,7 @@ export const providers = sqliteTable('providers', {
   enabled: integer({ mode: 'boolean' }).default(false),
   server: integer({ mode: 'boolean' }).default(false),
   serverUrl: text(),
+  siteUrl: text(),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()
@@ -35,7 +36,8 @@ export const providersInsertSchema = createInsertSchema(providers, {
   apiKey: (field) => field.max(10000).nullish(),
   description: (field) => field.max(5000).nullish(),
   serverUrl: (field) => field.max(1000).nullish(),
-  name: (field) => field.max(255).nullish()
+  name: (field) => field.max(255).nullish(),
+  siteUrl: (field) => field.max(1000).nullish()
 }).omit({
   id: true,
   createdAt: true,

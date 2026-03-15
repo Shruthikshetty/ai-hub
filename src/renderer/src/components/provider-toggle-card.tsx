@@ -9,6 +9,7 @@ import { Switch } from './ui/switch'
 import { cn } from '@renderer/lib/utils'
 import { useUpdateProviderById } from '@renderer/services/provider'
 import { hiddenText } from '@renderer/lib/format.utils'
+import { ExternalLink } from 'lucide-react'
 
 export default function ProviderToggleCard({ provider }: { provider: ProviderGetSchema }) {
   const defaultValue = provider.server ? provider.serverUrl : provider.apiKey || ''
@@ -65,8 +66,13 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
               />
             ) : null}
             <div className="flex flex-col gap-1.5 text-start items-start">
-              <CardTitle className="text-base font-semibold leading-none">
+              <CardTitle className="text-base font-semibold leading-none flex flex-row justify-start gap-2 items-center">
                 {provider?.name}
+                {provider?.siteUrl ? (
+                  <a href={provider?.siteUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="size-4" strokeWidth={3} />
+                  </a>
+                ) : null}
               </CardTitle>
               <CardDescription className="text-sm text-muted-foreground">
                 {provider?.description}

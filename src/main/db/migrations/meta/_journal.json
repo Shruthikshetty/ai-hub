@@ -43,6 +43,13 @@
       "when": 1773335056370,
       "tag": "0005_daffy_rick_jones",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1773555601144,
+      "tag": "0006_right_dracula",
+      "breakpoints": true
     }
   ]
 }

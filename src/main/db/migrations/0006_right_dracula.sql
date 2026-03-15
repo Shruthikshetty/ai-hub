@@ -1,0 +1,1 @@
+ALTER TABLE `providers` ADD `siteUrl` text;
