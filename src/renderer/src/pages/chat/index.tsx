@@ -46,7 +46,7 @@ const ChatPage = () => {
   // this is the conversation panel state shows all chat history
   const [conversationPanelOpen, setConversationPanelOpen] = useState(true)
   // this is the options panel state to show the model options
-  const [optionsPanelOpen, setOptionsPanelOpen] = useState(true)
+  const [optionsPanelOpen, setOptionsPanelOpen] = useState(false)
   // fetch all my models list
   const { data: modelData } = useFetchModels({ output: 'text' })
   // get the selected conversation
@@ -201,7 +201,11 @@ const ChatPage = () => {
       </ResizablePanel>
       {/* right side options panel */}
       <ResizableHandle withHandle />
-      <ChatOptionsPanel isOpen={optionsPanelOpen} setIsOpen={setOptionsPanelOpen} />
+      <ChatOptionsPanel
+        isOpen={optionsPanelOpen}
+        setIsOpen={setOptionsPanelOpen}
+        conversation={defaultMessages?.data}
+      />
     </ResizablePanelGroup>
   )
 }

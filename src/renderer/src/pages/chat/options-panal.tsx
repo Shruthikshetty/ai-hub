@@ -1,61 +1,140 @@
+import { FetchConversationWithMessagesResponseType } from '@common/schemas/conversation.schema'
 import ResizableSidePanel from '@renderer/components/resizable-side-panel'
+import { Button } from '@renderer/components/ui/button'
+import { FieldError, FieldGroup, FieldLabel, Field } from '@renderer/components/ui/field'
 import { Label } from '@renderer/components/ui/label'
 import { Select } from '@renderer/components/ui/select'
 import { Separator } from '@renderer/components/ui/separator'
 import { Switch } from '@renderer/components/ui/switch'
 import { Textarea } from '@renderer/components/ui/textarea'
+import { handleStringChange } from '@renderer/lib/form.utils'
+import {
+  ChatOptionsValidationSchema,
+  chatOptionsValidationSchema
+} from '@renderer/schemas/chat-options-validation.schema'
+import { useForm } from '@tanstack/react-form'
+import { Save, Trash } from 'lucide-react'
 
 //@TODO this logic to be handled by forms
 /**
  * This panel contains additional options that can be passed to the model
  */
-function ChatOptionsPanel(props: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) {
+function ChatOptionsPanel(props: {
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+  conversation?: FetchConversationWithMessagesResponseType['data'] | undefined
+}) {
+  // create a form to update the conversation settings
+  const form = useForm({
+    defaultValues: {
+      systemPrompt: props.conversation?.systemPrompt
+    } as ChatOptionsValidationSchema,
+    validators: { onSubmit: chatOptionsValidationSchema },
+    onSubmit: async ({ value }) => {
+      // update the conversation settings
+      console.log(value)
+    }
+  })
+
   return (
     <ResizableSidePanel {...props}>
-      {/* heading */}
-      <h1 className="text-foreground/80 font-semibold p-4">OPTIONS</h1>
-      <Separator />
-      {/* OPTIONS */}
-      <div className="p-4 flex flex-col gap-2">
-        <h2 className="text-foreground/80 font-semibold text-sm">MODEL OPTIONS</h2>
-        <Label className="text-foreground text-sm font-semibold" htmlFor="system-prompt">
-          System Prompt
-        </Label>
-        <Textarea id="system-prompt" placeholder="Enter system instructions for the AI..." />
-        <Label className="text-foreground text-sm font-semibold" htmlFor="reasoning">
-          Reasoning
-        </Label>
-        <Select />
-      </div>
-      <Separator />
-      {/* Tools */}
-      <div className="p-4 flex flex-col gap-2">
-        <h2 className="text-foreground/80 font-semibold text-sm">TOOLS</h2>
-        <div className="flex items-center justify-between">
-          <Label className="text-foreground text-sm font-semibold" htmlFor="search">
-            Search
-          </Label>
-          <Switch id="search" />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          form.handleSubmit()
+        }}
+        className="h-full w-full flex flex-col justify-between"
+      >
+        {/* heading */}
+        <div>
+          <h1 className="text-foreground/80 font-semibold p-4">OPTIONS</h1>
+          <Separator />
         </div>
-        <div className="flex items-center justify-between">
-          <Label className="text-foreground text-sm font-semibold" htmlFor="image-generation">
-            Image generation
-          </Label>
-          <Switch id="image-generation" />
+        <FieldGroup className="gap-1 grow overflow-y-auto">
+          {/* OPTIONS */}
+          <div className="p-4 flex flex-col gap-2">
+            <h2 className="text-foreground font-semibold text-sm">MODEL OPTIONS</h2>
+            <form.Field name="systemPrompt">
+              {(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel
+                      className="text-muted-foreground text-sm font-semibold"
+                      htmlFor={field.name}
+                    >
+                      System Prompt
+                    </FieldLabel>
+                    <Textarea
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value ?? ''}
+                      placeholder="Enter system instructions for the AI..."
+                      className="dark:bg-background/90"
+                      onChange={(e) => handleStringChange(e, field.handleChange)}
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                )
+              }}
+            </form.Field>
+            <Label className="text-muted-foreground text-sm font-semibold" htmlFor="reasoning">
+              Reasoning
+            </Label>
+            <Select />
+          </div>
+          <Separator />
+          {/* Tools */}
+          <div className="p-4 flex flex-col gap-2">
+            <h2 className="text-foreground font-semibold text-sm">TOOLS</h2>
+            <div className="flex items-center justify-between">
+              <Label className="text-muted-foreground text-sm font-semibold" htmlFor="search">
+                Search
+              </Label>
+              <Switch id="search" />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label
+                className="text-muted-foreground text-sm font-semibold"
+                htmlFor="image-generation"
+              >
+                Image generation
+              </Label>
+              <Switch id="image-generation" />
+            </div>
+          </div>
+          <Separator />
+          {/* Metadata */}
+          <div className="p-4 flex flex-col gap-2">
+            <h2 className="text-foreground font-semibold text-sm">META DATA</h2>
+            <div className="flex items-center justify-between">
+              <Label className="text-muted-foreground text-sm font-semibold" htmlFor="token-used">
+                Token used
+              </Label>
+              <Switch id="token-used" />
+            </div>
+          </div>
+          <Separator />
+        </FieldGroup>
+        <div>
+          <Separator />
+          <div className="flex flex-col items-center justify-center gap-2 px-4 py-2 sm:flex-row">
+            <Button
+              variant="destructive"
+              onClick={() => form.reset()}
+              type="button"
+              className="p-4"
+            >
+              <Trash />
+              Reset
+            </Button>
+            <Button type="submit" variant={'outline'} className="p-4">
+              <Save />
+              Save
+            </Button>
+          </div>
         </div>
-      </div>
-      <Separator />
-      {/* Metadata */}
-      <div className="p-4 flex flex-col gap-2">
-        <h2 className="text-foreground/80 font-semibold text-sm">META DATA</h2>
-        <div className="flex items-center justify-between">
-          <Label className="text-foreground text-sm font-semibold" htmlFor="token-used">
-            Token used
-          </Label>
-          <Switch id="token-used" />
-        </div>
-      </div>
-      <Separator />
+      </form>
     </ResizableSidePanel>
   )
 }
