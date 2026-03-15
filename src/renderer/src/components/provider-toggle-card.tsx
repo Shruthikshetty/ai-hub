@@ -61,7 +61,7 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
               <img
                 src={provider?.icon}
                 alt={`${provider.name}-icon`}
-                className="w-8 h-8 object-contain shrink-0 invert"
+                className="w-8 h-8 object-contain shrink-0 dark:invert"
               />
             ) : null}
             <div className="flex flex-col gap-1.5 text-start items-start">
