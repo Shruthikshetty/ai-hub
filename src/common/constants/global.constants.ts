@@ -34,6 +34,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     enabled: false,
     apiKey: '',
     server: false,
+    siteUrl: 'https://platform.openai.com',
     description: 'Open AI provider models'
   },
   {
@@ -44,6 +45,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     apiKey: null,
     server: true,
     serverUrl: 'http://localhost:11434',
+    siteUrl: 'https://ollama.com',
     description: 'Your local models running using ollama please add the exact server url'
   },
   {
@@ -53,6 +55,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     enabled: false,
     apiKey: '',
     server: false,
+    siteUrl: 'https://openrouter.ai',
     description: 'Open Router provider models'
   },
   {
@@ -62,6 +65,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     enabled: false,
     apiKey: '',
     server: false,
+    siteUrl: 'https://aistudio.google.com',
     description: 'Google ai studio models'
   }
 ]

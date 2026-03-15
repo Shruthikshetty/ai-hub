@@ -1,6 +1,7 @@
 /**
  * contains all the constants used throughout screens
  */
+import { Theme } from '@renderer/components/theme-context'
 import {
   MessageSquare,
   Image,
@@ -10,7 +11,11 @@ import {
   User,
   Package,
   Palette,
-  Settings
+  Settings,
+  Sun,
+  Moon,
+  Monitor,
+  LucideIcon
 } from 'lucide-react'
 
 // side tray items (do not change order add new items at the end)
@@ -107,4 +112,22 @@ export const SPINNER_COLORS = [
   '#4338ca', // indigo-700
   '#3730a3', // indigo-800
   '#312e81' // indigo-900
+]
+
+export const THEME_OPTIONS: { value: Theme; label: string; icon?: LucideIcon }[] = [
+  {
+    value: 'light',
+    label: 'Light',
+    icon: Sun
+  },
+  {
+    value: 'dark',
+    label: 'Dark',
+    icon: Moon
+  },
+  {
+    value: 'system',
+    label: 'System',
+    icon: Monitor
+  }
 ]

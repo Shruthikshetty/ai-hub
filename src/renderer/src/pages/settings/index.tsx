@@ -4,6 +4,8 @@ import { cn } from '@renderer/lib/utils'
 import { useState } from 'react'
 import ProfileSettings from './profile-settings'
 import { ProviderSettingsTab } from './provider-settings'
+import AppearanceTab from './appearance-setting'
+import SecurityTab from './security-settings'
 
 /**
  * Settings page
@@ -18,6 +20,10 @@ function Settings(): React.JSX.Element {
         return <ProfileSettings />
       case 'Providers':
         return <ProviderSettingsTab />
+      case 'Appearance':
+        return <AppearanceTab />
+      case 'Security':
+        return <SecurityTab />
       default:
         return <div className="text-2xl h-full w-full">In Progress</div>
     }
