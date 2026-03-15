@@ -42,6 +42,9 @@ export const conversationsInsertSchema = createInsertSchema(conversations, {
   updatedAt: true
 })
 
+// zod schema for updating  the conversation
+export const conversationsUpdateSchema = conversationsInsertSchema.partial()
+
 // schemas ------------>
 
 //zod schema for getting conversations
@@ -50,3 +53,4 @@ export const conversationsSchema = createSelectSchema(conversations)
 // export types
 export type ConversationsGetSchema = z.infer<typeof conversationsSchema>
 export type ConversationAddSchema = z.infer<typeof conversationsInsertSchema>
+export type ConversationUpdateSchema = z.infer<typeof conversationsUpdateSchema>

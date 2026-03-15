@@ -12,32 +12,39 @@ import {
   ChatOptionsValidationSchema,
   chatOptionsValidationSchema
 } from '@renderer/schemas/chat-options-validation.schema'
+import { useUpdateConversationById } from '@renderer/services/conversation'
 import { useForm } from '@tanstack/react-form'
 import { Save, Trash } from 'lucide-react'
 
-//@TODO this logic to be handled by forms
+//@TODO add the rest of the options later
 /**
  * This panel contains additional options that can be passed to the model
  */
-function ChatOptionsPanel(props: {
+function ChatOptionsPanel({
+  conversation,
+  ...rest
+}: {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
   conversation?: FetchConversationWithMessagesResponseType['data'] | undefined
 }) {
+  // hook to update conversation settings
+  const { mutate: updateConversationById } = useUpdateConversationById()
   // create a form to update the conversation settings
   const form = useForm({
     defaultValues: {
-      systemPrompt: props.conversation?.systemPrompt
+      systemPrompt: conversation?.systemPrompt
     } as ChatOptionsValidationSchema,
     validators: { onSubmit: chatOptionsValidationSchema },
     onSubmit: async ({ value }) => {
+      if (!conversation?.id) return
       // update the conversation settings
-      console.log(value)
+      updateConversationById({ id: conversation.id, data: value })
     }
   })
 
   return (
-    <ResizableSidePanel {...props}>
+    <ResizableSidePanel {...rest}>
       <form
         onSubmit={(e) => {
           e.preventDefault()

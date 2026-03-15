@@ -16,5 +16,6 @@ export const MUTATION_KEYS = {
   providerUpdateById: 'provider-update-by-id',
   conversationAdd: 'conversation-add',
   deleteConversationById: 'delete-conversation-by-id',
-  messageAdd: 'message-add'
+  messageAdd: 'message-add',
+  updateConversationById: 'update-conversation-by-id'
 }

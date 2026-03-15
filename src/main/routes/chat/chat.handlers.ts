@@ -10,6 +10,8 @@ import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 import db from '../../db'
 import { messages as messageSchema } from '../../../common/db-schemas/message.schema'
 import { generateTitle } from '../../lib/generate-title'
+import { eq } from 'drizzle-orm'
+import { conversations } from '../../db/schema'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
@@ -28,6 +30,21 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
       HTTP_STATUS_CODES.BAD_REQUEST
     )
   }
+  // get the conversation from db
+  const conversation = await db.query.conversations.findFirst({
+    where: eq(conversations.id, conversationId)
+  })
+
+  // if conversation is not found
+  if (!conversation) {
+    return c.json(
+      {
+        message: 'Conversation not found',
+        success: false
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
 
   // const get the provider as per user model
   const modelProvider = await getProviderInstanceModel({ model })
@@ -36,6 +53,7 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   const result = streamText({
     model: modelProvider(model.id),
     messages: coreMessages,
+    system: conversation?.systemPrompt ?? undefined,
     providerOptions: {
       openai: {
         reasoningEffort: 'low',

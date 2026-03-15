@@ -2,17 +2,21 @@
  * This file contain all the conversation related services
  */
 
-import { ConversationAddSchema } from '@common/db-schemas/conversation.schema'
+import {
+  ConversationAddSchema,
+  ConversationUpdateSchema
+} from '@common/db-schemas/conversation.schema'
 import {
   CreateConversationResponseSchemaType,
   DeleteConversationResponseType,
   FetchAllConversationsResponseSchemaType,
-  FetchConversationWithMessagesResponseType
+  FetchConversationWithMessagesResponseType,
+  UpdateConversationResponseSchemaType
 } from '@common/schemas/conversation.schema'
 import { ApiError } from '@common/types'
 import { FETCH_CONVERSATIONS_STALE_TIME } from '@renderer/constants/config.constants'
 import { MUTATION_KEYS, QUERY_KEYS } from '@renderer/constants/service-keys.constants'
-import { errorToast } from '@renderer/lib/toast-wrapper'
+import { errorToast, successToast } from '@renderer/lib/toast-wrapper'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**
@@ -73,7 +77,7 @@ export const useAddConversation = () => {
 }
 
 /**
- * const delete a conversation by id
+ * hook delete a conversation by id
  */
 export const useDeleteConversationById = () => {
   const queryClient = useQueryClient()
@@ -91,6 +95,39 @@ export const useDeleteConversationById = () => {
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to delete conversation')
+    }
+  })
+}
+
+/**
+ * hook to update a conversation by id
+ */
+export const useUpdateConversationById = () => {
+  const queryClient = useQueryClient()
+  return useMutation<
+    UpdateConversationResponseSchemaType,
+    ApiError,
+    { id: number; data: ConversationUpdateSchema }
+  >({
+    mutationKey: [MUTATION_KEYS.updateConversationById],
+    mutationFn: async ({ id, data }) => {
+      const response = await window.api.request('/api/conversation/' + id, 'PATCH', data)
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    onSuccess: async (response) => {
+      // show success toast
+      successToast('Conversation updated successfully')
+      // invalidate all the queries
+      return queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.conversationMessagesFetch, response.data.id]
+      })
+    },
+    onError: (error) => {
+      // show error toast
+      errorToast(error?.message ?? 'Failed to update conversation')
     }
   })
 }

@@ -30,6 +30,12 @@ export const createConversationResponseSchema = z.object({
   data: conversationsSchema
 })
 
+// response schema for updating a conversation
+export const updateConversationResponseSchema = z.object({
+  success: z.boolean(),
+  data: conversationsSchema
+})
+
 // metadata options
 export const conversationMetadataSchema = z.object({
   tokensPerMessage: z.string().nullish(),
@@ -56,3 +62,4 @@ export type FetchConversationWithMessagesResponseType = z.infer<typeof getMessag
 export type ConversationMetadataSchemaType = z.infer<typeof conversationMetadataSchema>
 export type ConversationToolsSchemaType = z.infer<typeof conversationToolsSchema>
 export type ReasoningOptionsSchemaType = z.infer<typeof reasoningOptionsSchema>
+export type UpdateConversationResponseSchemaType = z.infer<typeof updateConversationResponseSchema>
