@@ -5,7 +5,7 @@ AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)**
 ## 🛠️ Tech Stack
 
 - **Runtime**: [Electron](https://www.electronjs.org/), [Node.js](https://nodejs.org/)
-- **Frontend**: [React](https://react.dev/) (v19), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/) (v4), [Framer Motion](https://motion.dev/), [Zustand](https://zustand-demo.pmnd.rs/)
+- **Frontend**: [React](https://react.dev/) (v19), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/) (v4), [Zustand](https://zustand-demo.pmnd.rs/)
 - **UI & Styling**: [Radix UI](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/), [Lucide React](https://lucide.dev/)
 - **Backend/Logic**: [Hono](https://hono.dev/)
 - **Data Fetching**: [TanStack React Query](https://tanstack.com/query/latest)

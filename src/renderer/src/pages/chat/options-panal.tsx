@@ -84,7 +84,7 @@ function ChatOptionsPanel({
                       name={field.name}
                       value={field.state.value ?? ''}
                       placeholder="Enter system instructions for the AI..."
-                      className="dark:bg-background/90"
+                      className="dark:bg-background/90 max-h-60"
                       onChange={(e) => handleStringChange(e, field.handleChange)}
                     />
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}

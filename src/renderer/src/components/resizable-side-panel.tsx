@@ -14,7 +14,7 @@ export default function ResizableSidePanel({
   children,
   classNames = { container: '', panel: '' },
   defaultSize = '20%',
-  minSize = 0,
+  minSize = '5%',
   maxSize = '33%',
   collapsedSize = 0,
   ...panelProps
