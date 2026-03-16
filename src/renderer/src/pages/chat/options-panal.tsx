@@ -1,5 +1,6 @@
 import { FetchConversationWithMessagesResponseType } from '@common/schemas/conversation.schema'
 import ResizableSidePanel from '@renderer/components/resizable-side-panel'
+import TokensUsedCard from '@renderer/components/tokens-used-card'
 import { Button } from '@renderer/components/ui/button'
 import { FieldError, FieldGroup, FieldLabel, Field } from '@renderer/components/ui/field'
 import { Label } from '@renderer/components/ui/label'
@@ -15,20 +16,22 @@ import {
 import { useUpdateConversationById } from '@renderer/services/conversation'
 import { useForm } from '@tanstack/react-form'
 import { Save, Trash } from 'lucide-react'
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
 
 //@TODO add the rest of the options later
 /**
  * This panel contains additional options that can be passed to the model
  */
-function ChatOptionsPanel({
+const ChatOptionsPanel = ({
   conversation,
+  totalTokens = 0,
   ...rest
 }: {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
   conversation?: FetchConversationWithMessagesResponseType['data'] | undefined
-}) {
+  totalTokens?: number
+}) => {
   // hook to update conversation settings
   const { mutate: updateConversationById } = useUpdateConversationById()
   // create a form to update the conversation settings
@@ -125,22 +128,26 @@ function ChatOptionsPanel({
             <h2 className="text-foreground font-semibold text-sm">META DATA</h2>
             <form.Field name="metadata">
               {(field) => (
-                <Field
-                  data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-                  className="flex flex-row justify-between"
-                >
-                  <FieldLabel
-                    className="text-muted-foreground text-sm font-semibold"
-                    htmlFor={field.name}
+                <>
+                  <Field
+                    data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                    className="flex flex-row justify-between"
                   >
-                    Tokens used
-                  </FieldLabel>
-                  <Switch
-                    id={field.name}
-                    checked={field.state.value}
-                    onCheckedChange={(value) => field.handleChange(value)}
-                  />
-                </Field>
+                    <FieldLabel
+                      className="text-muted-foreground text-sm font-semibold"
+                      htmlFor={field.name}
+                    >
+                      Tokens used
+                    </FieldLabel>
+                    <Switch
+                      id={field.name}
+                      checked={field.state.value}
+                      onCheckedChange={(value) => field.handleChange(value)}
+                    />
+                  </Field>
+                  {/* total tokes used in conversation card */}
+                  <TokensUsedCard totalTokens={totalTokens} show={field.state.value} />
+                </>
               )}
             </form.Field>
           </div>
@@ -169,4 +176,4 @@ function ChatOptionsPanel({
   )
 }
 
-export default ChatOptionsPanel
+export default memo(ChatOptionsPanel)

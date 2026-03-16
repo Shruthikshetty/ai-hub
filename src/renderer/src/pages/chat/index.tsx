@@ -7,7 +7,7 @@ import {
   PromptInputTextarea,
   PromptInputTools
 } from '@renderer/components/ai-elements/prompt-input'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { createIPCStreamTransport } from '@renderer/lib/custom-transports'
 import { Message, MessageContent } from '@renderer/components/ai-elements/message'
@@ -141,6 +141,14 @@ const ChatPage = () => {
     setText('')
   }
 
+  // memoize total tokens used only update when messages are added an not streaming
+  const totalTokensUsed = useMemo(() => {
+    return messages.reduce((acc, message) => {
+      return acc + Number(message?.metadata?.tokensPerMessage ?? 0)
+    }, 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length, status])
+
   return (
     <ResizablePanelGroup className="h-full w-full" orientation="horizontal">
       {/* left side conversations tray */}
@@ -223,6 +231,7 @@ const ChatPage = () => {
         isOpen={optionsPanelOpen}
         setIsOpen={setOptionsPanelOpen}
         conversation={defaultMessages?.data}
+        totalTokens={totalTokensUsed}
       />
     </ResizablePanelGroup>
   )
