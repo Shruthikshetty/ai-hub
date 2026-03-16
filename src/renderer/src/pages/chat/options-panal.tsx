@@ -34,7 +34,8 @@ function ChatOptionsPanel({
   // create a form to update the conversation settings
   const form = useForm({
     defaultValues: {
-      systemPrompt: conversation?.systemPrompt
+      systemPrompt: conversation?.systemPrompt ?? null,
+      metadata: conversation?.metadata ?? true
     } as ChatOptionsValidationSchema,
     validators: { onSubmit: chatOptionsValidationSchema },
     onSubmit: async ({ value }) => {
@@ -46,7 +47,8 @@ function ChatOptionsPanel({
   // reset the form when the conversation changes this is important to sync the form with the conversation
   useEffect(() => {
     form.reset({
-      systemPrompt: conversation?.systemPrompt ?? null
+      systemPrompt: conversation?.systemPrompt ?? null,
+      metadata: conversation?.metadata ?? true
     })
   }, [conversation, form])
 
@@ -121,12 +123,26 @@ function ChatOptionsPanel({
           {/* Metadata */}
           <div className="p-4 flex flex-col gap-2">
             <h2 className="text-foreground font-semibold text-sm">META DATA</h2>
-            <div className="flex items-center justify-between">
-              <Label className="text-muted-foreground text-sm font-semibold" htmlFor="token-used">
-                Token used
-              </Label>
-              <Switch id="token-used" />
-            </div>
+            <form.Field name="metadata">
+              {(field) => (
+                <Field
+                  data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                  className="flex flex-row justify-between"
+                >
+                  <FieldLabel
+                    className="text-muted-foreground text-sm font-semibold"
+                    htmlFor={field.name}
+                  >
+                    Tokens used
+                  </FieldLabel>
+                  <Switch
+                    id={field.name}
+                    checked={field.state.value}
+                    onCheckedChange={(value) => field.handleChange(value)}
+                  />
+                </Field>
+              )}
+            </form.Field>
           </div>
           <Separator />
         </FieldGroup>

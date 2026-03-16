@@ -4,10 +4,7 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import type {
-  ConversationMetadataSchemaType,
-  ConversationToolsSchemaType
-} from '../schemas/conversation.schema'
+import type { ConversationToolsSchemaType } from '../schemas/conversation.schema'
 import { REASONING_OPTIONS } from '../constants/global.constants'
 
 //tables ----------->
@@ -19,7 +16,7 @@ export const conversations = sqliteTable('conversations', {
   provider: text().notNull(), //  current selected provider
   reasoning: text({ enum: REASONING_OPTIONS }).default('none'),
   systemPrompt: text(),
-  metadata: text({ mode: 'json' }).$type<ConversationMetadataSchemaType>().default({}),
+  metadata: integer({ mode: 'boolean' }).default(true),
   tools: text({ mode: 'json' })
     .$type<ConversationToolsSchemaType>()
     .default({ search: false, imageGeneration: false }),

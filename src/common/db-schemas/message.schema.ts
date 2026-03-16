@@ -5,7 +5,7 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { MessagePartsType } from '../schemas/messages.schema'
+import { MessageMetadataType, MessagePartsType } from '../schemas/messages.schema'
 import { conversations } from './conversation.schema'
 
 // create a message table
@@ -14,6 +14,7 @@ export const messages = sqliteTable('message', {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   role: text({ enum: ['user', 'assistant', 'system'] }).notNull(),
+  metadata: text({ mode: 'json' }).$type<MessageMetadataType>().default({}),
   parts: text({ mode: 'json' }).$type<MessagePartsType[]>().notNull(),
   conversationId: integer()
     .references(() => conversations.id, { onDelete: 'cascade' })
