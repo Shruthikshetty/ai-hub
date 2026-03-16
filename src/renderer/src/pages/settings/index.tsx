@@ -30,7 +30,7 @@ function Settings(): React.JSX.Element {
   }
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full overflow-hidden">
       {/* header */}
       <div className="px-5 py-2 border-border border-b">
         <h1 className="text-xl font-bold">Settings</h1>
@@ -38,7 +38,7 @@ function Settings(): React.JSX.Element {
           Manage your account, AI providers, and application settings
         </p>
       </div>
-      <div className="flex flex-1 flex-row">
+      <div className="flex flex-1 flex-row overflow-hidden">
         {/* tabs */}
         <div className="w-35 bg-sidebar-accent h-full pt-10 md:w-40 lg:w-48 lg:pt-12">
           {/* tab buttons */}
@@ -61,7 +61,7 @@ function Settings(): React.JSX.Element {
             ))}
           </div>
         </div>
-        <div className="h-full w-full grow">{renderTabContent()}</div>
+        <div className="flex-1 h-full overflow-y-auto">{renderTabContent()}</div>
       </div>
     </div>
   )
