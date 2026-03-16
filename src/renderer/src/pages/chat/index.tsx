@@ -143,6 +143,9 @@ const ChatPage = () => {
 
   // memoize total tokens used only update when messages are added an not streaming
   const totalTokensUsed = useMemo(() => {
+    // in case metadata is not available return  don't perform any calculation
+    if (!defaultMessages?.data.metadata) return 0
+    // calculate total tokens used
     return messages.reduce((acc, message) => {
       return acc + Number(message?.metadata?.tokensPerMessage ?? 0)
     }, 0)
