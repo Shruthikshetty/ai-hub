@@ -16,7 +16,7 @@ import {
 // route to generate image
 export const generateImage = createRoute({
   method: 'post',
-  path: '/generate-image',
+  path: '/image-gen',
   description: 'Generate image',
   tags: ['Image gen'],
   summary: 'Generate image',

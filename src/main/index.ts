@@ -172,10 +172,13 @@ app.whenReady().then(() => {
 
       worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
 
+      // 3 minutes — generous enough for slow AI image-gen calls (~60s+)
+      const TIMEOUT_MS = 3 * 60 * 1_000
+
       let timeout = setTimeout(() => {
         port1.close()
         reject(new Error('Worker request timed out'))
-      }, 30_000)
+      }, TIMEOUT_MS)
 
       // used to reset the timeout for each chunk
       const resetTimeout = () => {
@@ -183,7 +186,7 @@ app.whenReady().then(() => {
         timeout = setTimeout(() => {
           port1.close()
           reject(new Error('Worker request timed out'))
-        }, 30_000)
+        }, TIMEOUT_MS)
       }
 
       port1.on('message', (msgEvent) => {

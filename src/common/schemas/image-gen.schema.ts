@@ -9,9 +9,10 @@ export const generateImageRequestSchema = z.object({
 
 // generate image response schema
 export const generateImageResponseSchema = z.object({
-  imageUrl: z.string()
+  imageUrl: z.string(),
+  success: z.boolean()
 })
 
 // extract the type
-export type generateImageRequestSchemaType = z.infer<typeof generateImageRequestSchema>
-export type generateImageResponseSchemaType = z.infer<typeof generateImageResponseSchema>
+export type GenerateImageRequestSchemaType = z.infer<typeof generateImageRequestSchema>
+export type GenerateImageResponseSchemaType = z.infer<typeof generateImageResponseSchema>

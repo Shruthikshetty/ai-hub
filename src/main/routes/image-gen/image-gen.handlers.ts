@@ -46,5 +46,5 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
   // @TODO Store to db
 
   // return the image url
-  return c.json({ imageUrl: mediaUrl }, HTTP_STATUS_CODES.OK)
+  return c.json({ imageUrl: mediaUrl, success: true }, HTTP_STATUS_CODES.OK)
 }
