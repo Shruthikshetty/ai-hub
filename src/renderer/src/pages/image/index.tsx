@@ -15,8 +15,8 @@ import useSelectedModel from '@renderer/state-management/selected-model.store'
 const ImagePage = () => {
   // state to store prompt
   const [prompt, setPrompt] = useState('')
-  //get the selected model
-  const model = useSelectedModel((state) => state.model)
+  const { getModel } = useSelectedModel()
+  const model = getModel('image')
 
   // hook to generate image
   const { mutateAsync: generateImage, isPending, data } = useGenerateImage()
@@ -45,7 +45,7 @@ const ImagePage = () => {
         <PromptInputFooter>
           {/* All tools go here */}
           <PromptInputTools>
-            <AppModelSelector output="image" />
+            <AppModelSelector modelType="image" output="image" />
           </PromptInputTools>
           {/* submit button */}
           <PromptInputSubmit

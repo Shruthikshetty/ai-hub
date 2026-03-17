@@ -20,17 +20,20 @@ import { AVAILABLE_PROVIDER_LIST } from '@common/constants/global.constants'
 // lets you select the various models from all the available providers
 function AppModelSelector({
   output,
-  disableDefaultSelection = false
+  disableDefaultSelection = false,
+  modelType = 'chat'
 }: {
   output?: ModelIOType
   disableDefaultSelection?: boolean
+  modelType?: string
 }) {
   //@TODO show error message if no models are not loaded
   // fetch all the model list
   const { data: modelsData } = useFetchModels({ output })
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
   // selected model
-  const { model, setModel } = useSelectedModel()
+  const { getModel, setModel } = useSelectedModel()
+  const model = getModel(modelType)
 
   // set the model to the first model of the first provider
   useEffect(() => {
@@ -38,10 +41,10 @@ function AppModelSelector({
     if (disableDefaultSelection) return
     // set the model to the first model of the first provider
     if (modelsData?.data?.length && !model) {
-      setModel(modelsData?.data?.[0])
+      setModel(modelType, modelsData?.data?.[0])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modelsData, disableDefaultSelection])
+  }, [modelsData, disableDefaultSelection, modelType])
 
   return (
     <ModelSelector onOpenChange={setModelSelectorOpen} open={modelSelectorOpen}>
@@ -65,7 +68,12 @@ function AppModelSelector({
               {modelsData?.data
                 ?.filter((m) => m.provider === chef)
                 ?.map((m) => (
-                  <ModelItem key={m.id} model={m} onSelect={setModel} selectedModel={model} />
+                  <ModelItem
+                    key={m.id}
+                    model={m}
+                    onSelect={(selected) => setModel(modelType, selected)}
+                    selectedModel={model}
+                  />
                 ))}
             </ModelSelectorGroup>
           ))}

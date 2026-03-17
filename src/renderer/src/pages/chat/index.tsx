@@ -42,7 +42,8 @@ const chatTransport = createIPCStreamTransport('/api/chat')
 // this is the chat page contains all the chat interface
 const ChatPage = () => {
   const [text, setText] = useState('')
-  const { model: selectedModel, setModel: setSelectedModel } = useSelectedModel()
+  const { getModel, setModel: setSelectedModel } = useSelectedModel()
+  const selectedModel = getModel('chat')
   // this is the conversation panel state shows all chat history
   const [conversationPanelOpen, setConversationPanelOpen] = useState(true)
   // this is the options panel state to show the model options
@@ -118,7 +119,7 @@ const ChatPage = () => {
     // set the selected model (fallback to first available model)
     const modelToSet = model ?? modelData.data[0]
     if (modelToSet) {
-      setSelectedModel(modelToSet)
+      setSelectedModel('chat', modelToSet)
       modelRestoredForChatId.current = chatId
     }
   }, [chatId, modelData, selectedConversation?.modelId, setSelectedModel])

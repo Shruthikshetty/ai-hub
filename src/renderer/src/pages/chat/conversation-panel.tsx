@@ -28,7 +28,8 @@ const ChatConversationsHistory = (props: {
   // hooke to delete a conversation
   const { mutate: deleteConversation } = useDeleteConversationById()
   // get selected model
-  const selectedModel = useSelectedModel((state) => state.model)
+  const { getModel } = useSelectedModel()
+  const selectedModel = getModel('chat')
   // get selected conversation
   const { conversation: selectedConversation, setConversation: setSelectedConversation } =
     useSelectedConversation()
