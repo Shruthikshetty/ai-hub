@@ -58,8 +58,17 @@ function getExtension(filePath: string): string {
  * Uses Node.js streams so even large files (MBs) are handled efficiently.
  */
 export async function saveFile(options: mediaUploadSchemaType): Promise<SaveFileResult> {
-  const { sourcePath, category } = options
-  const ext = getExtension(sourcePath)
+  const { sourcePath, category, base64, extension } = options
+
+  // get the extension
+  let ext = extension
+  if (!ext && sourcePath) {
+    ext = getExtension(sourcePath)
+  } else if (!ext) {
+    ext = 'png'
+  }
+
+  // get the media root
   const mediaRoot = getMediaRoot()
 
   let relativePath: string
@@ -92,8 +101,16 @@ export async function saveFile(options: mediaUploadSchemaType): Promise<SaveFile
     relativePath = `${category}/${today}/${filename}`
   }
 
-  // Stream copy — efficient for files of any size
-  await pipeline(fs.createReadStream(sourcePath), fs.createWriteStream(absolutePath))
+  // Write file — use base64 data if provided, otherwise stream-copy from sourcePath
+  if (base64) {
+    // Strip data-URL prefix if present (e.g. "data:image/png;base64,...")
+    const raw = base64.includes(',') ? base64.split(',')[1] : base64
+    fs.writeFileSync(absolutePath, Buffer.from(raw, 'base64'))
+  } else if (sourcePath) {
+    await pipeline(fs.createReadStream(sourcePath), fs.createWriteStream(absolutePath))
+  } else {
+    throw new Error('saveFile: either base64 or sourcePath must be provided')
+  }
 
   return {
     relativePath,
