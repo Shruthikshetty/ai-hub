@@ -62,6 +62,7 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
     }
   })
 
+  //@TODO ADD custom error handling here
   // stream the response using data stream protocol (required by DefaultChatTransport)
   return result.toUIMessageStreamResponse({
     originalMessages: messages,
@@ -70,7 +71,19 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
       prefix: 'msg',
       size: 16
     }),
+    // attach meta data to the response
+    messageMetadata: ({ part }) => {
+      // use the conversation db to update and track total tokens
+      if (part.type === 'finish' && conversation?.metadata) {
+        return {
+          tokensPerMessage: part?.totalUsage?.totalTokens,
+          timeStamp: new Date()
+        }
+      }
+      return undefined
+    },
     onFinish: async ({ messages }) => {
+      // generate title if first message
       if (messages.length <= 2) {
         // do not wait for this to complete
         generateTitle({
@@ -103,6 +116,7 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
             .values({
               id: assistantMessage.id,
               role: assistantMessage.role,
+              metadata: assistantMessage.metadata,
               parts: assistantMessage.parts,
               conversationId
             })

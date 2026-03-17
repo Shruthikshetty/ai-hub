@@ -36,13 +36,6 @@ export const updateConversationResponseSchema = z.object({
   data: conversationsSchema
 })
 
-// metadata options
-export const conversationMetadataSchema = z.object({
-  tokensPerMessage: z.string().nullish(),
-  totalTokens: z.string().nullish(),
-  timeStamp: z.date().nullish()
-})
-
 //conversation tools options
 export const conversationToolsSchema = z.object({
   search: z.boolean().default(false),
@@ -59,7 +52,6 @@ export type FetchAllConversationsResponseSchemaType = z.infer<
 export type CreateConversationResponseSchemaType = z.infer<typeof createConversationResponseSchema>
 export type DeleteConversationResponseType = z.infer<typeof deleteConversationByIdSchema>
 export type FetchConversationWithMessagesResponseType = z.infer<typeof getMessagesByConversation>
-export type ConversationMetadataSchemaType = z.infer<typeof conversationMetadataSchema>
 export type ConversationToolsSchemaType = z.infer<typeof conversationToolsSchema>
 export type ReasoningOptionsSchemaType = z.infer<typeof reasoningOptionsSchema>
 export type UpdateConversationResponseSchemaType = z.infer<typeof updateConversationResponseSchema>

@@ -51,7 +51,7 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
   return (
     <Card
       className={cn(
-        'flex flex-col p-5',
+        'flex flex-col p-5 shrink-0',
         provider.enabled ? 'bg-green-400/10 ring-green-500/50' : 'bg-muted-foreground/5'
       )}
     >

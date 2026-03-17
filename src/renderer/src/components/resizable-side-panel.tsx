@@ -14,7 +14,7 @@ export default function ResizableSidePanel({
   children,
   classNames = { container: '', panel: '' },
   defaultSize = '20%',
-  minSize = 0,
+  minSize = '5%',
   maxSize = '33%',
   collapsedSize = 0,
   ...panelProps
@@ -27,7 +27,10 @@ export default function ResizableSidePanel({
   minSize?: number | string
   maxSize?: number | string
   collapsedSize?: number | string
-} & Omit<PanelProps, 'children' | 'defaultSize' | 'minSize' | 'maxSize' | 'collapsedSize'>) {
+} & Omit<
+  PanelProps,
+  'children' | 'defaultSize' | 'minSize' | 'maxSize' | 'collapsedSize' | 'className'
+>) {
   // store the panel ref
   const panelRef = useRef<PanelImperativeHandle>(null)
   // handel the toggle state to sync with open close of the external state
@@ -59,8 +62,8 @@ export default function ResizableSidePanel({
     >
       <div
         className={cn(
-          'transition-opacity duration-200 h-full flex flex-col',
-          !isOpen ? 'opacity-0 overflow-hidden' : 'opacity-100',
+          'h-full flex flex-col',
+          !isOpen ? 'hidden' : 'opacity-100',
           classNames.container
         )}
       >

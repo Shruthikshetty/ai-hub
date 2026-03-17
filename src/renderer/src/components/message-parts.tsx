@@ -3,6 +3,8 @@ import { MessageResponse } from './ai-elements/message'
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './ai-elements/reasoning'
 import BotIcon from './bot-icon'
 import { ChatStatus } from 'ai'
+import { Badge } from './ui/badge'
+import { formatDateTime } from '@renderer/lib/date.utils'
 
 /**
  *
@@ -26,7 +28,6 @@ function MessageParts({
   const lastPart = message.parts.at(-1)
   const isReasoningStreaming =
     isLastMessage && status === 'streaming' && lastPart?.type === 'reasoning'
-
   return (
     <>
       {/* role based icon */}
@@ -63,6 +64,18 @@ function MessageParts({
             return null
         }
       })}
+      {/* meta data info */}
+      {message.metadata?.tokensPerMessage ? (
+        <div className="flex flex-row justify-start items-center gap-2 mt-1">
+          <Badge variant="outline" className="hover:bg-secondary transition-colors duration-200">
+            Tokens used: {message.metadata.tokensPerMessage}
+          </Badge>
+          <Badge variant="outline" className="hover:bg-secondary transition-colors duration-200">
+            Time:{' '}
+            {message?.metadata?.timeStamp ? formatDateTime(message?.metadata?.timeStamp) : 'N/A'}
+          </Badge>
+        </div>
+      ) : null}
     </>
   )
 }

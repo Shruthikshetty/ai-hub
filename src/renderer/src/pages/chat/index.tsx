@@ -7,7 +7,7 @@ import {
   PromptInputTextarea,
   PromptInputTools
 } from '@renderer/components/ai-elements/prompt-input'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { createIPCStreamTransport } from '@renderer/lib/custom-transports'
 import { Message, MessageContent } from '@renderer/components/ai-elements/message'
@@ -141,8 +141,19 @@ const ChatPage = () => {
     setText('')
   }
 
+  // memoize total tokens used only update when messages are added an not streaming
+  const totalTokensUsed = useMemo(() => {
+    // in case metadata is not available return  don't perform any calculation
+    if (!defaultMessages?.data.metadata) return 0
+    // calculate total tokens used
+    return messages.reduce((acc, message) => {
+      return acc + Number(message?.metadata?.tokensPerMessage ?? 0)
+    }, 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length, defaultMessages?.data?.metadata, status])
+
   return (
-    <ResizablePanelGroup className="flex flex-row h-full w-full" orientation="horizontal">
+    <ResizablePanelGroup className="h-full w-full" orientation="horizontal">
       {/* left side conversations tray */}
       <ChatConversationsHistory
         isOpen={conversationPanelOpen}
@@ -150,7 +161,7 @@ const ChatPage = () => {
       />
       <ResizableHandle withHandle />
       {/*  main chat interface */}
-      <ResizablePanel className="flex flex-col h-full w-full">
+      <ResizablePanel className="flex flex-col grow">
         <div className="flex flex-row items-center justify-between pt-2">
           <PanelTrigger
             value={conversationPanelOpen}
@@ -223,6 +234,7 @@ const ChatPage = () => {
         isOpen={optionsPanelOpen}
         setIsOpen={setOptionsPanelOpen}
         conversation={defaultMessages?.data}
+        totalTokens={totalTokensUsed}
       />
     </ResizablePanelGroup>
   )

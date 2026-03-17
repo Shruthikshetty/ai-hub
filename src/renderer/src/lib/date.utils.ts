@@ -29,3 +29,21 @@ export function formatRelativeDateLabel(dateString: string | Date): string {
 
   return target.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 }
+
+/**
+ * take date | date string and return in dd/mm/yy hh:mm AM/PM format  eg 03/15/25, 02:30 PM
+ */
+export function formatDateTime(dateString: string | Date): string {
+  const target = new Date(dateString)
+  // check if valid date
+  if (isNaN(target.getTime())) {
+    return 'Unknown date'
+  }
+  return target.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}

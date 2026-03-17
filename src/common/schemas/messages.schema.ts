@@ -30,12 +30,18 @@ export const MessagePartSchema = z.discriminatedUnion('type', [
   StepStartUIPartSchema
 ])
 
+// metadata schema for message
+export const MessageMetadataSchema = z.object({
+  tokensPerMessage: z.number().nullish(),
+  timeStamp: z.coerce.date().nullish()
+})
+
 // define the UI message schema used in the app @TODO type tp be taken from db schema file
 export const UIMessageSchema = z
   .object({
     id: z.string(),
     role: z.enum(['user', 'assistant', 'system']),
-    metadata: z.any().optional(), // will be modified later,
+    metadata: MessageMetadataSchema.nullish(),
     parts: z.array(MessagePartSchema)
   })
   .loose()
@@ -57,3 +63,4 @@ export type AppUIMessage = z.infer<typeof UIMessageSchema>
 export type MessagePartsType = z.infer<typeof MessagePartSchema>
 export type GetMessageByIdResponseType = z.infer<typeof getMessageByIdResponseSchema>
 export type AddMessageResponseType = z.infer<typeof addMessageResponseSchema>
+export type MessageMetadataType = z.infer<typeof MessageMetadataSchema>
