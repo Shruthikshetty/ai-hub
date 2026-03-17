@@ -16,7 +16,7 @@ export const conversations = sqliteTable('conversations', {
   provider: text().notNull(), //  current selected provider
   reasoning: text({ enum: REASONING_OPTIONS }).default('none'),
   systemPrompt: text(),
-  metadata: integer({ mode: 'boolean' }).default(true),
+  metadata: integer({ mode: 'boolean' }).notNull().default(true),
   tools: text({ mode: 'json' })
     .$type<ConversationToolsSchemaType>()
     .default({ search: false, imageGeneration: false }),

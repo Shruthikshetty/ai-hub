@@ -31,7 +31,7 @@ export function formatRelativeDateLabel(dateString: string | Date): string {
 }
 
 /**
- * take date | date string and return in dd/mm/yy hh:mm format
+ * take date | date string and return in dd/mm/yy hh:mm AM/PM format  eg 03/15/25, 02:30 PM
  */
 export function formatDateTime(dateString: string | Date): string {
   const target = new Date(dateString)

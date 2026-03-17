@@ -150,7 +150,7 @@ const ChatPage = () => {
       return acc + Number(message?.metadata?.tokensPerMessage ?? 0)
     }, 0)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages.length, status])
+  }, [messages.length, defaultMessages?.data?.metadata, status])
 
   return (
     <ResizablePanelGroup className="h-full w-full" orientation="horizontal">

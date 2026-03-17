@@ -28,7 +28,6 @@ function MessageParts({
   const lastPart = message.parts.at(-1)
   const isReasoningStreaming =
     isLastMessage && status === 'streaming' && lastPart?.type === 'reasoning'
-
   return (
     <>
       {/* role based icon */}
