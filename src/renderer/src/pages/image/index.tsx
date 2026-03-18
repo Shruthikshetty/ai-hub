@@ -7,10 +7,29 @@ import {
   PromptInputTools
 } from '@renderer/components/ai-elements/prompt-input'
 import AppModelSelector from '@renderer/components/model-selector'
-import { Spinner } from '@renderer/components/ui/spinner'
 import { useGenerateImage } from '@renderer/services/image-gen'
 import { useState } from 'react'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
+import GeneratedImageDisplay from '@renderer/components/generated-image-display'
+
+//temp list of images
+const images = [
+  {
+    imageUrl: 'media://profile-img/avatar.png'
+  },
+  {
+    imageUrl: 'media://profile-img/avatar.png'
+  },
+  {
+    imageUrl: 'media://profile-img/avatar.png'
+  },
+  {
+    imageUrl: 'media://profile-img/avatar.png'
+  },
+  {
+    imageUrl: 'media://profile-img/avatar.png'
+  }
+]
 
 const ImagePage = () => {
   // state to store prompt
@@ -19,7 +38,7 @@ const ImagePage = () => {
   const model = getModel('image')
 
   // hook to generate image
-  const { mutateAsync: generateImage, isPending, data } = useGenerateImage()
+  const { mutateAsync: generateImage, isPending } = useGenerateImage()
 
   // handler to handle submit
   const handleSubmit = () => {
@@ -28,12 +47,19 @@ const ImagePage = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-between h-full p-5">
+    <div className="flex flex-col items-center justify-between h-full p-4 overflow-hidden w-full mx-auto">
       {/* images grid */}
-      <div className="grow">
-        {/* @TODO in progress */}
-        {isPending ? <Spinner className="size-10" /> : null}
-        {data?.imageUrl ? <img src={data.imageUrl} alt="generated image" /> : null}
+      <div className="grow overflow-auto min-h-0 w-full">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+          {!isPending && <GeneratedImageDisplay imageUrl="" loading={true} />}
+          {images.map((image, index) => (
+            <GeneratedImageDisplay
+              key={image?.imageUrl + index}
+              imageUrl={image.imageUrl}
+              loading={false}
+            />
+          ))}
+        </div>
       </div>
       {/* input area */}
       <PromptInput onSubmit={handleSubmit} className="mt-4">

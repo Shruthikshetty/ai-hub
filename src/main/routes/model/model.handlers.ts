@@ -11,7 +11,7 @@ import { getModelListFromProvider } from '../../lib/get-model-list'
 export const getModels: AppRouteHandler<GetModelsRoute> = async (c) => {
   // get the valid outputs from query params
   const { output } = c.req.valid('query')
-  console.log('Requested outputs filter:', output)
+
   // get all the providers that are enabled
   const enabledProviders = await db.query.providers.findMany({
     where: (providers, { eq }) => eq(providers.enabled, true)
