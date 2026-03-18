@@ -15,6 +15,7 @@ import {
   mediaUploadResponseSchema,
   mediaUploadSchema
 } from '../../../common/schemas/media.schema'
+import { MEDIA_REQUEST_TYPES } from '../../../common/constants/global.constants'
 
 // used to upload a media
 export const uploadMedia = createRoute({
@@ -53,8 +54,8 @@ export const getMedia = createRoute({
   path: '/media/{type}',
   request: {
     params: z.object({
-      type: z.coerce
-        .string()
+      type: z
+        .enum(MEDIA_REQUEST_TYPES)
         .default('all')
         .openapi({
           param: {

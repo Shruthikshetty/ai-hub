@@ -7,7 +7,8 @@ export const QUERY_KEYS = {
   providersFetch: 'providers-fetch',
   conversationsFetch: 'conversations-fetch',
   conversationMessagesFetch: 'conversation-messages-fetch',
-  messageFetch: 'message-fetch'
+  messageFetch: 'message-fetch',
+  mediaFetch: 'media-fetch'
 }
 
 export const MUTATION_KEYS = {

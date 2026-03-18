@@ -7,11 +7,13 @@ import { generateImage as aiGenerateImage } from 'ai'
 import { saveFile } from '../../lib/file-storage'
 import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
+import db from '../../db'
+import { media } from '../../db/schema'
 
 // handler for image generation
 export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
   // get the prompt from request body
-  const { prompt, model } = await c.req.json()
+  const { prompt, model } = c.req.valid('json')
 
   // get the provider as per user model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,7 +45,14 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
     extension: 'png'
   })
 
-  // @TODO Store to db
+  //Store to db
+  await db.insert(media).values({
+    imageUrl: mediaUrl,
+    type: 'image',
+    prompt: prompt,
+    modelId: model.id,
+    provider: model.provider
+  })
 
   // return the image url
   return c.json({ imageUrl: mediaUrl, success: true }, HTTP_STATUS_CODES.OK)
