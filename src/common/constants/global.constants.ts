@@ -73,3 +73,5 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
 export const AVAILABLE_PROVIDER_LIST = ['openai', 'ollama', 'openrouter', 'google'] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
+
+export const MEDIA_TYPE = ['image', 'video'] as const

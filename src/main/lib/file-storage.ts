@@ -20,7 +20,7 @@ import path from 'node:path'
 import { pipeline } from 'node:stream/promises'
 import { randomUUID } from 'node:crypto'
 import { EXT_TO_MIME, FILE_STORAGE_CATEGORY } from '../../common/constants/global.constants'
-import { mediaUploadSchemaType } from '../../common/schemas/media.schema'
+import { MediaUploadSchemaType } from '../../common/schemas/media.schema'
 
 //types
 export interface SaveFileResult {
@@ -57,7 +57,7 @@ function getExtension(filePath: string): string {
  * Stream-copy a file from sourcePath to the appropriate location in app data.
  * Uses Node.js streams so even large files (MBs) are handled efficiently.
  */
-export async function saveFile(options: mediaUploadSchemaType): Promise<SaveFileResult> {
+export async function saveFile(options: MediaUploadSchemaType): Promise<SaveFileResult> {
   const { sourcePath, category, base64, extension } = options
 
   // get the extension

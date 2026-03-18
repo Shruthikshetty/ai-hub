@@ -4,17 +4,21 @@
  * NOT through Hono routes — so no serving route is defined here.
  */
 
-import { createRoute } from '@hono/zod-openapi'
+import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import {
   internalServerErrorDocObject,
   zodValidationErrorDocObject
 } from '../../constants/doc-constants'
-import { mediaUploadResponseSchema, mediaUploadSchema } from '../../../common/schemas/media.schema'
+import {
+  getMediaResponseSchema,
+  mediaUploadResponseSchema,
+  mediaUploadSchema
+} from '../../../common/schemas/media.schema'
 
 // used to upload a media
 export const uploadMedia = createRoute({
-  tags: ['media'],
+  tags: ['Media'],
   method: 'post',
   path: '/media/upload',
   request: {
@@ -42,5 +46,41 @@ export const uploadMedia = createRoute({
   }
 })
 
+// get all the stored media by type image/video
+export const getMedia = createRoute({
+  tags: ['Media'],
+  method: 'get',
+  path: '/media/{type}',
+  request: {
+    params: z.object({
+      type: z.coerce
+        .string()
+        .default('all')
+        .openapi({
+          param: {
+            name: 'type',
+            in: 'path',
+            required: true,
+            description: 'type of media'
+          },
+          example: 2
+        })
+    })
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: getMediaResponseSchema
+        }
+      },
+      description: 'Media items retrieved successfully'
+    },
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 //types all types
 export type UploadMediaRoute = typeof uploadMedia
+export type GetMediaRoute = typeof getMedia

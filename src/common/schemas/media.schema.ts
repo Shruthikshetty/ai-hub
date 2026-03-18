@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { FILE_STORAGE_CATEGORY } from '../constants/global.constants'
+import { mediaGetSchema } from '../db-schemas/media.schema'
 
 export const mediaUploadSchema = z
   .object({
@@ -31,6 +32,13 @@ export const mediaUploadResponseSchema = z.object({
   })
 })
 
+// schema to get all media by type
+export const getMediaResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(mediaGetSchema)
+})
+
 // extract the type
-export type mediaUploadSchemaType = z.infer<typeof mediaUploadSchema>
-export type mediaUploadResponseSchemaType = z.infer<typeof mediaUploadResponseSchema>
+export type MediaUploadSchemaType = z.infer<typeof mediaUploadSchema>
+export type MediaUploadResponseSchemaType = z.infer<typeof mediaUploadResponseSchema>
+export type GetMediaResponseType = z.infer<typeof getMediaResponseSchema>
