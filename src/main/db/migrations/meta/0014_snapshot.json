@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b5f0c26c-6260-416f-b7e5-558ee353f51e",
-  "prevId": "c73b5057-24fd-4c06-93b7-4300b9810b0e",
+  "id": "256fe669-c684-489d-9878-f482091121e5",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "users": {
       "name": "users",
@@ -163,7 +163,9 @@
       "indexes": {
         "providers_provider_unique": {
           "name": "providers_provider_unique",
-          "columns": ["provider"],
+          "columns": [
+            "provider"
+          ],
           "isUnique": true
         }
       },
@@ -221,11 +223,11 @@
         },
         "metadata": {
           "name": "metadata",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
-          "default": "'{}'"
+          "default": true
         },
         "tools": {
           "name": "tools",
@@ -273,6 +275,14 @@
           "notNull": true,
           "autoincrement": false
         },
+        "metadata": {
+          "name": "metadata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'{}'"
+        },
         "parts": {
           "name": "parts",
           "type": "text",
@@ -301,12 +311,82 @@
           "name": "message_conversationId_conversations_id_fk",
           "tableFrom": "message",
           "tableTo": "conversations",
-          "columnsFrom": ["conversationId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "conversationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "media": {
+      "name": "media",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "prompt": {
+          "name": "prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "imageUrl": {
+          "name": "imageUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "relativePath": {
+          "name": "relativePath",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "modelId": {
+          "name": "modelId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

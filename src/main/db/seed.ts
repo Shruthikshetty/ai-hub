@@ -33,7 +33,7 @@ export async function seed(): Promise<void> {
   }
 }
 
-// Allow running the script directly bunx tsx src/main/db/seed.ts
+//Allow running the script directly bunx tsx src/main/db/seed.ts
 // if (require.main === module) {
 //   seed()
 //     .then(() => {

@@ -1,1 +1,0 @@
-ALTER TABLE `media` ADD `relativePath` text NOT NULL;
