@@ -1,26 +1,17 @@
-# Electron Hono React Template
+# AI Hub
 
-A robust, modern template for building cross-platform desktop applications using **Electron**, **React**, and **Hono**. This template leverages **TypeScript** for type safety, **Vite** for fast builds, and **Tailwind CSS** for styling, along with **Drizzle ORM** for efficient SQLite database management.
-
-## 🚀 Features
-
-- **Electron**: Build cross-platform desktop apps with JavaScript, HTML, and CSS.
-- **React**: Modern UI development with the latest React 19 features.
-- **Hono**: Ultrafast web framework, used here for handling backend logic/worker processes.
-- **TypeScript**: Standardized type safety across the entire stack.
-- **Vite & Electron-Vite**: Lightning-fast development server and build tool.
-- **Tailwind CSS (v4)**: Utility-first CSS framework for rapid UI design.
-- **Drizzle ORM**: Lightweight and type-safe ORM for SQLite/LibSQL.
-- **Zod**: TypeScript-first schema declaration and validation.
-- **Electron Builder**: Ready-to-use configuration for packaging apps for Windows, macOS, and Linux.
+AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)** philosophy. You can run AI models of your choice from any available cloud provider (like OpenAI, Anthropic, etc.), or run local models completely offline using tools like [Ollama](https://ollama.com/).
 
 ## 🛠️ Tech Stack
 
 - **Runtime**: [Electron](https://www.electronjs.org/), [Node.js](https://nodejs.org/)
-- **Frontend**: [React](https://react.dev/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/)
+- **Frontend**: [React](https://react.dev/) (v19), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/) (v4), [Zustand](https://zustand-demo.pmnd.rs/)
+- **UI & Styling**: [Radix UI](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/), [Lucide React](https://lucide.dev/)
 - **Backend/Logic**: [Hono](https://hono.dev/)
+- **Data Fetching**: [TanStack React Query](https://tanstack.com/query/latest)
 - **Database**: [Drizzle ORM](https://orm.drizzle.team/), [LibSQL](https://github.com/tursodatabase/libsql)
 - **Validation**: [Zod](https://zod.dev/)
+- **AI Integration**: [Vercel AI SDK](https://sdk.vercel.ai/)
 - **Testing**: [Vitest](https://vitest.dev/)
 
 ## 📦 Project Structure
@@ -30,17 +21,23 @@ A robust, modern template for building cross-platform desktop applications using
 ├── drizzle.config.ts        # Drizzle ORM configuration
 ├── electron-builder.yml     # Electron Builder configuration
 ├── src/
-│   ├── main/                # Main process code (Electron & Hono)
-│   │   ├── db/              # Database schema and migrations
-│   │   ├── routes/          # API routes
-│   │   └── worker.ts        # Worker process entry point
-│   ├── preload/             # Preload scripts
-│   └── renderer/            # Renderer process code (React App)
-│       ├── src/
-│       │   ├── components/  # React components
-│       │   └── main.tsx     # React entry point
-│       └── index.html
-└── out/                     # Build output directory
+│   ├── common/              # Shared logic, shared Zod schemas, types, and constants
+│   ├── main/                # Main process code (Electron & Hono backend)
+│   │   ├── config/          # Application configurations
+│   │   ├── db/              # Database connections, schemas, and migrations
+│   │   ├── middlewares/     # Hono middlewares
+│   │   ├── routes/          # API routes for providers, models, settings, etc.
+│   │   ├── worker.ts        # Worker process entry point
+│   │   └── index.ts         # Main process entry point
+│   ├── preload/             # Electron preload scripts
+│   └── renderer/            # Renderer process code (React App frontend)
+│       └── src/             # Frontend source
+│           ├── components/  # Reusable UI components
+│           ├── hooks/       # Custom React hooks
+│           ├── pages/       # React application pages/routes
+│           ├── store/       # Zustand state management
+│           └── main.tsx     # React application entry point
+└── out/                     # Build output directory (generated)
 ```
 
 ## ⚡ Getting Started
@@ -56,7 +53,7 @@ Clone the repository and install dependencies:
 
 ```bash
 git clone <your-repo-url>
-cd electron-hono-react-template
+cd ai-hub
 npm install
 ```
 
@@ -134,10 +131,32 @@ The packaged application will be available in the `dist/` directory.
 - **Environment Variables**: Manage `.env` files for sensitive configs.
 - **Electron Builder**: Modify `electron-builder.yml` to change app metadata, icons, and build settings.
 
-## 🤝 Contributing
+## ✨ App Showcase
 
-This is not open for contributions.
+### Dashboard
 
-## 📄 License
+The central hub for all AI-powered modules.
+![Dashboard](./resources/app-dashboard.png)
 
-[MIT](LICENSE)
+### Chat Interface
+
+Intuitive conversational experience with multi-model support.
+![Chat Main](./resources/chat-main.png)
+
+Modify the model options.
+![Chat Options](./resources/chat-reasoning.png)
+
+### Personal Profile
+
+Manage your identity and app-wide preferences.
+![User Profile](./resources/user-profile.png)
+
+### AI Providers
+
+Securely manage and switch between various AI service providers.
+![AI Providers](./resources/ai-providers.png)
+
+### Themes
+
+Switch between light and dark themes.
+![Themes](./resources/themes.png)

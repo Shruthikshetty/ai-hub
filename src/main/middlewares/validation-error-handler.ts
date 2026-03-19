@@ -6,9 +6,10 @@ import * as HTTP_STATUS_CODES from '../constants/http-status-codes.constants'
 // handles the api zod validation errors this will be used as the default hook for zod open api
 const validationErrorHandler: Hook<any, any, any, any> = (result, c) => {
   if (!result.success) {
+    console.error(flattenError(result.error))
     return c.json(
       {
-        success: result.success,
+        success: false,
         error: flattenError(result.error)
       },
       HTTP_STATUS_CODES.BAD_REQUEST

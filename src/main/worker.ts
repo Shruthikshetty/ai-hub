@@ -8,6 +8,13 @@ import createApp from './lib/create-app'
 import base from './routes/index.route'
 import profile from './routes/profile/profile.index'
 import { serve } from '@hono/node-server'
+import chat from './routes/chat/chat.index'
+import media from './routes/media/media.index'
+import model from './routes/model/model.index'
+import provider from './routes/provider/provider.index'
+import conversation from './routes/conversation/conversation.index'
+import message from './routes/message/message.index'
+import image from './routes/image-gen/image-gen.index'
 
 import { runMigrations } from './db/migrate'
 import { seed } from './db/seed'
@@ -30,7 +37,7 @@ const migrationPromise =
 configureOpenApi(app)
 
 // all routes go here
-const routes = [base, profile]
+const routes = [base, profile, chat, media, model, provider, conversation, message, image]
 
 routes.forEach((route) => {
   if (route === base) {
@@ -64,12 +71,34 @@ process.parentPort.on('message', async (e) => {
           body: body ? JSON.stringify(body) : undefined
         })
       )
-      const result = await res.json()
-      port.postMessage(result)
+      const contentType = res.headers.get('content-type') || ''
+      if (contentType.includes('application/json')) {
+        const result = await res.json()
+        port.postMessage({ type: 'complete', data: result })
+        port.close()
+      } else if (res.body) {
+        // Stream the response chunks back through the port
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          port.postMessage({ type: 'chunk', data: decoder.decode(value, { stream: true }) })
+        }
+        // Flush any remaining buffered bytes from incomplete multi-byte UTF-8 sequences
+        const remaining = decoder.decode()
+        if (remaining) {
+          port.postMessage({ type: 'chunk', data: remaining })
+        }
+        port.postMessage({ type: 'end' })
+        port.close()
+      } else {
+        port.postMessage({ type: 'complete', data: null })
+        port.close()
+      }
     } catch (error) {
       console.error('Worker request failed:', error)
-      port.postMessage({ error: 'Worker request failed', details: String(error) })
-    } finally {
+      port.postMessage({ type: 'error', data: String(error) })
       port.close()
     }
   }

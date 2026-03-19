@@ -13,3 +13,10 @@ test.db
 
 # env files
 .env.test
+
+# temp/backup config files
+electron.vite.config.*.mjs
+
+# misc 
+backlog.txt
+

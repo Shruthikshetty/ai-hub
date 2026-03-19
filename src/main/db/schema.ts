@@ -1,40 +1,15 @@
 /**
- * @file contains all our table schemas
+ * @file Aggregator for all DB schemas.
+ * Re-exports from individual schema files in src/common/db-schemas/.
+ * Drizzle config points here, so no config changes needed when adding new tables.
  */
 
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+export * from '../../common/db-schemas/user.schema'
+export * from '../../common/db-schemas/provider.schema'
+export * from '../../common/db-schemas/conversation.schema'
+export * from '../../common/db-schemas/message.schema'
+export * from '../../common/db-schemas/relations.schema'
+export * from '../../common/db-schemas/media.schema'
 
-// table schemas go here
-
-// user table schema
-export const users = sqliteTable('users', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
-  age: integer('age').notNull(),
-  city: text('city').notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' })
-    .notNull()
-    .$defaultFn(() => new Date())
-    .$onUpdate(() => new Date())
-})
-
-// zod schemas go here
-
-// create a zod schema for the users table
-export const usersGetSchema = createSelectSchema(users)
-
-// create a zod schema for inserting into the users table
-export const usersInsertSchema = createInsertSchema(users, {
-  name: (field) => field.min(3).max(255),
-  age: (field) => field.min(1).max(120),
-  city: (field) => field.min(1).max(255)
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true
-})
-
-// zod schema for updating the users table
-export const userPatchSchema = usersInsertSchema.partial()
+// When you add more tables, just add more re-exports here:
+// export * from '../../common/db-schemas/messages.schema'
