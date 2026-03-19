@@ -1,4 +1,4 @@
-import { mediaUploadResponseSchemaType } from '@common/schemas/media.schema'
+import type { MediaUploadResponseSchemaType } from '@common/schemas/media.schema'
 import { FileStorageCategory } from '@common/types'
 
 /**
@@ -8,7 +8,7 @@ import { FileStorageCategory } from '@common/types'
 export async function uploadMediaFile(
   file: File,
   category: FileStorageCategory
-): Promise<mediaUploadResponseSchemaType> {
+): Promise<MediaUploadResponseSchemaType> {
   // Get the real filesystem path from the File object
   const sourcePath = window.api.getFilePath(file)
 
