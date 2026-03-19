@@ -1,12 +1,26 @@
 import { z } from 'zod'
 import { FILE_STORAGE_CATEGORY } from '../constants/global.constants'
+import { mediaGetSchema } from '../db-schemas/media.schema'
 
-export const mediaUploadSchema = z.object({
-  /** Absolute path to the source file on disk */
-  sourcePath: z.string().min(1),
-  /**category of storage for separation  */
-  category: z.enum(FILE_STORAGE_CATEGORY)
-})
+export const mediaUploadSchema = z
+  .object({
+    /** Absolute path to the source file on disk */
+    sourcePath: z.string().optional(),
+    /**category of storage for separation  */
+    category: z.enum(FILE_STORAGE_CATEGORY),
+    /** base64 of the file */
+    base64: z.string().optional(),
+    /** extension of the file */
+    extension: z.string().optional()
+  })
+  .refine(
+    (data) => {
+      return data.sourcePath || data.base64
+    },
+    {
+      message: 'Either sourcePath or base64 must be provided'
+    }
+  )
 
 export const mediaUploadResponseSchema = z.object({
   success: z.boolean(),
@@ -18,6 +32,13 @@ export const mediaUploadResponseSchema = z.object({
   })
 })
 
+// schema to get all media by type
+export const getMediaResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(mediaGetSchema)
+})
+
 // extract the type
-export type mediaUploadSchemaType = z.infer<typeof mediaUploadSchema>
-export type mediaUploadResponseSchemaType = z.infer<typeof mediaUploadResponseSchema>
+export type MediaUploadSchemaType = z.infer<typeof mediaUploadSchema>
+export type MediaUploadResponseSchemaType = z.infer<typeof mediaUploadResponseSchema>
+export type GetMediaResponseType = z.infer<typeof getMediaResponseSchema>

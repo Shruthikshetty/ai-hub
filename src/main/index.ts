@@ -172,34 +172,50 @@ app.whenReady().then(() => {
 
       worker.postMessage({ type: 'hono-request', path, method, body }, [port2])
 
-      let timeout = setTimeout(() => {
-        port1.close()
-        reject(new Error('Worker request timed out'))
-      }, 30_000)
+      // Resettable inactivity timeout — resets on every chunk to allow slow AI calls
+      const INACTIVITY_TIMEOUT_MS = 30_000 // 30 seconds between chunks
+      // Absolute upper bound — never reset, prevents trickle streams from running forever
+      const OVERALL_TIMEOUT_MS = 5 * 60 * 1_000 // 5 minutes
 
-      // used to reset the timeout for each chunk
+      let inactivityTimeout = setTimeout(() => {
+        clearTimeout(overallTimeout)
+        port1.close()
+        reject(new Error('Worker request timed out (inactivity)'))
+      }, INACTIVITY_TIMEOUT_MS)
+
+      const overallTimeout = setTimeout(() => {
+        clearTimeout(inactivityTimeout)
+        port1.close()
+        reject(new Error('Worker request exceeded max duration'))
+      }, OVERALL_TIMEOUT_MS)
+
+      // used to reset the inactivity timeout for each chunk
       const resetTimeout = () => {
-        clearTimeout(timeout)
-        timeout = setTimeout(() => {
+        clearTimeout(inactivityTimeout)
+        inactivityTimeout = setTimeout(() => {
+          clearTimeout(overallTimeout)
           port1.close()
-          reject(new Error('Worker request timed out'))
-        }, 30_000)
+          reject(new Error('Worker request timed out (inactivity)'))
+        }, INACTIVITY_TIMEOUT_MS)
       }
 
       port1.on('message', (msgEvent) => {
         const msg = msgEvent.data
 
         if (msg.type === 'complete') {
-          clearTimeout(timeout)
+          clearTimeout(inactivityTimeout)
+          clearTimeout(overallTimeout)
           // If chunks were buffered, concatenate them; otherwise use complete data
           resolve(chunks.length > 0 ? chunks.join('') : msg.data)
           port1.close()
         } else if (msg.type === 'end') {
-          clearTimeout(timeout)
+          clearTimeout(inactivityTimeout)
+          clearTimeout(overallTimeout)
           resolve(chunks.join(''))
           port1.close()
         } else if (msg.type === 'error') {
-          clearTimeout(timeout)
+          clearTimeout(inactivityTimeout)
+          clearTimeout(overallTimeout)
           reject(new Error(msg.data))
           port1.close()
         } else if (msg.type === 'chunk') {

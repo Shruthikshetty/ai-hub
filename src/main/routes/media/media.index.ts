@@ -7,6 +7,8 @@ import * as handlers from './media.handlers'
 import * as routes from './media.routes'
 
 // create the router
-const router = createRouter().openapi(routes.uploadMedia, handlers.uploadMedia)
+const router = createRouter()
+  .openapi(routes.uploadMedia, handlers.uploadMedia)
+  .openapi(routes.getMedia, handlers.getMedia)
 
 export default router
