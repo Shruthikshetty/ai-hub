@@ -35,7 +35,7 @@ export function useUploadMedia() {
  */
 export function useFetchMedia({ type = 'all' }: { type?: (typeof MEDIA_REQUEST_TYPES)[number] }) {
   return useQuery<GetMediaResponseType, ApiError>({
-    queryKey: [QUERY_KEYS.mediaFetch],
+    queryKey: [QUERY_KEYS.mediaFetch, type],
     queryFn: async () => {
       const response = await window.api.request('/api/media/' + type, 'GET')
       if (!response.success) {

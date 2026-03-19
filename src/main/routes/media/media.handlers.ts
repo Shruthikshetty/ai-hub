@@ -9,7 +9,8 @@ import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { saveFile } from '../../lib/file-storage'
 import { MEDIA_TYPE } from '../../../common/constants/global.constants'
 import db from '../../db'
-import { MediaGetSchema } from '../../db/schema'
+import { media, MediaGetSchema } from '../../db/schema'
+import { desc } from 'drizzle-orm'
 
 // handler for uploading media files
 export const uploadMedia: AppRouteHandler<UploadMediaRoute> = async (c) => {
@@ -44,14 +45,17 @@ export const getMedia: AppRouteHandler<GetMediaRoute> = async (c) => {
   // get media items from db
   let result: MediaGetSchema[] = []
   if (getType === 'all') {
-    result = await db.query.media.findMany()
+    result = await db.query.media.findMany({
+      orderBy: [desc(media.createdAt)]
+    })
   } else {
     result = await db.query.media.findMany({
-      where: (media, { eq }) => eq(media.type, getType as MediaGetSchema['type'])
+      where: (media, { eq }) => eq(media.type, getType as MediaGetSchema['type']),
+      orderBy: [desc(media.createdAt)]
     })
   }
 
-  // send response once image is saved with the url , path
+  // send response with retrieved media items
   return c.json(
     {
       success: true,

@@ -23,7 +23,7 @@ const ImagePage = () => {
   const { data: mediaList, refetch } = useFetchMedia({ type: 'image' })
 
   // hook to generate image
-  const { mutateAsync: generateImage, isPending } = useGenerateImage()
+  const { mutate: generateImage, isPending } = useGenerateImage()
 
   // handler to handle submit
   const handleSubmit = () => {

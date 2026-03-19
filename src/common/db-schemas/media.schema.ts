@@ -12,10 +12,11 @@ export const media = sqliteTable('media', {
   id: integer().primaryKey({ autoIncrement: true }),
   prompt: text().notNull(),
   imageUrl: text().notNull(),
+  relativePath: text().notNull(),
   modelId: text().notNull(),
   provider: text().notNull(),
   type: text({ enum: MEDIA_TYPE }).notNull(),
-  createdAt: integer({ mode: 'timestamp' }).default(new Date())
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
 
 // zod schema for getting media items

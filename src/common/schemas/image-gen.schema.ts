@@ -3,7 +3,7 @@ import { modelSchema } from './model.schema'
 
 // generate image request schema
 export const generateImageRequestSchema = z.object({
-  prompt: z.string(),
+  prompt: z.string().trim().min(1, 'Prompt is required'),
   model: modelSchema
 })
 

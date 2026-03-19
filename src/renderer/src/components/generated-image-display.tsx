@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { cn } from '../lib/utils'
 import { Spinner } from './ui/spinner'
 import { generateTailwindGradient } from '@renderer/lib/colors'
@@ -10,10 +10,16 @@ import { generateTailwindGradient } from '@renderer/lib/colors'
 const GeneratedImageDisplay = ({ imageUrl, loading }: { imageUrl: string; loading: boolean }) => {
   // state to check if image is loaded
   const [loaded, setLoaded] = useState(false)
+  // reset loaded state when image url changes
+  useEffect(() => {
+    if (imageUrl) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLoaded(false)
+    }
+  }, [imageUrl])
 
   // generate random gradient for the image
   const gradientStyles = useMemo(() => generateTailwindGradient(), [])
-  console.log(gradientStyles)
   return (
     <div
       className={cn(

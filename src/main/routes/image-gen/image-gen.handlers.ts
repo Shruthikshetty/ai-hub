@@ -4,7 +4,7 @@
 import { GenerateImageRoute } from './image-gen.routes'
 import { AppRouteHandler } from '../../types'
 import { generateImage as aiGenerateImage } from 'ai'
-import { saveFile } from '../../lib/file-storage'
+import { saveFile, deleteMediaFile } from '../../lib/file-storage'
 import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import db from '../../db'
@@ -39,20 +39,26 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
   })
 
   // store the image in file and get the url
-  const { mediaUrl } = await saveFile({
+  const { mediaUrl, relativePath } = await saveFile({
     category: 'img-gen',
     base64: image.base64,
     extension: 'png'
   })
 
-  //Store to db
-  await db.insert(media).values({
-    imageUrl: mediaUrl,
-    type: 'image',
-    prompt: prompt,
-    modelId: model.id,
-    provider: model.provider
-  })
+  //Store to db — if this fails, clean up the saved file to avoid orphans
+  try {
+    await db.insert(media).values({
+      imageUrl: mediaUrl,
+      relativePath: relativePath,
+      type: 'image',
+      prompt: prompt,
+      modelId: model.id,
+      provider: model.provider
+    })
+  } catch (err) {
+    deleteMediaFile(relativePath)
+    throw err
+  }
 
   // return the image url
   return c.json({ imageUrl: mediaUrl, success: true }, HTTP_STATUS_CODES.OK)

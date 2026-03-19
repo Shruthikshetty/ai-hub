@@ -64,7 +64,7 @@ export const getMedia = createRoute({
             required: true,
             description: 'type of media'
           },
-          example: 2
+          example: 'all'
         })
     })
   },
