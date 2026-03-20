@@ -2,7 +2,12 @@ import axios, { AxiosResponse } from 'axios'
 import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
-import { buildGatewayModel, buildGoogleModel, buildOpenAiModel } from './extract-model-capabilities'
+import {
+  buildGatewayModel,
+  buildGoogleModel,
+  buildGroqModel,
+  buildOpenAiModel
+} from './extract-model-capabilities'
 
 // types
 type OpenAiModel = {
@@ -85,6 +90,20 @@ export type GatewayModel = {
 }
 
 /**
+ * groq model type
+ * full types https://console.groq.com/docs/models
+ */
+export type GroqModel = {
+  id: string
+  object: string
+  created: number
+  owned_by: string
+  active: boolean
+  context_window: number
+  max_completion_tokens: number
+}
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -138,6 +157,13 @@ export async function getModelListFromProvider(
         })
         break
       }
+      case 'groq': {
+        response = await axios.get('https://api.groq.com/openai/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        break
+      }
       default:
         // For other providers (like ollama) or generic OpenAI-compatible endpoints
         if (provider.serverUrl) {
@@ -185,6 +211,11 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<GatewayModel>).data
         if (!data) return []
         return data.map((model: GatewayModel) => buildGatewayModel(model, provider.provider))
+      }
+      case 'groq': {
+        const data = (response.data as OpenAiResponse<GroqModel>).data
+        if (!data) return []
+        return data.map((model: GroqModel) => buildGroqModel(model, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

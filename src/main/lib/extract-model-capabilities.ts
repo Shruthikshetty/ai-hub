@@ -1,5 +1,5 @@
 import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
-import { GatewayModel, GoogleModel } from './get-model-list'
+import { GatewayModel, GoogleModel, GroqModel } from './get-model-list'
 
 // builds a complete model record for an OpenAI model from its ID
 export function buildOpenAiModel(
@@ -147,6 +147,42 @@ export function buildGatewayModel(
     capabilities: {
       vision: model.tags?.includes('vision'),
       //not set for now
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}
+
+/**
+ * function to extract capabilities from groq model
+ */
+export function buildGroqModel(
+  model: GroqModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+  const lowerModeId = model.id.toLowerCase()
+
+  if (lowerModeId.includes('tts') || lowerModeId.includes('orpheus')) {
+    outputs.push('audio')
+  } else if (lowerModeId.includes('whisper')) {
+    inputs.pop() // remove text
+    inputs.push('audio') // add audio
+    outputs.push('text')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: model.id,
+    name: model.id.split('/')?.[1] ?? model.id,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    // not set for now
+    capabilities: {
+      vision: false,
       videoReasoning: false,
       realtime: false
     }

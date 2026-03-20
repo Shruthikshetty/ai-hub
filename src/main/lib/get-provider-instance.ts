@@ -7,6 +7,7 @@ import { createOllama } from 'ollama-ai-provider-v2'
 import { normalizeProviderUrl } from '../../common/utils/url.util'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { createGroq } from '@ai-sdk/groq'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({ model }: { model: ModelSchemaType }) {
@@ -47,6 +48,12 @@ export async function getProviderInstanceModel({ model }: { model: ModelSchemaTy
         apiKey
       })
       return googleInstance
+    }
+    case 'groq': {
+      const groqInstance = createGroq({
+        apiKey
+      })
+      return groqInstance
     }
     default: {
       const gatewayInstance = createGateway({

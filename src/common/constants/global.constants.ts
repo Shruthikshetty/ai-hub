@@ -77,6 +77,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://vercel.com/ai-gateway',
     description: 'vercel ai gateway get a aggregated list of models'
+  },
+  {
+    provider: 'groq',
+    name: 'Groq',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/groq.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://groq.com',
+    description: 'Groq provider models'
   }
 ]
 
@@ -85,7 +95,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'ollama',
   'openrouter',
   'google',
-  'vercel'
+  'vercel',
+  'groq'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
