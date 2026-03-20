@@ -67,10 +67,26 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://aistudio.google.com',
     description: 'Google ai studio models'
+  },
+  {
+    provider: 'vercel',
+    name: 'AI Gateway',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/vercel.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://vercel.com/ai-gateway',
+    description: 'vercel ai gateway get a aggregated list of models'
   }
 ]
 
-export const AVAILABLE_PROVIDER_LIST = ['openai', 'ollama', 'openrouter', 'google'] as const
+export const AVAILABLE_PROVIDER_LIST = [
+  'openai',
+  'ollama',
+  'openrouter',
+  'google',
+  'vercel'
+] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
 

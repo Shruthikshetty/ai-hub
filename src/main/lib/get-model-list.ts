@@ -1,7 +1,8 @@
 import axios, { AxiosResponse } from 'axios'
 import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
-import { ModelSchemaType, ModelIOType } from '../../common/schemas/model.schema'
+import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
+import { buildGatewayModel, buildGoogleModel, buildOpenAiModel } from './extract-model-capabilities'
 
 // types
 type OpenAiModel = {
@@ -39,7 +40,7 @@ type OpenRouterModel = {
  * google ai studio mode object
  * doc: https://ai.google.dev/api/models#Model
  */
-type GoogleModel = {
+export type GoogleModel = {
   name: string
   version: string
   displayName: string
@@ -62,110 +63,32 @@ type GoogleResponse = {
 }
 
 /**
+ * vercel gateway model type
+ * full types https://vercel.com/docs/ai-gateway/models-and-providers#dynamic-model-discovery
+ */
+export type GatewayModel = {
+  id: string
+  object: 'model'
+  created: number
+  released: number
+  owned_by: string
+  name: string
+  description: string
+  context_window: number
+  max_token: number
+  type: 'language' | 'embedding' | 'image' | 'video'
+  tags: string[]
+  pricing: {
+    input: string
+    output: string
+  }
+}
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
   data: T[]
-}
-//@TODO move out the helpers
-// helper function to infer capabilities of OpenAI models from their IDs
-function inferOpenAiCapabilities(
-  modelId: string
-): Pick<ModelSchemaType, 'capabilities' | 'inputs' | 'outputs'> {
-  const isImage = modelId.includes('dall-e') || modelId.includes('image')
-  const isEmbedding = modelId.includes('embedding')
-  const isTTS = modelId.includes('tts') || modelId.includes('audio')
-  const isWhisper = modelId.includes('whisper')
-  const isRealTime = modelId.includes('realtime')
-  const isVideo = modelId.includes('sora')
-
-  // Vision inputs for newer multimodal textual models NOTE: this might not be accurate
-  const isVision =
-    modelId.includes('vision') ||
-    modelId.startsWith('gpt-4o') ||
-    modelId.startsWith('o1') ||
-    modelId.startsWith('gpt-5')
-
-  const inputs: ModelIOType[] = ['text']
-  const outputs: ModelIOType[] = []
-
-  // Set Inputs
-  if (isVision) inputs.push('image')
-  if (isWhisper) {
-    // Whisper takes audio and returns text
-    inputs.push('audio')
-  }
-
-  // Set Outputs
-  switch (true) {
-    case isImage:
-      outputs.push('image')
-      break
-    case isEmbedding:
-      outputs.push('embedding')
-      break
-    case isTTS:
-      outputs.push('audio')
-      break
-    case isRealTime:
-      outputs.push('realtime')
-      break
-    case isVideo:
-      outputs.push('video')
-      break
-    default:
-      outputs.push('text')
-      break
-  }
-
-  return {
-    inputs,
-    outputs,
-    capabilities: {
-      vision: isVision,
-      videoReasoning: false, // @ TODO No clear distinction for now
-      realtime: modelId.includes('realtime')
-    }
-  }
-}
-
-// helper function to infer capabilities of google ai studio model from the model name
-function inferGoogleCapabilities(
-  model: GoogleModel
-): Pick<ModelSchemaType, 'capabilities' | 'inputs' | 'outputs'> {
-  const name = model.name.toLowerCase()
-  const methods = model.supportedGenerationMethods || []
-
-  // Determine Input Types
-  // Gemini is multimodal by default unless it's an embedding model
-  const inputs: ModelIOType[] = ['text']
-  if (!name.includes('embedding')) {
-    inputs.push('image', 'video', 'audio', 'file')
-  }
-
-  // Determine Output Types
-  const outputs: ModelIOType[] = []
-  if (methods.includes('embedContent')) {
-    outputs.push('embedding')
-  } else if (name.includes('image') || name.includes('banana')) {
-    outputs.push('image')
-  } else if (name.includes('veo')) {
-    outputs.push('video')
-  } else if (name.includes('audio')) {
-    outputs.push('audio')
-  } else {
-    outputs.push('text')
-  }
-
-  // return the capabilities
-  return {
-    inputs,
-    outputs,
-    capabilities: {
-      vision: !name.includes('embedding'), // All modern Gemini models have vision
-      videoReasoning: name.includes('pro') || name.includes('flash')
-    }
-  }
 }
 
 /**
@@ -187,7 +110,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<GoogleResponse>
 
     // handel the fetching logic separately for all the providers
-    switch (provider.provider) {
+    switch (provider.provider as ModelProviderType) {
       case 'openai':
         response = await axios.get('https://api.openai.com/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
@@ -208,6 +131,13 @@ export async function getModelListFromProvider(
         })
         break
       }
+      case 'vercel': {
+        response = await axios.get('https://ai-gateway.vercel.sh/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        break
+      }
       default:
         // For other providers (like ollama) or generic OpenAI-compatible endpoints
         if (provider.serverUrl) {
@@ -222,21 +152,11 @@ export async function getModelListFromProvider(
     }
     // map the response to standard format as per the provider
     // @TODO catch the data and then access from db
-    switch (provider.provider) {
+    switch (provider.provider as ModelProviderType) {
       case 'openai': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
         if (!data) return []
-        return data.map((model: OpenAiModel) => {
-          const capabilities = inferOpenAiCapabilities(model.id)
-          return {
-            id: model.id,
-            name: model.id,
-            provider: provider.provider,
-            inputs: capabilities.inputs,
-            outputs: capabilities.outputs,
-            capabilities: capabilities.capabilities
-          }
-        })
+        return data.map((model: OpenAiModel) => buildOpenAiModel(model.id, provider.provider))
       }
       case 'openrouter': {
         const data = (response.data as OpenAiResponse<OpenRouterModel>).data
@@ -259,17 +179,12 @@ export async function getModelListFromProvider(
       case 'google': {
         const models = (response.data as GoogleResponse).models
         if (!models) return []
-        return models.map((model: GoogleModel) => {
-          const capabilities = inferGoogleCapabilities(model)
-          return {
-            id: model.name.split('/')?.[1] ?? model.name,
-            name: model.displayName,
-            provider: provider.provider,
-            inputs: capabilities.inputs,
-            outputs: capabilities.outputs,
-            capabilities: capabilities.capabilities
-          }
-        })
+        return models.map((model: GoogleModel) => buildGoogleModel(model, provider.provider))
+      }
+      case 'vercel': {
+        const data = (response.data as OpenAiResponse<GatewayModel>).data
+        if (!data) return []
+        return data.map((model: GatewayModel) => buildGatewayModel(model, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
@@ -283,7 +198,6 @@ export async function getModelListFromProvider(
         }))
       }
     }
-    return []
   } catch (error) {
     console.error('failed to fetch models for ', provider.name, error)
     return []
