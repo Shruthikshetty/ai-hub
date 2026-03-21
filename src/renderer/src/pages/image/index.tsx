@@ -59,7 +59,11 @@ const ImagePage = () => {
       <PromptInput onSubmit={handleSubmit} className="mt-4">
         {/* BODY  */}
         <PromptInputBody>
-          <PromptInputTextarea onChange={(e) => setPrompt(e.target.value)} value={prompt} />
+          <PromptInputTextarea
+            onChange={(e) => setPrompt(e.target.value)}
+            value={prompt}
+            placeholder="Explain your image in detail"
+          />
         </PromptInputBody>
         {/* FOOTER */}
         <PromptInputFooter>
