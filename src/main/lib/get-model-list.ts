@@ -6,6 +6,7 @@ import {
   buildGatewayModel,
   buildGoogleModel,
   buildGroqModel,
+  buildHuggingFaceModel,
   buildOpenAiModel
 } from './extract-model-capabilities'
 
@@ -90,6 +91,25 @@ export type GatewayModel = {
 }
 
 /**
+ * hugging face model type
+ * full types https://huggingface.co/docs/inference-providers
+ */
+export interface HuggingFaceModel {
+  id: string // Unique model ID
+  modelId: string
+  author?: string // User or Organization name
+  pipeline_tag?: string // Task type (e.g., "image-to-text", "image-text-to-text")
+  downloads: number // Total downloads
+  likes: number // Community "stars"
+  library_name: string
+  tags: string[]
+  createdAt: string // ISO timestamp
+}
+
+/** huggingface response type */
+type HuggingFaceResponse = HuggingFaceModel[]
+
+/**
  * groq model type
  * full types https://console.groq.com/docs/models
  */
@@ -127,6 +147,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<OpenAiResponse<OpenRouterModel>>
       | AxiosResponse<OpenAiResponse<OpenAiModel>>
       | AxiosResponse<GoogleResponse>
+      | AxiosResponse<HuggingFaceResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -161,6 +182,19 @@ export async function getModelListFromProvider(
         response = await axios.get('https://api.groq.com/openai/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
+        })
+        break
+      }
+      case 'huggingface': {
+        response = await axios.get('https://huggingface.co/api/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          params: {
+            inference_provider: 'all', // only fetch models that can be run on inference endpoint
+            limit: 600, // lets limit for 600 now @TODO check exact filters to access only the models we need
+            sort: 'downloads', // Shows the most reliable/popular first
+            direction: -1
+          },
+          timeout: 5000 // 5 seconds
         })
         break
       }
@@ -216,6 +250,13 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<GroqModel>).data
         if (!data) return []
         return data.map((model: GroqModel) => buildGroqModel(model, provider.provider))
+      }
+      case 'huggingface': {
+        const data = response.data as HuggingFaceModel[]
+        if (!data) return []
+        return data
+          .map((model: HuggingFaceModel) => buildHuggingFaceModel(model, provider.provider))
+          .filter((model) => model.inputs.length > 0) // drop unsupported pipeline_tag types
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
