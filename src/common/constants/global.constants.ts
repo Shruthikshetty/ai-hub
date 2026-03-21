@@ -76,7 +76,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     apiKey: '',
     server: false,
     siteUrl: 'https://vercel.com/ai-gateway',
-    description: 'vercel ai gateway get a aggregated list of models'
+    description: 'vercel ai gateway get an aggregated list of models'
   },
   {
     provider: 'groq',
