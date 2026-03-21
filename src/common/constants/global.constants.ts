@@ -87,6 +87,17 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://groq.com',
     description: 'Groq provider models'
+  },
+  {
+    provider: 'huggingface',
+    name: 'Hugging Face',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/huggingface.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://huggingface.co/docs/inference-providers',
+    description:
+      'Hugging Face’s Inference Providers give developers access to hundreds of machine learning models, powered by world-class inference providers'
   }
 ]
 
@@ -96,7 +107,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'openrouter',
   'google',
   'vercel',
-  'groq'
+  'groq',
+  'huggingface'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const

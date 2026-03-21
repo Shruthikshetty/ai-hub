@@ -8,6 +8,7 @@ import { normalizeProviderUrl } from '../../common/utils/url.util'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createGroq } from '@ai-sdk/groq'
+import { createHuggingFace } from '@ai-sdk/huggingface'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({ model }: { model: ModelSchemaType }) {
@@ -55,6 +56,13 @@ export async function getProviderInstanceModel({ model }: { model: ModelSchemaTy
       })
       return groqInstance
     }
+    case 'huggingface': {
+      const huggingfaceInstance = createHuggingFace({
+        apiKey
+      })
+      return huggingfaceInstance
+    }
+    case 'vercel': // fall's to default
     default: {
       const gatewayInstance = createGateway({
         apiKey

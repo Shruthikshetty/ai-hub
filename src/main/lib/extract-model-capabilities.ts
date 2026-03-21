@@ -1,5 +1,5 @@
 import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
-import { GatewayModel, GoogleModel, GroqModel } from './get-model-list'
+import { GatewayModel, GoogleModel, GroqModel, HuggingFaceModel } from './get-model-list'
 
 // builds a complete model record for an OpenAI model from its ID
 export function buildOpenAiModel(
@@ -183,6 +183,78 @@ export function buildGroqModel(
     // not set for now
     capabilities: {
       vision: false,
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}
+
+/**
+ * function to build a model record for a HuggingFace model
+ * uses pipeline_tag to accurately determine inputs and outputs
+ * pipeline_tag reference: https://huggingface.co/tasks
+ *
+ * @TODO This is not properly test if all are categorized properly
+ */
+export function buildHuggingFaceModel(
+  model: HuggingFaceModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const tag = model.pipeline_tag ?? ''
+
+  const inputs: ModelIOType[] = []
+  const outputs: ModelIOType[] = []
+
+  // Derive inputs and outputs from pipeline_tag
+  switch (tag) {
+    // Chat models
+    case 'text-generation':
+    case 'conversational':
+      inputs.push('text')
+      outputs.push('text')
+      break
+    // Multimodal chat models
+    case 'image-text-to-text':
+      inputs.push('text', 'image')
+      outputs.push('text')
+      break
+    // Image generation
+    case 'text-to-image':
+      inputs.push('text')
+      outputs.push('image')
+      break
+    // Embedding models
+    case 'feature-extraction':
+    case 'sentence-similarity':
+      inputs.push('text')
+      outputs.push('embedding')
+      break
+    // TTS models
+    case 'text-to-speech':
+    case 'text-to-audio':
+      inputs.push('text')
+      outputs.push('audio')
+      break
+    // Video generation
+    case 'text-to-video':
+      inputs.push('text')
+      outputs.push('video')
+      break
+    default:
+      // Not a model type we support — leave inputs/outputs empty
+      break
+  }
+
+  const hasVision = inputs.includes('image')
+
+  return {
+    id: model.id,
+    name: model.id,
+    provider,
+    inputs,
+    outputs,
+    capabilities: {
+      vision: hasVision,
       videoReasoning: false,
       realtime: false
     }

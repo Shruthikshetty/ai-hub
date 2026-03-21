@@ -6,8 +6,10 @@ import {
   buildGatewayModel,
   buildGoogleModel,
   buildGroqModel,
+  buildHuggingFaceModel,
   buildOpenAiModel
 } from './extract-model-capabilities'
+import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
 // types
 type OpenAiModel = {
@@ -90,6 +92,25 @@ export type GatewayModel = {
 }
 
 /**
+ * hugging face model type
+ * full types https://huggingface.co/docs/inference-providers
+ */
+export interface HuggingFaceModel {
+  id: string // Unique model ID
+  modelId: string
+  author?: string // User or Organization name
+  pipeline_tag?: string // Task type (e.g., "image-to-text", "image-text-to-text")
+  downloads: number // Total downloads
+  likes: number // Community "stars"
+  library_name: string
+  tags: string[]
+  createdAt: string // ISO timestamp
+}
+
+/** huggingface response type */
+type HuggingFaceResponse = HuggingFaceModel[]
+
+/**
  * groq model type
  * full types https://console.groq.com/docs/models
  */
@@ -163,6 +184,33 @@ export async function getModelListFromProvider(
           timeout: 2000 //2 seconds
         })
         break
+      }
+      case 'huggingface': {
+        // Each request targets one pipeline_tag — HuggingFace only supports one at a time.
+        // Fire them all in parallel and merge the results.
+        // @TODO requires proper testing and verification
+        const results = await Promise.all(
+          HF_MODEL_CATEGORIES.map(
+            ({ tag, limit }) =>
+              axios
+                .get<HuggingFaceResponse>('https://huggingface.co/api/models', {
+                  headers: { Authorization: `Bearer ${apiKey}` },
+                  params: {
+                    inference_provider: 'all',
+                    pipeline_tag: tag,
+                    limit,
+                    sort: 'downloads',
+                    direction: -1
+                  },
+                  timeout: 2000 //2 seconds
+                })
+                .then((res) => res.data)
+                .catch(() => [] as HuggingFaceModel[]) // if one category fails, skip it
+          )
+        )
+
+        const allModels = results.flat()
+        return allModels.map((model) => buildHuggingFaceModel(model, provider.provider))
       }
       default:
         // For other providers (like ollama) or generic OpenAI-compatible endpoints

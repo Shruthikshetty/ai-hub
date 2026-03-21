@@ -146,6 +146,11 @@ Intuitive conversational experience with multi-model support.
 Modify the model options.
 ![Chat Options](./resources/chat-reasoning.png)
 
+### Image Generation
+
+Create stunning visuals with built-in image generation capabilities using available image models.
+![Image Generation](./resources/image-gen.png)
+
 ### Personal Profile
 
 Manage your identity and app-wide preferences.
