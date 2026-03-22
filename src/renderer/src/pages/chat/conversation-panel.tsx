@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Separator } from '@renderer/components/ui/separator'
 import { Button } from '@renderer/components/ui/button'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import {
   useAddConversation,
   useDeleteConversationById,
@@ -13,6 +13,7 @@ import useSelectedConversation from '@renderer/state-management/selected-convers
 import { Virtuoso } from 'react-virtuoso'
 import { cn } from '@renderer/lib/utils'
 import ResizableSidePanel from '@renderer/components/resizable-side-panel'
+import ConversationOptions from './conversation-options'
 
 /**
  * This component contain the history of all the conversations
@@ -133,14 +134,11 @@ const ChatConversationsHistory = (props: {
                   </p>
                 </div>
               </button>
-              <button
-                className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-600"
-                aria-label={`Delete conversation ${conversation.title}`}
-                onClick={handleDelete.bind(null, conversation.id)}
-              >
-                <Trash2 className="size-4" />
-              </button>
-              <Separator />
+              {/* conversation options */}
+              <ConversationOptions
+                conversation={conversation}
+                onDelete={handleDelete.bind(null, conversation.id)}
+              />
             </div>
           )}
         />
