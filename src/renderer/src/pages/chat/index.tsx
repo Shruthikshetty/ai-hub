@@ -81,6 +81,8 @@ const ChatPage = () => {
       }
     }
   })
+  // check if the model is generating
+  const isGenerating = status === 'submitted' || status === 'streaming'
 
   // Load messages when switching conversations
   useEffect(() => {
@@ -240,12 +242,10 @@ const ChatPage = () => {
               </PromptInputTools>
               {/* submit button */}
               <PromptInputSubmit
+                //@TODO stop will not work
                 onStop={stop}
                 disabled={
-                  status === 'submitted' ||
-                  !selectedModel?.id ||
-                  !selectedConversation?.id ||
-                  (!text.trim() && status === 'ready')
+                  !isGenerating && (!selectedModel?.id || !selectedConversation?.id || !text.trim())
                 }
                 status={status}
               />

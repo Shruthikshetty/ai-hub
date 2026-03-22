@@ -61,7 +61,8 @@ const ConversationOptions = ({ conversation, onDelete }: ConversationOptionsProp
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+            aria-label="Conversation options"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100"
           >
             <EllipsisVertical />
           </Button>

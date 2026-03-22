@@ -16,10 +16,10 @@ import {
 import type { ComponentProps, HTMLAttributes, ReactNode } from 'react'
 import { useCallback, useMemo } from 'react'
 import {
+  type AttachmentContextValue,
+  type AttachmentsProps,
   AttachmentContext,
-  AttachmentContextValue,
   AttachmentsContext,
-  AttachmentsProps,
   getAttachmentLabel,
   getMediaCategory,
   useAttachmentContext,
