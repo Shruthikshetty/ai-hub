@@ -10,53 +10,63 @@
  * The AI SDK's `downloadAssets` only accepts http/https in the `url` field.
  * This helper converts each case to something the SDK accepts without fetching.
  */
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import { AppUIMessage } from '../../common/schemas/messages.schema'
 import { resolveMediaPath } from './file-storage'
 
-function normalizeFileParts(parts: AppUIMessage['parts']): any[] {
-  return parts.map((part) => {
-    if (part.type !== 'file') return part
+async function normalizeFileParts(parts: AppUIMessage['parts']): Promise<any[]> {
+  // Use Promise.all to handle multiple parts concurrently
+  return Promise.all(
+    parts.map(async (part) => {
+      if (part.type !== 'file') return part
 
-    const { url } = part
+      const { url } = part
 
-    //media:// URL → read file from disk as Buffer
-    if (url?.startsWith('media://')) {
-      const relativePath = url.slice('media://'.length)
-      const absolutePath = resolveMediaPath(relativePath)
-      if (absolutePath) {
+      // media:// URL → read file from disk as Buffer asynchronously
+      if (url?.startsWith('media://')) {
+        const relativePath = url.slice('media://'.length)
+        const absolutePath = resolveMediaPath(relativePath)
+        if (absolutePath) {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { url: _url, ...rest } = part
+            return {
+              ...rest,
+              // await fs.readFile ensures the event loop is not blocked
+              url: await fs.readFile(absolutePath)
+            }
+          } catch (e) {
+            // Fallback if file read fails
+            console.error(e)
+            return part
+          }
+        }
+        return part
+      }
+
+      // data: URI → strip prefix, put raw base64 in url
+      if (url?.startsWith('data:')) {
+        const [prefix, base64] = url.split(',')
+        const inferredMediaType = prefix.split(':')[1]?.split(';')[0] ?? part.mediaType
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { url: _url, ...rest } = part
-        return {
-          ...rest,
-          // SDK accepts Buffer/Uint8Array directly — no download triggered
-          url: fs.readFileSync(absolutePath)
-        }
+        return { ...rest, mediaType: inferredMediaType, url: base64 }
       }
-      // File missing on disk — fall through to handle as-is
+
       return part
-    }
-
-    //data: URI → strip prefix, put raw base64 in url
-    if (url?.startsWith('data:')) {
-      const [prefix, base64] = url.split(',')
-      const inferredMediaType = prefix.split(':')[1]?.split(';')[0] ?? part.mediaType
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { url: _url, ...rest } = part
-      return { ...rest, mediaType: inferredMediaType, url: base64 }
-    }
-
-    return part
-  })
+    })
+  )
 }
 
 /**
- * Normalizes all messages — history messages now persist `media://` URLs in
- * the DB so every message needs its file parts resolved before the SDK sees them.
+ * Normalizes all messages asynchronously before passing to the AI SDK
  */
-export function normalizeMessages(messages: AppUIMessage[]): any[] {
-  return messages.map((msg) => ({
-    ...msg,
-    parts: normalizeFileParts(msg.parts)
-  }))
+export async function normalizeMessages(messages: AppUIMessage[]): Promise<any[]> {
+  return Promise.all(
+    messages.map(async (msg) => ({
+      ...msg,
+      // Wait for file parts to be resolved
+      parts: await normalizeFileParts(msg.parts)
+    }))
+  )
 }

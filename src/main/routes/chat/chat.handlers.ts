@@ -20,7 +20,7 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   const { messages, model, conversationId } = c.req.valid('json')
 
   // Normalize any data: URIs in file parts before handing off to the SDK
-  const normalizedMessages = normalizeMessages(messages)
+  const normalizedMessages = await normalizeMessages(messages)
 
   // convert to core messages
   const coreMessages = await convertToModelMessages(normalizedMessages)
