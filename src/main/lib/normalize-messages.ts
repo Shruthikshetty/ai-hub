@@ -37,16 +37,21 @@ async function normalizeFileParts(parts: AppUIMessage['parts']): Promise<any[]> 
             }
           } catch (e) {
             // Fallback if file read fails
-            console.error(e)
-            return part
+            console.error('Failed to normalize media attachment', e)
+            // Drop broken attachment
+            return null
           }
         }
-        return part
+        return null
       }
 
       // data: URI → strip prefix, put raw base64 in url
       if (url?.startsWith('data:')) {
-        const [prefix, base64] = url.split(',')
+        const commaIdx = url.indexOf(',')
+        if (commaIdx < 0) return part
+        const prefix = url.slice(0, commaIdx)
+        const base64 = url.slice(commaIdx + 1)
+        if (!base64) return part
         const inferredMediaType = prefix.split(':')[1]?.split(';')[0] ?? part.mediaType
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { url: _url, ...rest } = part
@@ -62,11 +67,13 @@ async function normalizeFileParts(parts: AppUIMessage['parts']): Promise<any[]> 
  * Normalizes all messages asynchronously before passing to the AI SDK
  */
 export async function normalizeMessages(messages: AppUIMessage[]): Promise<any[]> {
-  return Promise.all(
-    messages.map(async (msg) => ({
-      ...msg,
-      // Wait for file parts to be resolved
-      parts: await normalizeFileParts(msg.parts)
-    }))
-  )
+  return (
+    await Promise.all(
+      messages.map(async (msg) => ({
+        ...msg,
+        // Wait for file parts to be resolved
+        parts: await normalizeFileParts(msg.parts)
+      }))
+    )
+  ).filter(Boolean)
 }

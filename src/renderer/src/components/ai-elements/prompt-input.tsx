@@ -175,12 +175,16 @@ export const PromptInputProvider = ({
       if (found?.url?.startsWith('blob:')) {
         URL.revokeObjectURL(found.url)
       }
+      if (found?.url?.startsWith('media://')) {
+        deleteMediaFile(found.url)
+      }
       return prev.filter((f) => f.id !== id)
     })
   }, [])
 
   const clear = useCallback(() => {
     setAttachmentFiles((prev) => {
+      console.log('here')
       for (const f of prev) {
         // Only revoke blob: URLs; media:// URLs are persistent files on disk
         if (f.url?.startsWith('blob:')) {

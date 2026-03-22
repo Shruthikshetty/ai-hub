@@ -8,6 +8,7 @@ import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import {
   internalServerErrorDocObject,
+  zodNotFoundDocObject,
   zodValidationErrorDocObject
 } from '../../constants/doc-constants'
 import {
@@ -109,6 +110,7 @@ export const deleteMedia = createRoute({
       },
       description: 'File deleted successfully'
     },
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
     [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
     [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }
