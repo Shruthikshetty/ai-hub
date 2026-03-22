@@ -77,8 +77,8 @@ export const deleteMedia: AppRouteHandler<DeleteMediaRoute> = async (c) => {
   return c.json(
     {
       success: deleted,
-      message: 'Media deleted successfully'
+      message: deleted ? 'Media deleted successfully' : 'Media not found'
     },
-    HTTP_STATUS_CODES.OK
+    deleted ? HTTP_STATUS_CODES.OK : HTTP_STATUS_CODES.NOT_FOUND
   )
 }
