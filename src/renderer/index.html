@@ -10,7 +10,8 @@
         default-src 'self';
         script-src 'self';
         style-src 'self' 'unsafe-inline';
-        img-src 'self' data: 
+        connect-src 'self' blob:;
+        img-src 'self' data: blob: media:
           https://unpkg.com
           https://models.dev;
       "

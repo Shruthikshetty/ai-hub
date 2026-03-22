@@ -38,7 +38,20 @@ export const getMediaResponseSchema = z.object({
   data: z.array(mediaGetSchema)
 })
 
+export const mediaDeleteSchema = z.object({
+  /** Relative path from media root, e.g. "profile/avatar.png" */
+  relativePath: z.string()
+})
+
+// response schema for deleting a media file
+export const mediaDeleteResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+})
+
 // extract the type
 export type MediaUploadSchemaType = z.infer<typeof mediaUploadSchema>
 export type MediaUploadResponseSchemaType = z.infer<typeof mediaUploadResponseSchema>
 export type GetMediaResponseType = z.infer<typeof getMediaResponseSchema>
+export type MediaDeleteSchemaType = z.infer<typeof mediaDeleteSchema>
+export type MediaDeleteResponseSchemaType = z.infer<typeof mediaDeleteResponseSchema>

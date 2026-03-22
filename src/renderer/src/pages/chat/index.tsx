@@ -1,12 +1,18 @@
 import {
   PromptInput,
+  PromptInputActionAddAttachments,
+  PromptInputActionMenu,
+  PromptInputActionMenuContent,
+  PromptInputActionMenuTrigger,
   PromptInputBody,
   PromptInputFooter,
+  PromptInputHeader,
   PromptInputMessage,
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTools
 } from '@renderer/components/ai-elements/prompt-input'
+import { PromptInputAttachmentsDisplay } from '@renderer/components/ai-elements/prompt-input-attachments'
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { createIPCStreamTransport } from '@renderer/lib/custom-transports'
@@ -65,7 +71,7 @@ const ChatPage = () => {
   // Track the last conversation ID for which the model was restored
   const modelRestoredForChatId = useRef<string | null>(null)
   // hook to manage chat
-  const { messages, sendMessage, error, status, setMessages } = useChat<AppUIMessage>({
+  const { messages, sendMessage, error, status, setMessages, stop } = useChat<AppUIMessage>({
     id: chatId,
     transport: chatTransport,
     onFinish: () => {
@@ -75,6 +81,8 @@ const ChatPage = () => {
       }
     }
   })
+  // check if the model is generating
+  const isGenerating = status === 'submitted' || status === 'streaming'
 
   // Load messages when switching conversations
   useEffect(() => {
@@ -126,10 +134,18 @@ const ChatPage = () => {
 
   // function to handle submit of the prompt input
   const handleSubmit = (message: PromptInputMessage) => {
-    if (!message.text.trim() || !selectedModel?.id || !selectedConversation?.id) return
+    // check if the message has text or attachments
+    const hasText = Boolean(message.text.trim())
+    const hasAttachments = Boolean(message.files?.length)
+
+    // if the message has no text or attachments or model or conversation id then return
+    if (!(hasText || hasAttachments) || !selectedModel?.id || !selectedConversation?.id) return
+
+    // send the message
     sendMessage(
       {
-        text: message.text
+        text: message.text || 'Sent with attachments',
+        files: message.files
       },
       {
         body: {
@@ -204,7 +220,10 @@ const ChatPage = () => {
           </Conversation>
           {error && error.message && <p className="text-red-500 text-center">{error.message}</p>}
           {/* Prompt inputs go here */}
-          <PromptInput onSubmit={handleSubmit} className="mt-4">
+          <PromptInput onSubmit={handleSubmit} className="mt-4" globalDrop multiple>
+            <PromptInputHeader>
+              <PromptInputAttachmentsDisplay />
+            </PromptInputHeader>
             {/* BODY  */}
             <PromptInputBody>
               <PromptInputTextarea onChange={(e) => setText(e.target.value)} value={text} />
@@ -213,15 +232,20 @@ const ChatPage = () => {
             <PromptInputFooter>
               {/* All tools go here */}
               <PromptInputTools>
+                <PromptInputActionMenu>
+                  <PromptInputActionMenuTrigger />
+                  <PromptInputActionMenuContent align="start" side="top">
+                    <PromptInputActionAddAttachments label="Add images or files" />
+                  </PromptInputActionMenuContent>
+                </PromptInputActionMenu>
                 <AppModelSelector output="text" disableDefaultSelection />
               </PromptInputTools>
               {/* submit button */}
               <PromptInputSubmit
+                //@TODO stop will not work
+                onStop={stop}
                 disabled={
-                  !text.trim() ||
-                  status === 'submitted' ||
-                  !selectedModel?.id ||
-                  !selectedConversation?.id
+                  !isGenerating && (!selectedModel?.id || !selectedConversation?.id || !text.trim())
                 }
                 status={status}
               />

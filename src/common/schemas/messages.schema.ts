@@ -23,11 +23,21 @@ export const StepStartUIPartSchema = z.object({
   type: z.enum(['step-start'])
 })
 
+// file ui part schema
+export const FileUIPartSchema = z.object({
+  type: z.literal('file'),
+  mediaType: z.string(),
+  filename: z.string().optional(),
+  providerMetadata: z.any().optional(),
+  url: z.string()
+})
+
 //added additional parts as required
 export const MessagePartSchema = z.discriminatedUnion('type', [
   TextUIPartSchema,
   ReasoningUIPartSchema,
-  StepStartUIPartSchema
+  StepStartUIPartSchema,
+  FileUIPartSchema
 ])
 
 // metadata schema for message

@@ -45,6 +45,8 @@ import {
 import { Spinner } from '@renderer/components/ui/spinner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { cn } from '@renderer/lib/utils'
+import { deleteMediaFileFromServer, uploadMediaFile } from '@renderer/lib/media-upload'
+import { FILE_STORAGE_CATEGORY } from '@common/constants/global.constants'
 import { CornerDownLeftIcon, ImageIcon, PlusIcon, SquareIcon, XIcon } from 'lucide-react'
 import { nanoid } from 'nanoid'
 import { Children, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -79,6 +81,13 @@ const convertBlobUrlToDataUrl = async (url: string): Promise<string | null> => {
     })
   } catch {
     return null
+  }
+}
+
+/** Delete a media:// file from server — fire-and-forget, safe to call even if it wasn't uploaded yet */
+const deleteMediaFile = (url: string | undefined) => {
+  if (url?.startsWith('media://')) {
+    deleteMediaFileFromServer(url.replace('media://', '')).catch(console.error)
   }
 }
 
@@ -132,27 +141,42 @@ export const PromptInputProvider = ({
 
   const add = useCallback((files: File[] | FileList) => {
     const incoming = [...files]
-    if (incoming.length === 0) {
-      return
-    }
+    if (incoming.length === 0) return
 
-    setAttachmentFiles((prev) => [
-      ...prev,
-      ...incoming.map((file) => ({
-        filename: file.name,
-        id: nanoid(),
-        mediaType: file.type,
-        type: 'file' as const,
-        url: URL.createObjectURL(file)
-      }))
-    ])
+    // Upload each file to disk immediately so we get a stable media:// URL.
+    // We add a pending placeholder first so the UI shows the attachment right away.
+    for (const file of incoming) {
+      const id = nanoid()
+      // Add placeholder with blob URL for instant preview
+      const blobUrl = URL.createObjectURL(file)
+      setAttachmentFiles((prev) => [
+        ...prev,
+        { filename: file.name, id, mediaType: file.type, type: 'file' as const, url: blobUrl }
+      ])
+      // Upload in background and swap blob URL to media:// URL once done
+      uploadMediaFile(file, FILE_STORAGE_CATEGORY.chatAttachment)
+        .then(({ data }) => {
+          URL.revokeObjectURL(blobUrl)
+          setAttachmentFiles((prev) =>
+            prev.map((f) => (f.id === id ? { ...f, url: data.mediaUrl } : f))
+          )
+        })
+        .catch(() => {
+          // Upload failed — keep blob URL as fallback (normalizeMessages handles it)
+          console.error('Failed to upload attachment to disk, falling back to blob')
+        })
+    }
   }, [])
 
   const remove = useCallback((id: string) => {
     setAttachmentFiles((prev) => {
       const found = prev.find((f) => f.id === id)
-      if (found?.url) {
+      // Only revoke blob: URLs; media:// URLs are persistent files on disk
+      if (found?.url?.startsWith('blob:')) {
         URL.revokeObjectURL(found.url)
+      }
+      if (found?.url?.startsWith('media://')) {
+        deleteMediaFile(found.url)
       }
       return prev.filter((f) => f.id !== id)
     })
@@ -160,8 +184,10 @@ export const PromptInputProvider = ({
 
   const clear = useCallback(() => {
     setAttachmentFiles((prev) => {
+      console.log('here')
       for (const f of prev) {
-        if (f.url) {
+        // Only revoke blob: URLs; media:// URLs are persistent files on disk
+        if (f.url?.startsWith('blob:')) {
           URL.revokeObjectURL(f.url)
         }
       }
@@ -377,13 +403,18 @@ export const PromptInput = ({
         }
         const next: (FileUIPart & { id: string })[] = []
         for (const file of capped) {
-          next.push({
-            filename: file.name,
-            id: nanoid(),
-            mediaType: file.type,
-            type: 'file',
-            url: URL.createObjectURL(file)
-          })
+          const id = nanoid()
+          const blobUrl = URL.createObjectURL(file)
+          next.push({ filename: file.name, id, mediaType: file.type, type: 'file', url: blobUrl })
+          // Upload to disk; swap blob URL → media:// URL on success
+          uploadMediaFile(file, FILE_STORAGE_CATEGORY.chatAttachment)
+            .then(({ data }) => {
+              URL.revokeObjectURL(blobUrl)
+              setItems((prev) => prev.map((f) => (f.id === id ? { ...f, url: data.mediaUrl } : f)))
+            })
+            .catch(() => {
+              console.error('Failed to upload attachment to disk, falling back to blob')
+            })
         }
         return [...prev, ...next]
       })
@@ -395,8 +426,12 @@ export const PromptInput = ({
     (id: string) =>
       setItems((prev) => {
         const found = prev.find((file) => file.id === id)
-        if (found?.url) {
+        // Only revoke blob: URLs; media:// URLs are persistent on disk
+        if (found?.url?.startsWith('blob:')) {
           URL.revokeObjectURL(found.url)
+        }
+        if (found?.url?.startsWith('media://')) {
+          deleteMediaFile(found.url)
         }
         return prev.filter((file) => file.id !== id)
       }),
@@ -449,7 +484,8 @@ export const PromptInput = ({
         ? controller?.attachments.clear()
         : setItems((prev) => {
             for (const file of prev) {
-              if (file.url) {
+              // Only revoke blob: URLs; media:// URLs are persistent on disk
+              if (file.url?.startsWith('blob:')) {
                 URL.revokeObjectURL(file.url)
               }
             }

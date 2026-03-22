@@ -8,10 +8,13 @@ import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import {
   internalServerErrorDocObject,
+  zodNotFoundDocObject,
   zodValidationErrorDocObject
 } from '../../constants/doc-constants'
 import {
   getMediaResponseSchema,
+  mediaDeleteResponseSchema,
+  mediaDeleteSchema,
   mediaUploadResponseSchema,
   mediaUploadSchema
 } from '../../../common/schemas/media.schema'
@@ -82,6 +85,38 @@ export const getMedia = createRoute({
   }
 })
 
+// delete a stored media file
+export const deleteMedia = createRoute({
+  tags: ['Media'],
+  method: 'delete',
+  path: '/media/file',
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: mediaDeleteSchema
+        }
+      },
+      description: 'Relative path of the media file to delete'
+    }
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: mediaDeleteResponseSchema
+        }
+      },
+      description: 'File deleted successfully'
+    },
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 //types all types
 export type UploadMediaRoute = typeof uploadMedia
 export type GetMediaRoute = typeof getMedia
+export type DeleteMediaRoute = typeof deleteMedia

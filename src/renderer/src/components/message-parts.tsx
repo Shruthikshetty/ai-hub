@@ -5,6 +5,12 @@ import BotIcon from './bot-icon'
 import { ChatStatus } from 'ai'
 import { Badge } from './ui/badge'
 import { formatDateTime } from '@renderer/lib/date.utils'
+import {
+  Attachments,
+  Attachment,
+  AttachmentPreview,
+  AttachmentData
+} from './ai-elements/attachments'
 
 /**
  *
@@ -28,6 +34,9 @@ function MessageParts({
   const lastPart = message.parts.at(-1)
   const isReasoningStreaming =
     isLastMessage && status === 'streaming' && lastPart?.type === 'reasoning'
+
+  // check if there are any file parts
+  const hasFileParts = message.parts.some((part) => part.type === 'file')
   return (
     <>
       {/* role based icon */}
@@ -45,6 +54,26 @@ function MessageParts({
           <ReasoningTrigger />
           <ReasoningContent>{reasoningText}</ReasoningContent>
         </Reasoning>
+      ) : null}
+
+      {/* render file parts */}
+      {hasFileParts ? (
+        <Attachments variant="grid" className="my-2">
+          {message.parts
+            .filter((part) => part.type === 'file')
+            .map((part, index) => {
+              const attachmentData = {
+                ...part,
+                id: `${message.id}-${index}`
+              } as unknown as AttachmentData
+
+              return (
+                <Attachment key={`${message.id}-${index}`} data={attachmentData}>
+                  <AttachmentPreview />
+                </Attachment>
+              )
+            })}
+        </Attachments>
       ) : null}
 
       {/* message parts */}

@@ -13,6 +13,8 @@ import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { conversations } from '../../../common/db-schemas/conversation.schema'
 import { desc, eq } from 'drizzle-orm'
 import db from '../../db'
+import { messages } from '../../../common/db-schemas/message.schema'
+import { deleteMediaFile } from '../../lib/file-storage'
 
 // handler for get conversation route @TODO pagination should be added
 export const getConversation: AppRouteHandler<GetConversationRoute> = async (c) => {
@@ -52,7 +54,25 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
   // get id from params
   const { id } = c.req.valid('param')
 
-  // delete the conversation
+  // Clean up any media files attached to messages in this conversation before deleting.
+  // The DB cascade will remove the message rows, but files on disk need explicit cleanup.
+  try {
+    const conversationMessages = await db.query.messages.findMany({
+      where: eq(messages.conversationId, id)
+    })
+    for (const msg of conversationMessages) {
+      for (const part of msg.parts ?? []) {
+        if (part.type === 'file' && part.url?.startsWith('media://')) {
+          const relativePath = part.url.slice('media://'.length)
+          deleteMediaFile(relativePath) // best-effort, ignore failures
+        }
+      }
+    }
+  } catch {
+    // Silent fail — don't block deletion if cleanup errors
+  }
+
+  // delete the conversation (cascades to messages in DB)
   const [deleted] = await db.delete(conversations).where(eq(conversations.id, id)).returning()
 
   // in case not deleted
