@@ -4,9 +4,9 @@
  */
 
 import { AppRouteHandler } from '../../types'
-import { GetMediaRoute, UploadMediaRoute } from './media.routes'
+import { DeleteMediaRoute, GetMediaRoute, UploadMediaRoute } from './media.routes'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { saveFile } from '../../lib/file-storage'
+import { deleteMediaFile, saveFile } from '../../lib/file-storage'
 import { MEDIA_TYPE } from '../../../common/constants/global.constants'
 import db from '../../db'
 import { media, MediaGetSchema } from '../../db/schema'
@@ -60,6 +60,24 @@ export const getMedia: AppRouteHandler<GetMediaRoute> = async (c) => {
     {
       success: true,
       data: result
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+// handler for deleting a media file
+export const deleteMedia: AppRouteHandler<DeleteMediaRoute> = async (c) => {
+  // get the relative path from the request body
+  const { relativePath } = c.req.valid('json')
+
+  // delete the media file from the app storage
+  const deleted = deleteMediaFile(relativePath)
+
+  // send response with the deleted status
+  return c.json(
+    {
+      success: deleted,
+      message: 'Media deleted successfully'
     },
     HTTP_STATUS_CODES.OK
   )

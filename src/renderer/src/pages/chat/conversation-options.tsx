@@ -36,7 +36,7 @@ const ConversationOptions = ({ conversation, onDelete }: ConversationOptionsProp
       title: conversation?.title ?? ''
     },
     onSubmit: ({ value }) => {
-      if (!conversation?.id || !value.title) return
+      if (!conversation?.id || !value.title.trim()) return
       mutate(
         {
           id: conversation?.id,
@@ -110,6 +110,7 @@ const ConversationOptions = ({ conversation, onDelete }: ConversationOptionsProp
                     <Field data-invalid={isInvalid}>
                       <Input
                         id={field.name}
+                        aria-label="Chat title"
                         name={field.name}
                         value={field.state.value ?? ''}
                         onBlur={field.handleBlur}

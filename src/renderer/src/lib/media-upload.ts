@@ -23,3 +23,14 @@ export async function uploadMediaFile(
 
   return response
 }
+
+/**
+ * Delete a media file from the backend storage.
+ */
+export async function deleteMediaFileFromServer(relativePath: string): Promise<boolean> {
+  const response = await window.api.request('/api/media/file', 'DELETE', {
+    relativePath
+  })
+
+  return response.success
+}

@@ -10,5 +10,6 @@ import * as routes from './media.routes'
 const router = createRouter()
   .openapi(routes.uploadMedia, handlers.uploadMedia)
   .openapi(routes.getMedia, handlers.getMedia)
+  .openapi(routes.deleteMedia, handlers.deleteMedia)
 
 export default router
