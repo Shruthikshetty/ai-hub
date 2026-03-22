@@ -7,7 +7,8 @@ import {
   buildGoogleModel,
   buildGroqModel,
   buildHuggingFaceModel,
-  buildOpenAiModel
+  buildOpenAiModel,
+  buildXaiModel
 } from './extract-model-capabilities'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
@@ -185,6 +186,13 @@ export async function getModelListFromProvider(
         })
         break
       }
+      case 'xai': {
+        response = await axios.get('https://api.x.ai/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        break
+      }
       case 'huggingface': {
         // Each request targets one pipeline_tag — HuggingFace only supports one at a time.
         // Fire them all in parallel and merge the results.
@@ -210,6 +218,7 @@ export async function getModelListFromProvider(
         )
 
         const allModels = results.flat()
+        //early return
         return allModels.map((model) => buildHuggingFaceModel(model, provider.provider))
       }
       default:
@@ -264,6 +273,11 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<GroqModel>).data
         if (!data) return []
         return data.map((model: GroqModel) => buildGroqModel(model, provider.provider))
+      }
+      case 'xai': {
+        const data = (response.data as OpenAiResponse<OpenAiModel>).data
+        if (!data) return []
+        return data.map((model: OpenAiModel) => buildXaiModel(model.id, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

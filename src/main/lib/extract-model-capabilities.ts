@@ -260,3 +260,36 @@ export function buildHuggingFaceModel(
     }
   }
 }
+
+export function buildXaiModel(
+  model: string,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+  const lowerModeId = model.toLowerCase()
+
+  if (lowerModeId.includes('image')) {
+    outputs.push('image')
+    inputs.push('image')
+  } else if (lowerModeId.includes('video')) {
+    outputs.push('video')
+  } else {
+    outputs.push('text')
+    inputs.push('image')
+  }
+
+  return {
+    id: lowerModeId,
+    name: lowerModeId.split('/')?.[1] ?? lowerModeId,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    // not set for now
+    capabilities: {
+      vision: inputs.includes('image'),
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}

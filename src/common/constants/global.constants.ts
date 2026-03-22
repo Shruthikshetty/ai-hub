@@ -99,6 +99,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     siteUrl: 'https://huggingface.co/docs/inference-providers',
     description:
       'Hugging Face’s Inference Providers give developers access to hundreds of machine learning models, powered by world-class inference providers'
+  },
+  {
+    provider: 'xai',
+    name: 'xAI',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/xai.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://console.x.ai',
+    description: 'xAI provider models'
   }
 ]
 
@@ -109,7 +119,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'google',
   'vercel',
   'groq',
-  'huggingface'
+  'huggingface',
+  'xai'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const

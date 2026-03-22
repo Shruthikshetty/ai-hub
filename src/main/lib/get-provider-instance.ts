@@ -9,6 +9,7 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createGroq } from '@ai-sdk/groq'
 import { createHuggingFace } from '@ai-sdk/huggingface'
+import { createXai } from '@ai-sdk/xai'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({ model }: { model: ModelSchemaType }) {
@@ -61,6 +62,12 @@ export async function getProviderInstanceModel({ model }: { model: ModelSchemaTy
         apiKey
       })
       return huggingfaceInstance
+    }
+    case 'xai': {
+      const xaiInstance = createXai({
+        apiKey
+      })
+      return xaiInstance
     }
     case 'vercel': // fall's to default
     default: {
