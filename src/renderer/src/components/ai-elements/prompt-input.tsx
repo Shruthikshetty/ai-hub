@@ -45,7 +45,7 @@ import {
 import { Spinner } from '@renderer/components/ui/spinner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
 import { cn } from '@renderer/lib/utils'
-import { uploadMediaFile } from '@renderer/lib/media-upload'
+import { deleteMediaFileFromServer, uploadMediaFile } from '@renderer/lib/media-upload'
 import { FILE_STORAGE_CATEGORY } from '@common/constants/global.constants'
 import { CornerDownLeftIcon, ImageIcon, PlusIcon, SquareIcon, XIcon } from 'lucide-react'
 import { nanoid } from 'nanoid'
@@ -81,6 +81,13 @@ const convertBlobUrlToDataUrl = async (url: string): Promise<string | null> => {
     })
   } catch {
     return null
+  }
+}
+
+/** Delete a media:// file from server — fire-and-forget, safe to call even if it wasn't uploaded yet */
+const deleteMediaFile = (url: string | undefined) => {
+  if (url?.startsWith('media://')) {
+    deleteMediaFileFromServer(url.replace('media://', '')).catch(console.error)
   }
 }
 
@@ -418,6 +425,9 @@ export const PromptInput = ({
         // Only revoke blob: URLs; media:// URLs are persistent on disk
         if (found?.url?.startsWith('blob:')) {
           URL.revokeObjectURL(found.url)
+        }
+        if (found?.url?.startsWith('media://')) {
+          deleteMediaFile(found.url)
         }
         return prev.filter((file) => file.id !== id)
       }),
