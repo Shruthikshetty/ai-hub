@@ -5,7 +5,8 @@
 // File storage category
 export const FILE_STORAGE_CATEGORY = {
   profileImg: 'profile-img',
-  imageGen: 'img-gen'
+  imageGen: 'img-gen',
+  chatAttachment: 'chat-attachments'
 } as const
 
 // MIME lookup for common image types
