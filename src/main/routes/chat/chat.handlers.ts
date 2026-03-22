@@ -12,14 +12,18 @@ import { messages as messageSchema } from '../../../common/db-schemas/message.sc
 import { generateTitle } from '../../lib/generate-title'
 import { eq } from 'drizzle-orm'
 import { conversations } from '../../db/schema'
+import { normalizeMessages } from '../../lib/normalize-messages'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   // get the messages from request body
   const { messages, model, conversationId } = c.req.valid('json')
 
+  // Normalize any data: URIs in file parts before handing off to the SDK
+  const normalizedMessages = normalizeMessages(messages)
+
   // convert to core messages
-  const coreMessages = await convertToModelMessages(messages)
+  const coreMessages = await convertToModelMessages(normalizedMessages)
 
   if (coreMessages.length === 0) {
     return c.json(
