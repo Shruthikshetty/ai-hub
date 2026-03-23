@@ -16,13 +16,16 @@ export const getTools = async (
   const tools: Record<string, Tool<any, any>> = {}
   // check for search tool
   if (conversation.tools?.search?.enabled && targetProvider) {
+    const provider = conversation.tools.search.provider
+
+    if (!provider) return undefined
     // get the provider instance
     const modelProvider = await getProviderInstanceModel({
-      provider: targetProvider
+      provider
     })
 
     /** @TODO to implement others */
-    switch (targetProvider as ModelProviderType) {
+    switch (provider as ModelProviderType) {
       case 'openai':
         tools['search'] = (modelProvider as OpenAIProvider).tools.webSearch() as any
         break

@@ -1,10 +1,17 @@
+import { PROVIDERS_WITH_SEARCH_TOOL } from '@common/constants/global.constants'
 import { FetchConversationWithMessagesResponseType } from '@common/schemas/conversation.schema'
 import ResizableSidePanel from '@renderer/components/resizable-side-panel'
 import TokensUsedCard from '@renderer/components/tokens-used-card'
 import { Button } from '@renderer/components/ui/button'
 import { FieldError, FieldGroup, FieldLabel, Field } from '@renderer/components/ui/field'
 import { Label } from '@renderer/components/ui/label'
-import { Select } from '@renderer/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@renderer/components/ui/select'
 import { Separator } from '@renderer/components/ui/separator'
 import { Switch } from '@renderer/components/ui/switch'
 import { Textarea } from '@renderer/components/ui/textarea'
@@ -40,7 +47,8 @@ const ChatOptionsPanel = ({
       systemPrompt: conversation?.systemPrompt ?? null,
       tools: {
         search: {
-          enabled: conversation?.tools?.search?.enabled ?? false
+          enabled: conversation?.tools?.search?.enabled ?? false,
+          provider: conversation?.tools?.search?.provider ?? ''
         }
       },
       metadata: conversation?.metadata ?? true
@@ -59,7 +67,8 @@ const ChatOptionsPanel = ({
       metadata: conversation?.metadata ?? true,
       tools: {
         search: {
-          enabled: conversation?.tools?.search?.enabled ?? false
+          enabled: conversation?.tools?.search?.enabled ?? false,
+          provider: conversation?.tools?.search?.provider ?? ''
         }
       }
     })
@@ -146,7 +155,7 @@ const ChatOptionsPanel = ({
               }}
             </form.Field>
             {/*TODO currently not useful for future use Dynamic Search Provider Field */}
-            {/* <form.Subscribe selector={(state) => state.values.tools.search.enabled}>
+            <form.Subscribe selector={(state) => state.values.tools.search.enabled}>
               {(isSearchEnabled) => {
                 if (!isSearchEnabled) return null
                 return (
@@ -176,7 +185,7 @@ const ChatOptionsPanel = ({
                   </form.Field>
                 )
               }}
-            </form.Subscribe> */}
+            </form.Subscribe>
 
             <div className="flex items-center justify-between">
               <Label
