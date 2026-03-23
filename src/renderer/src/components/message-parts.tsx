@@ -70,6 +70,7 @@ function MessageParts({
             {toolCalls.map((part, index) => {
               switch (part.type) {
                 case 'tool-search':
+                  if (!(part as any).output) return null
                   return (
                     <TaskItem key={`${message.id}-${index}`}>
                       action : {JSON.stringify((part as any)?.output?.action)}
