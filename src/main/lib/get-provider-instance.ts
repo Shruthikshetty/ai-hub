@@ -13,9 +13,11 @@ import { createXai } from '@ai-sdk/xai'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({
-  provider
+  provider,
+  toolAccess
 }: {
   provider: ModelSchemaType['provider']
+  toolAccess?: boolean
 }) {
   // get the provider details
   const providerDetails = await db.query.providers.findFirst({
@@ -74,6 +76,12 @@ export async function getProviderInstanceModel({
       const xaiInstance = createXai({
         apiKey
       })
+      /* xai requires responses factory method for server-side argentic tool calling
+       *https://ai-sdk.dev/providers/ai-sdk-providers/xai
+       */
+      if (toolAccess) {
+        return xaiInstance.responses
+      }
       return xaiInstance
     }
     case 'vercel': // fall's to default

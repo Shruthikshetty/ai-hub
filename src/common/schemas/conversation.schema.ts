@@ -40,7 +40,8 @@ export const updateConversationResponseSchema = z.object({
 export const conversationToolsSchema = z.object({
   search: z
     .object({
-      enabled: z.boolean().default(false)
+      enabled: z.boolean().default(false),
+      provider: z.string().optional()
     })
     .optional(),
   imageGeneration: z
