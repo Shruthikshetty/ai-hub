@@ -38,6 +38,11 @@ const ChatOptionsPanel = ({
   const form = useForm({
     defaultValues: {
       systemPrompt: conversation?.systemPrompt ?? null,
+      tools: {
+        search: {
+          enabled: conversation?.tools?.search?.enabled ?? false
+        }
+      },
       metadata: conversation?.metadata ?? true
     } as ChatOptionsValidationSchema,
     validators: { onSubmit: chatOptionsValidationSchema },
@@ -51,7 +56,12 @@ const ChatOptionsPanel = ({
   useEffect(() => {
     form.reset({
       systemPrompt: conversation?.systemPrompt ?? null,
-      metadata: conversation?.metadata ?? true
+      metadata: conversation?.metadata ?? true,
+      tools: {
+        search: {
+          enabled: conversation?.tools?.search?.enabled ?? false
+        }
+      }
     })
   }, [conversation, form])
 
@@ -106,12 +116,68 @@ const ChatOptionsPanel = ({
           {/* Tools */}
           <div className="p-4 flex flex-col gap-2">
             <h2 className="text-foreground font-semibold text-sm">TOOLS</h2>
-            <div className="flex items-center justify-between">
-              <Label className="text-muted-foreground text-sm font-semibold" htmlFor="search">
-                Search
-              </Label>
-              <Switch id="search" />
-            </div>
+            {/* search tool  */}
+            <form.Field name="tools.search.enabled">
+              {(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <p className="text-xs text-muted-foreground">
+                      ❗Note : if your provider or model does not support search tool then it will
+                      not be used
+                    </p>
+                    <div className="flex flex-row justify-between">
+                      <FieldLabel
+                        className="text-muted-foreground text-sm font-semibold"
+                        htmlFor={field.name}
+                      >
+                        Search
+                      </FieldLabel>
+                      <Switch
+                        id={field.name}
+                        name={field.name}
+                        checked={field.state.value}
+                        onCheckedChange={(value) => field.handleChange(value)}
+                      />
+                    </div>
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                )
+              }}
+            </form.Field>
+            {/*TODO currently not useful for future use Dynamic Search Provider Field */}
+            {/* <form.Subscribe selector={(state) => state.values.tools.search.enabled}>
+              {(isSearchEnabled) => {
+                if (!isSearchEnabled) return null
+                return (
+                  <form.Field name="tools.search.provider">
+                    {(field) => (
+                      <Field className="flex flex-col gap-1 my-2 animate-in fade-in slide-in-from-top-1">
+                        <Select
+                          onValueChange={(value) => field.handleChange(value)}
+                          value={field.state.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a provider" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PROVIDERS_WITH_SEARCH_TOOL.map((provider) => (
+                              <SelectItem key={provider} value={provider}>
+                                {provider}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {field.state.meta.isTouched && field.state.meta.errors && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    )}
+                  </form.Field>
+                )
+              }}
+            </form.Subscribe> */}
+
             <div className="flex items-center justify-between">
               <Label
                 className="text-muted-foreground text-sm font-semibold"

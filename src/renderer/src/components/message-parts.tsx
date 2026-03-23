@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppUIMessage } from '@common/schemas/messages.schema'
 import { MessageResponse } from './ai-elements/message'
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './ai-elements/reasoning'
@@ -11,6 +12,8 @@ import {
   AttachmentPreview,
   AttachmentData
 } from './ai-elements/attachments'
+import { Task, TaskContent, TaskItem, TaskTrigger } from './ai-elements/task'
+import { Shimmer } from './ai-elements/shimmer'
 
 /**
  *
@@ -37,6 +40,9 @@ function MessageParts({
 
   // check if there are any file parts
   const hasFileParts = message.parts.some((part) => part.type === 'file')
+  // check if there are any tool parts
+  const toolCalls = message.parts.filter((part) => part.type.startsWith('tool-'))
+  const hasToolCalls = toolCalls.length > 0
   return (
     <>
       {/* role based icon */}
@@ -54,6 +60,27 @@ function MessageParts({
           <ReasoningTrigger />
           <ReasoningContent>{reasoningText}</ReasoningContent>
         </Reasoning>
+      ) : null}
+
+      {/* tool calls */}
+      {hasToolCalls ? (
+        <Task className="w-full">
+          <TaskTrigger title="searched the web" />
+          <TaskContent>
+            {toolCalls.map((part, index) => {
+              switch (part.type) {
+                case 'tool-search':
+                  return (
+                    <TaskItem key={`${message.id}-${index}`}>
+                      action : {JSON.stringify((part as any)?.output?.action)}
+                    </TaskItem>
+                  )
+                default:
+                  return null
+              }
+            })}
+          </TaskContent>
+        </Task>
       ) : null}
 
       {/* render file parts */}
@@ -89,6 +116,14 @@ function MessageParts({
                 {part.text}
               </MessageResponse>
             )
+          case 'tool-search':
+            switch (part.state) {
+              case 'input-available':
+              case 'input-streaming':
+                return <Shimmer key={`${message.id}-${index}`}>searching the web ...</Shimmer>
+              default:
+                return null
+            }
           default:
             return null
         }

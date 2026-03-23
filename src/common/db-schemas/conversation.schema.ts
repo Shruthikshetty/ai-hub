@@ -19,7 +19,7 @@ export const conversations = sqliteTable('conversations', {
   metadata: integer({ mode: 'boolean' }).notNull().default(true),
   tools: text({ mode: 'json' })
     .$type<ConversationToolsSchemaType>()
-    .default({ search: false, imageGeneration: false }),
+    .default({ search: { enabled: false }, imageGeneration: { enabled: false } }),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()

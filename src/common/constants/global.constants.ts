@@ -128,3 +128,5 @@ export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
 export const MEDIA_TYPE = ['image', 'video'] as const
 
 export const MEDIA_REQUEST_TYPES = [...MEDIA_TYPE, 'all'] as const
+
+export const PROVIDERS_WITH_SEARCH_TOOL = ['openai', 'xai'] as const

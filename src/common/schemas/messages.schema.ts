@@ -32,12 +32,44 @@ export const FileUIPartSchema = z.object({
   url: z.string()
 })
 
+// The base invocation states matching your UIToolInvocation type
+const ToolInvocationBase = z.object({
+  toolCallId: z.string(),
+  title: z.string().optional(),
+  providerExecuted: z.boolean().optional()
+})
+
+// tool state schema
+const ToolStateSchema = z.discriminatedUnion('state', [
+  z.object({ state: z.literal('input-streaming'), input: z.any() }),
+  z.object({ state: z.literal('input-available'), input: z.any() }),
+  z.object({
+    state: z.literal('approval-requested'),
+    input: z.any(),
+    approval: z.any()
+  }),
+  z.object({
+    state: z.literal('approval-responded'),
+    input: z.any(),
+    approval: z.any()
+  }),
+  z.object({ state: z.literal('output-available'), input: z.any(), output: z.any() }),
+  z.object({ state: z.literal('output-error'), input: z.any(), errorText: z.string() }),
+  z.object({ state: z.literal('output-denied'), input: z.any(), approval: z.any() })
+])
+
+// search tool schema
+const SearchToolSchema = ToolInvocationBase.extend({
+  type: z.literal('tool-search')
+}).and(ToolStateSchema)
+
 //added additional parts as required
-export const MessagePartSchema = z.discriminatedUnion('type', [
+export const MessagePartSchema = z.union([
   TextUIPartSchema,
   ReasoningUIPartSchema,
   StepStartUIPartSchema,
-  FileUIPartSchema
+  FileUIPartSchema,
+  SearchToolSchema
 ])
 
 // metadata schema for message
@@ -74,3 +106,4 @@ export type MessagePartsType = z.infer<typeof MessagePartSchema>
 export type GetMessageByIdResponseType = z.infer<typeof getMessageByIdResponseSchema>
 export type AddMessageResponseType = z.infer<typeof addMessageResponseSchema>
 export type MessageMetadataType = z.infer<typeof MessageMetadataSchema>
+export type ToolInvocationType = z.infer<typeof ToolInvocationBase>

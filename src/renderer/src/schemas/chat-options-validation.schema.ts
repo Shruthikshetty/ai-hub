@@ -3,7 +3,12 @@ import { z } from 'zod'
 // used to validate the chat options update validation form
 export const chatOptionsValidationSchema = z.object({
   systemPrompt: z.string().nullish(),
-  metadata: z.boolean()
+  metadata: z.boolean(),
+  tools: z.object({
+    search: z.object({
+      enabled: z.boolean()
+    })
+  })
   // rest will be added here
 })
 
