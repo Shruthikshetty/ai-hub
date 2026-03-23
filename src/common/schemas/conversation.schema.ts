@@ -38,8 +38,18 @@ export const updateConversationResponseSchema = z.object({
 
 //conversation tools options
 export const conversationToolsSchema = z.object({
-  search: z.boolean().default(false),
-  imageGeneration: z.boolean().default(false)
+  search: z
+    .object({
+      enabled: z.boolean().default(false)
+    })
+    .optional(),
+  imageGeneration: z
+    .object({
+      enabled: z.boolean().default(false),
+      modelId: z.string().optional(),
+      provider: z.string().optional()
+    })
+    .optional()
 })
 
 // reasoning options

@@ -57,7 +57,7 @@
     "electron-updater": "^6.3.9",
     "hono": "^4.11.9",
     "hono-pino": "^0.10.3",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.0.1",
     "motion": "^12.34.5",
     "nanoid": "^5.1.6",
     "ollama-ai-provider-v2": "^3.4.0",

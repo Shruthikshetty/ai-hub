@@ -18,7 +18,7 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
   // get the provider as per user model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const modelProvider: any = await getProviderInstanceModel({
-    model
+    provider: model.provider
   })
 
   // check if provider is capable of generating images

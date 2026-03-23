@@ -12,20 +12,24 @@ import { createHuggingFace } from '@ai-sdk/huggingface'
 import { createXai } from '@ai-sdk/xai'
 
 // get the model based on the provider
-export async function getProviderInstanceModel({ model }: { model: ModelSchemaType }) {
+export async function getProviderInstanceModel({
+  provider
+}: {
+  provider: ModelSchemaType['provider']
+}) {
   // get the provider details
-  const provider = await db.query.providers.findFirst({
-    where: (providers, { eq }) => eq(providers.provider, model.provider)
+  const providerDetails = await db.query.providers.findFirst({
+    where: (providers, { eq }) => eq(providers.provider, provider)
   })
 
   let apiKey: string | undefined
   // if key exists decrypt it
-  if (provider?.apiKey) {
-    apiKey = decryptText(provider.apiKey)
+  if (providerDetails?.apiKey) {
+    apiKey = decryptText(providerDetails.apiKey)
   }
 
   //all the custom providers go here
-  switch (model.provider as ModelProviderType) {
+  switch (provider as ModelProviderType) {
     case 'openai': {
       const openaiInstance = createOpenAI({
         apiKey
@@ -33,7 +37,10 @@ export async function getProviderInstanceModel({ model }: { model: ModelSchemaTy
       return openaiInstance
     }
     case 'ollama': {
-      const baseURL = normalizeProviderUrl(provider?.serverUrl || 'http://localhost:11434', '/api')
+      const baseURL = normalizeProviderUrl(
+        providerDetails?.serverUrl || 'http://localhost:11434',
+        '/api'
+      )
       const ollamaInstance = createOllama({
         baseURL
       })

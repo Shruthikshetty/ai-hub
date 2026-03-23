@@ -4,15 +4,17 @@
 import { StreamChatRoute } from './chat.routes'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { createIdGenerator, convertToModelMessages, streamText } from 'ai'
+import { createIdGenerator, convertToModelMessages, streamText, stepCountIs } from 'ai'
 import { OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
 import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 import db from '../../db'
 import { messages as messageSchema } from '../../../common/db-schemas/message.schema'
+import { MessageMetadataType, MessagePartsType } from '../../../common/schemas/messages.schema'
 import { generateTitle } from '../../lib/generate-title'
 import { eq } from 'drizzle-orm'
 import { conversations } from '../../db/schema'
 import { normalizeMessages } from '../../lib/normalize-messages'
+import { getTools } from '../../lib/get-tools'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
@@ -51,12 +53,18 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   }
 
   // const get the provider as per user model
-  const modelProvider = await getProviderInstanceModel({ model })
+  const modelProvider = await getProviderInstanceModel({ provider: model.provider })
+
+  // get the tools
+  const tools = await getTools(conversation, model.provider)
 
   // stream the response from ai model
   const result = streamText({
     model: modelProvider(model.id),
     messages: coreMessages,
+    tools,
+    toolChoice: tools ? 'auto' : 'none',
+    stopWhen: stepCountIs(20),
     system: conversation?.systemPrompt ?? undefined,
     providerOptions: {
       openai: {
@@ -107,10 +115,10 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
             .values({
               id: userMessage.id,
               role: userMessage.role,
-              parts: userMessage.parts,
+              parts: userMessage.parts as MessagePartsType[],
               conversationId
-            })
-            .onConflictDoNothing() // Prevent errors if the user message was already saved (e.g. regenerations)
+            }) // Prevent errors if the user message was already saved (e.g. regenerations)
+            .onConflictDoNothing()
         }
 
         // store assistant message
@@ -120,8 +128,8 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
             .values({
               id: assistantMessage.id,
               role: assistantMessage.role,
-              metadata: assistantMessage.metadata,
-              parts: assistantMessage.parts,
+              metadata: assistantMessage.metadata as MessageMetadataType,
+              parts: assistantMessage.parts as MessagePartsType[],
               conversationId
             })
             .onConflictDoNothing()
