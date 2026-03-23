@@ -64,7 +64,7 @@ function MessageParts({
 
       {/* tool calls */}
       {hasToolCalls ? (
-        <Task className="w-full">
+        <Task className="w-full" defaultOpen={false}>
           <TaskTrigger title="searched the web" />
           <TaskContent>
             {toolCalls.map((part, index) => {
