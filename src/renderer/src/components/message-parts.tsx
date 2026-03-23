@@ -65,15 +65,16 @@ function MessageParts({
       {/* tool calls */}
       {hasToolCalls ? (
         <Task className="w-full" defaultOpen={false}>
-          <TaskTrigger title="searched the web" />
+          <TaskTrigger title="tools called" />
           <TaskContent>
             {toolCalls.map((part, index) => {
               switch (part.type) {
                 case 'tool-search':
-                  if (!(part as any).output) return null
                   return (
                     <TaskItem key={`${message.id}-${index}`}>
-                      action : {JSON.stringify((part as any)?.output?.action)}
+                      searched the web{' '}
+                      {JSON.stringify((part as any)?.output?.action) ??
+                        'search completed details unavailable'}
                     </TaskItem>
                   )
                 default:
@@ -118,6 +119,9 @@ function MessageParts({
               </MessageResponse>
             )
           case 'tool-search':
+            if (part.providerExecuted) {
+              return null
+            }
             switch (part.state) {
               case 'input-available':
               case 'input-streaming':

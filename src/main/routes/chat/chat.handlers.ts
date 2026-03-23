@@ -52,18 +52,19 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
     )
   }
 
-  // const get the provider as per user model
-  const modelProvider = await getProviderInstanceModel({ provider: model.provider })
-
   // get the tools
   const tools = await getTools(conversation, model.provider)
+  // const get the provider as per user model
+  const modelProvider = await getProviderInstanceModel({
+    provider: model.provider,
+    toolAccess: !!tools
+  })
 
   // stream the response from ai model
   const result = streamText({
     model: modelProvider(model.id),
     messages: coreMessages,
     tools,
-    toolChoice: tools ? 'auto' : 'none',
     stopWhen: stepCountIs(20),
     system: conversation?.systemPrompt ?? undefined,
     providerOptions: {
