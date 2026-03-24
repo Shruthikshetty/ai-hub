@@ -44,6 +44,11 @@ export const conversationToolsSchema = z.object({
       provider: z.string().optional()
     })
     .optional(),
+  profileAccess: z
+    .object({
+      enabled: z.boolean().default(false)
+    })
+    .optional(),
   imageGeneration: z
     .object({
       enabled: z.boolean().default(false),

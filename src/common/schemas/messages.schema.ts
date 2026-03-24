@@ -39,6 +39,17 @@ const ToolInvocationBase = z.object({
   providerExecuted: z.boolean().optional()
 })
 
+// profile tool output schema
+export const ProfileToolOutputSchema = z
+  .object({
+    name: z.string(),
+    email: z.string(),
+    age: z.number(),
+    city: z.string(),
+    image: z.string()
+  })
+  .partial()
+
 // tool state schema
 const ToolStateSchema = z.discriminatedUnion('state', [
   z.object({ state: z.literal('input-streaming'), input: z.any() }),
@@ -53,7 +64,11 @@ const ToolStateSchema = z.discriminatedUnion('state', [
     input: z.any(),
     approval: z.any()
   }),
-  z.object({ state: z.literal('output-available'), input: z.any(), output: z.any() }),
+  z.object({
+    state: z.literal('output-available'),
+    input: z.any(),
+    output: z.any()
+  }),
   z.object({ state: z.literal('output-error'), input: z.any(), errorText: z.string() }),
   z.object({ state: z.literal('output-denied'), input: z.any(), approval: z.any() })
 ])
@@ -63,13 +78,19 @@ const SearchToolSchema = ToolInvocationBase.extend({
   type: z.literal('tool-search')
 }).and(ToolStateSchema)
 
+// profile access tool schema
+const ProfileAccessToolSchema = ToolInvocationBase.extend({
+  type: z.literal('tool-profile')
+}).and(ToolStateSchema)
+
 //added additional parts as required
 export const MessagePartSchema = z.union([
   TextUIPartSchema,
   ReasoningUIPartSchema,
   StepStartUIPartSchema,
   FileUIPartSchema,
-  SearchToolSchema
+  SearchToolSchema,
+  ProfileAccessToolSchema
 ])
 
 // metadata schema for message
@@ -107,3 +128,4 @@ export type GetMessageByIdResponseType = z.infer<typeof getMessageByIdResponseSc
 export type AddMessageResponseType = z.infer<typeof addMessageResponseSchema>
 export type MessageMetadataType = z.infer<typeof MessageMetadataSchema>
 export type ToolInvocationType = z.infer<typeof ToolInvocationBase>
+export type ProfileToolOutputSchemaType = z.infer<typeof ProfileToolOutputSchema>
