@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppUIMessage } from '@common/schemas/messages.schema'
+import { AppUIMessage, ProfileToolOutputSchemaType } from '@common/schemas/messages.schema'
 import { MessageResponse } from './ai-elements/message'
 import { Reasoning, ReasoningContent, ReasoningTrigger } from './ai-elements/reasoning'
 import BotIcon from './bot-icon'
@@ -14,6 +14,7 @@ import {
 } from './ai-elements/attachments'
 import { Task, TaskContent, TaskItem, TaskTrigger } from './ai-elements/task'
 import { Shimmer } from './ai-elements/shimmer'
+import { ProfileCard } from './profile-card'
 
 /**
  *
@@ -77,6 +78,28 @@ function MessageParts({
                         'search completed details unavailable'}
                     </TaskItem>
                   )
+                case 'tool-profile':
+                  if (part.state === 'output-available') {
+                    // in case the part.output is string in case of error
+                    if (typeof part.output === 'string') {
+                      return (
+                        <TaskItem key={`${message.id}-${index}`}>
+                          profile data access failed
+                        </TaskItem>
+                      )
+                    }
+                    return (
+                      <TaskItem
+                        key={`${message.id}-${index}`}
+                        className="flex flex-col gap-1 text-muted-foreground"
+                      >
+                        <p>accessed profile data</p>
+                        <ProfileCard profile={part.output as ProfileToolOutputSchemaType} />
+                      </TaskItem>
+                    )
+                  } else {
+                    return <Shimmer key={`${message.id}-${index}`}>accessing profile ...</Shimmer>
+                  }
                 default:
                   return null
               }
@@ -119,6 +142,7 @@ function MessageParts({
               </MessageResponse>
             )
           case 'tool-search':
+            // some times inc case of some providers the past . state dose not update properly hence adding this case to clear out the searching text
             if (part.providerExecuted) {
               return null
             }
@@ -126,6 +150,14 @@ function MessageParts({
               case 'input-available':
               case 'input-streaming':
                 return <Shimmer key={`${message.id}-${index}`}>searching the web ...</Shimmer>
+              default:
+                return null
+            }
+          case 'tool-profile':
+            switch (part.state) {
+              case 'input-available':
+              case 'input-streaming':
+                return <Shimmer key={`${message.id}-${index}`}>accessing profile ...</Shimmer>
               default:
                 return null
             }
