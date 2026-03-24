@@ -80,14 +80,22 @@ function MessageParts({
                   )
                 case 'tool-profile':
                   if (part.state === 'output-available') {
+                    // in case the part.output is string in case of error
+                    if (typeof part.output === 'string') {
+                      return (
+                        <TaskItem key={`${message.id}-${index}`}>
+                          profile data access failed
+                        </TaskItem>
+                      )
+                    }
                     return (
-                      <div
+                      <TaskItem
                         key={`${message.id}-${index}`}
                         className="flex flex-col gap-1 text-muted-foreground"
                       >
                         <p>accessed profile data</p>
                         <ProfileCard profile={part.output as ProfileToolOutputSchemaType} />
-                      </div>
+                      </TaskItem>
                     )
                   } else {
                     return <Shimmer key={`${message.id}-${index}`}>accessing profile ...</Shimmer>
