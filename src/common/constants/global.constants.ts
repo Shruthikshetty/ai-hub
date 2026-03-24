@@ -109,6 +109,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://console.x.ai',
     description: 'xAI provider models'
+  },
+  {
+    provider: 'togetherai',
+    name: 'Together AI',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/together.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://together.ai',
+    description: 'together.ai provider models'
   }
 ]
 
@@ -120,7 +130,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'vercel',
   'groq',
   'huggingface',
-  'xai'
+  'xai',
+  'togetherai'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const

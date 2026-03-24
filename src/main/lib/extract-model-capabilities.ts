@@ -1,5 +1,11 @@
 import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
-import { GatewayModel, GoogleModel, GroqModel, HuggingFaceModel } from './get-model-list'
+import {
+  GatewayModel,
+  GoogleModel,
+  GroqModel,
+  HuggingFaceModel,
+  TogetherAiModel
+} from './get-model-list'
 
 // builds a complete model record for an OpenAI model from its ID
 export function buildOpenAiModel(
@@ -288,6 +294,37 @@ export function buildXaiModel(
     // not set for now
     capabilities: {
       vision: inputs.includes('image'),
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}
+
+// extract model capabilities from together ai model @TODO might need to change
+export function buildTogetherAiModel(
+  model: TogetherAiModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+  const lowerModeId = model.id.toLowerCase()
+
+  if (model.type === 'image') {
+    outputs.push('image')
+  } else if (model.type === 'embedding') {
+    outputs.push('embedding')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: lowerModeId,
+    name: model.display_name,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    capabilities: {
+      vision: false,
       videoReasoning: false,
       realtime: false
     }

@@ -10,6 +10,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createGroq } from '@ai-sdk/groq'
 import { createHuggingFace } from '@ai-sdk/huggingface'
 import { createXai } from '@ai-sdk/xai'
+import { createTogetherAI } from '@ai-sdk/togetherai'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({
@@ -83,6 +84,12 @@ export async function getProviderInstanceModel({
         return xaiInstance.responses
       }
       return xaiInstance
+    }
+    case 'togetherai': {
+      const togetheraiInstance = createTogetherAI({
+        apiKey
+      })
+      return togetheraiInstance
     }
     case 'vercel': // fall's to default
     default: {

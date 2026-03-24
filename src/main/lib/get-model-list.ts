@@ -8,6 +8,7 @@ import {
   buildGroqModel,
   buildHuggingFaceModel,
   buildOpenAiModel,
+  buildTogetherAiModel,
   buildXaiModel
 } from './extract-model-capabilities'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
@@ -126,6 +127,38 @@ export type GroqModel = {
 }
 
 /**
+ * together ai model type
+ * full types https://docs.together.ai/reference/models#list-all-models
+ */
+export type TogetherAiModel = {
+  id: string
+  uuid: string
+  object: 'model'
+  created: number
+  type: 'chat' | 'language' | 'code' | 'image' | 'embedding' | 'moderation' | 'rerank'
+  display_name: string
+  organization: string
+  link: string
+  license: string
+  context_length: number
+  config: {
+    max_output_length: number
+  }
+  pricing: {
+    hourly?: number
+    input?: number
+    output?: number
+    base?: number
+    finetune?: number
+  }
+}
+
+/**
+ * together ai response type
+ */
+type TogetherAiResponse = TogetherAiModel[]
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -149,6 +182,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<OpenAiResponse<OpenRouterModel>>
       | AxiosResponse<OpenAiResponse<OpenAiModel>>
       | AxiosResponse<GoogleResponse>
+      | AxiosResponse<TogetherAiResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -190,6 +224,13 @@ export async function getModelListFromProvider(
         response = await axios.get('https://api.x.ai/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
+        })
+        break
+      }
+      case 'togetherai': {
+        response = await axios.get('https://api.together.ai/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 5000 //5 seconds
         })
         break
       }
@@ -278,6 +319,12 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
         if (!data) return []
         return data.map((model: OpenAiModel) => buildXaiModel(model.id, provider.provider))
+      }
+      case 'togetherai': {
+        const data = response.data as TogetherAiResponse
+        if (!data) return []
+        // @TODO proper extraction
+        return data.map((model: TogetherAiModel) => buildTogetherAiModel(model, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
