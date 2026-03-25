@@ -49,6 +49,9 @@ const ChatOptionsPanel = ({
         search: {
           enabled: conversation?.tools?.search?.enabled ?? false,
           provider: conversation?.tools?.search?.provider ?? ''
+        },
+        profileAccess: {
+          enabled: conversation?.tools?.profileAccess?.enabled ?? false
         }
       },
       metadata: conversation?.metadata ?? true
@@ -69,6 +72,9 @@ const ChatOptionsPanel = ({
         search: {
           enabled: conversation?.tools?.search?.enabled ?? false,
           provider: conversation?.tools?.search?.provider ?? ''
+        },
+        profileAccess: {
+          enabled: conversation?.tools?.profileAccess?.enabled ?? false
         }
       }
     })
@@ -141,6 +147,31 @@ const ChatOptionsPanel = ({
                         htmlFor={field.name}
                       >
                         Search
+                      </FieldLabel>
+                      <Switch
+                        id={field.name}
+                        name={field.name}
+                        checked={field.state.value}
+                        onCheckedChange={(value) => field.handleChange(value)}
+                      />
+                    </div>
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                )
+              }}
+            </form.Field>
+            {/* Profile Access Tool */}
+            <form.Field name="tools.profileAccess.enabled">
+              {(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <div className="flex flex-row justify-between">
+                      <FieldLabel
+                        className="text-muted-foreground text-sm font-semibold"
+                        htmlFor={field.name}
+                      >
+                        Profile Access
                       </FieldLabel>
                       <Switch
                         id={field.name}

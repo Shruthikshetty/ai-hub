@@ -5,6 +5,9 @@ export const chatOptionsValidationSchema = z.object({
   systemPrompt: z.string().nullish(),
   metadata: z.boolean(),
   tools: z.object({
+    profileAccess: z.object({
+      enabled: z.boolean()
+    }),
     search: z
       .object({
         enabled: z.boolean(),
