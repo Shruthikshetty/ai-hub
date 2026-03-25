@@ -1,5 +1,12 @@
 import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
-import { GatewayModel, GoogleModel, GroqModel, HuggingFaceModel } from './get-model-list'
+import {
+  FireworksAiModel,
+  GatewayModel,
+  GoogleModel,
+  GroqModel,
+  HuggingFaceModel,
+  TogetherAiModel
+} from './get-model-list'
 
 // builds a complete model record for an OpenAI model from its ID
 export function buildOpenAiModel(
@@ -280,12 +287,80 @@ export function buildXaiModel(
   }
 
   return {
-    id: lowerModeId,
+    id: model,
     name: lowerModeId.split('/')?.[1] ?? lowerModeId,
     provider,
     inputs: inputs,
     outputs: outputs,
     // not set for now
+    capabilities: {
+      vision: inputs.includes('image'),
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}
+
+// extract model capabilities from together ai model @TODO might need to change
+export function buildTogetherAiModel(
+  model: TogetherAiModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+
+  if (model.type === 'image') {
+    outputs.push('image')
+  } else if (model.type === 'embedding') {
+    outputs.push('embedding')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: model.id,
+    name: model.display_name,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    capabilities: {
+      vision: false,
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}
+
+/**
+ * function to extract capabilities from fireworks ai model
+ * @TODO no proper way to fetch exact list of models
+ */
+export function buildFireworksAiModel(
+  model: FireworksAiModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+  const lowerModeId = model.name.toLowerCase()
+
+  if (model.supportsImageInput) {
+    inputs.push('image')
+  }
+
+  if (lowerModeId.includes('flux')) {
+    outputs.push('image')
+  } else if (lowerModeId.includes('embedding')) {
+    outputs.push('embedding')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: model.name,
+    name: model.displayName,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
     capabilities: {
       vision: inputs.includes('image'),
       videoReasoning: false,

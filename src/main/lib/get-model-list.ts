@@ -3,11 +3,13 @@ import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
 import {
+  buildFireworksAiModel,
   buildGatewayModel,
   buildGoogleModel,
   buildGroqModel,
   buildHuggingFaceModel,
   buildOpenAiModel,
+  buildTogetherAiModel,
   buildXaiModel
 } from './extract-model-capabilities'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
@@ -126,6 +128,62 @@ export type GroqModel = {
 }
 
 /**
+ * together ai model type
+ * full types https://docs.together.ai/reference/models#list-all-models
+ */
+export type TogetherAiModel = {
+  id: string
+  uuid: string
+  object: 'model'
+  created: number
+  type: 'chat' | 'language' | 'code' | 'image' | 'embedding' | 'moderation' | 'rerank'
+  display_name: string
+  organization: string
+  link: string
+  license: string
+  context_length: number
+  config: {
+    max_output_length: number
+  }
+  pricing: {
+    hourly?: number
+    input?: number
+    output?: number
+    base?: number
+    finetune?: number
+  }
+}
+
+/**
+ * together ai response type
+ */
+type TogetherAiResponse = TogetherAiModel[]
+
+/**
+ * fireworks ai model type
+ * full types https://docs.fireworks.ai/api-reference/list-models
+ */
+export type FireworksAiModel = {
+  name: string
+  displayName: string
+  description: string
+  contextLength: number
+  owned_by: string
+  githubUrl?: string
+  huggingFaceUrl?: string
+  createTime: string //iso
+  kind: string
+  supportsImageInput: boolean
+  supportsLora: boolean
+  supportsTools: boolean
+  modelType: string
+}
+/**
+ * firework response type
+ */
+type FireworksAiResponse = { models: FireworksAiModel[] }
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -149,6 +207,8 @@ export async function getModelListFromProvider(
       | AxiosResponse<OpenAiResponse<OpenRouterModel>>
       | AxiosResponse<OpenAiResponse<OpenAiModel>>
       | AxiosResponse<GoogleResponse>
+      | AxiosResponse<TogetherAiResponse>
+      | AxiosResponse<FireworksAiResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -191,6 +251,27 @@ export async function getModelListFromProvider(
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
         })
+        break
+      }
+      case 'togetherai': {
+        response = await axios.get('https://api.together.ai/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 5000 //5 seconds
+        })
+        break
+      }
+      case 'fireworks-ai': {
+        /**
+         * inference endpoint fetches open ai compatible models only
+         * @TODO get the complete list of models and test
+         */
+        response = await axios.get(
+          'https://api.fireworks.ai/v1/accounts/fireworks/models?filter=supports_serverless=true&pageSize=200',
+          {
+            headers: { Authorization: `Bearer ${apiKey}` },
+            timeout: 5000 //5 seconds
+          }
+        )
         break
       }
       case 'huggingface': {
@@ -278,6 +359,19 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
         if (!data) return []
         return data.map((model: OpenAiModel) => buildXaiModel(model.id, provider.provider))
+      }
+      case 'togetherai': {
+        const data = response.data as TogetherAiResponse
+        if (!data) return []
+        // @TODO proper extraction
+        return data.map((model: TogetherAiModel) => buildTogetherAiModel(model, provider.provider))
+      }
+      case 'fireworks-ai': {
+        const data = (response.data as FireworksAiResponse).models
+        if (!data) return []
+        return data.map((model: FireworksAiModel) =>
+          buildFireworksAiModel(model, provider.provider)
+        )
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
