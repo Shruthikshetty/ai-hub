@@ -287,7 +287,7 @@ export function buildXaiModel(
   }
 
   return {
-    id: lowerModeId,
+    id: model,
     name: lowerModeId.split('/')?.[1] ?? lowerModeId,
     provider,
     inputs: inputs,
@@ -308,7 +308,6 @@ export function buildTogetherAiModel(
 ): ModelSchemaType {
   const inputs: ModelIOType[] = ['text']
   const outputs: ModelIOType[] = []
-  const lowerModeId = model.id.toLowerCase()
 
   if (model.type === 'image') {
     outputs.push('image')
@@ -319,7 +318,7 @@ export function buildTogetherAiModel(
   }
 
   return {
-    id: lowerModeId,
+    id: model.id,
     name: model.display_name,
     provider,
     inputs: inputs,
@@ -334,7 +333,7 @@ export function buildTogetherAiModel(
 
 /**
  * function to extract capabilities from fireworks ai model
- * @TODO needs proper testing
+ * @TODO no proper way to fetch exact list of models
  */
 export function buildFireworksAiModel(
   model: FireworksAiModel,
@@ -342,21 +341,23 @@ export function buildFireworksAiModel(
 ): ModelSchemaType {
   const inputs: ModelIOType[] = ['text']
   const outputs: ModelIOType[] = []
-  const lowerModeId = model.id.toLowerCase()
+  const lowerModeId = model.name.toLowerCase()
 
-  if (model.supports_image_input) {
+  if (model.supportsImageInput) {
     inputs.push('image')
   }
 
-  if (model.supports_chat) {
-    outputs.push('text')
-  } else {
+  if (lowerModeId.includes('flux')) {
     outputs.push('image')
+  } else if (lowerModeId.includes('embedding')) {
+    outputs.push('embedding')
+  } else {
+    outputs.push('text')
   }
 
   return {
-    id: lowerModeId,
-    name: model.id,
+    id: model.name,
+    name: model.displayName,
     provider,
     inputs: inputs,
     outputs: outputs,

@@ -164,16 +164,25 @@ type TogetherAiResponse = TogetherAiModel[]
  * full types https://docs.fireworks.ai/api-reference/list-models
  */
 export type FireworksAiModel = {
-  id: string
-  object: 'model'
+  name: string
+  displayName: string
+  description: string
+  contextLength: number
   owned_by: string
-  created: number
+  githubUrl?: string
+  huggingFaceUrl?: string
+  createTime: string //iso
   kind: string
-  supports_chat: boolean
-  supports_image_input: boolean
-  supports_tools: boolean
-  context_length: number
+  supportsImageInput: boolean
+  supportsLora: boolean
+  supportsTools: boolean
+  modelType: string
 }
+/**
+ * firework response type
+ */
+type FireworksAiResponse = { models: FireworksAiModel[] }
+
 /**
  * open AI type response for models endpoint
  */
@@ -199,7 +208,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<OpenAiResponse<OpenAiModel>>
       | AxiosResponse<GoogleResponse>
       | AxiosResponse<TogetherAiResponse>
-      | AxiosResponse<OpenAiResponse<FireworksAiModel>>
+      | AxiosResponse<FireworksAiResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -256,10 +265,13 @@ export async function getModelListFromProvider(
          * inference endpoint fetches open ai compatible models only
          * @TODO get the complete list of models and test
          */
-        response = await axios.get('https://api.fireworks.ai/inference/v1/models', {
-          headers: { Authorization: `Bearer ${apiKey}` },
-          timeout: 5000 //5 seconds
-        })
+        response = await axios.get(
+          'https://api.fireworks.ai/v1/accounts/fireworks/models?filter=supports_serverless=true&pageSize=200',
+          {
+            headers: { Authorization: `Bearer ${apiKey}` },
+            timeout: 5000 //5 seconds
+          }
+        )
         break
       }
       case 'huggingface': {
@@ -355,7 +367,7 @@ export async function getModelListFromProvider(
         return data.map((model: TogetherAiModel) => buildTogetherAiModel(model, provider.provider))
       }
       case 'fireworks-ai': {
-        const data = (response.data as OpenAiResponse<FireworksAiModel>).data
+        const data = (response.data as FireworksAiResponse).models
         if (!data) return []
         return data.map((model: FireworksAiModel) =>
           buildFireworksAiModel(model, provider.provider)
