@@ -119,10 +119,21 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://together.ai',
     description: 'together.ai provider models'
+  },
+  {
+    provider: 'fireworks-ai',
+    name: 'Fireworks AI',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/fireworks.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://app.fireworks.ai',
+    description: 'Fireworks AI provider models'
   }
 ]
 
 export const AVAILABLE_PROVIDER_LIST = [
+  'fireworks-ai',
   'openai',
   'ollama',
   'openrouter',

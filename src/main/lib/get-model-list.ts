@@ -3,6 +3,7 @@ import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
 import {
+  buildFireworksAiModel,
   buildGatewayModel,
   buildGoogleModel,
   buildGroqModel,
@@ -159,6 +160,21 @@ export type TogetherAiModel = {
 type TogetherAiResponse = TogetherAiModel[]
 
 /**
+ * fireworks ai model type
+ * full types https://docs.fireworks.ai/api-reference/list-models
+ */
+export type FireworksAiModel = {
+  id: string
+  object: 'model'
+  owned_by: string
+  created: number
+  kind: string
+  supports_chat: boolean
+  supports_image_input: boolean
+  supports_tools: boolean
+  context_length: number
+}
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -183,6 +199,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<OpenAiResponse<OpenAiModel>>
       | AxiosResponse<GoogleResponse>
       | AxiosResponse<TogetherAiResponse>
+      | AxiosResponse<OpenAiResponse<FireworksAiModel>>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -229,6 +246,17 @@ export async function getModelListFromProvider(
       }
       case 'togetherai': {
         response = await axios.get('https://api.together.ai/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 5000 //5 seconds
+        })
+        break
+      }
+      case 'fireworks-ai': {
+        /**
+         * inference endpoint fetches open ai compatible models only
+         * @TODO get the complete list of models and test
+         */
+        response = await axios.get('https://api.fireworks.ai/inference/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 5000 //5 seconds
         })
@@ -325,6 +353,13 @@ export async function getModelListFromProvider(
         if (!data) return []
         // @TODO proper extraction
         return data.map((model: TogetherAiModel) => buildTogetherAiModel(model, provider.provider))
+      }
+      case 'fireworks-ai': {
+        const data = (response.data as OpenAiResponse<FireworksAiModel>).data
+        if (!data) return []
+        return data.map((model: FireworksAiModel) =>
+          buildFireworksAiModel(model, provider.provider)
+        )
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

@@ -26,6 +26,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@ai-sdk/fireworks": "^2.0.42",
     "@ai-sdk/google": "^3.0.43",
     "@ai-sdk/groq": "^3.0.29",
     "@ai-sdk/huggingface": "^1.0.39",

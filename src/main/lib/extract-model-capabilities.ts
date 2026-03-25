@@ -1,5 +1,6 @@
 import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
 import {
+  FireworksAiModel,
   GatewayModel,
   GoogleModel,
   GroqModel,
@@ -325,6 +326,42 @@ export function buildTogetherAiModel(
     outputs: outputs,
     capabilities: {
       vision: false,
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}
+
+/**
+ * function to extract capabilities from fireworks ai model
+ * @TODO needs proper testing
+ */
+export function buildFireworksAiModel(
+  model: FireworksAiModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+  const lowerModeId = model.id.toLowerCase()
+
+  if (model.supports_image_input) {
+    inputs.push('image')
+  }
+
+  if (model.supports_chat) {
+    outputs.push('text')
+  } else {
+    outputs.push('image')
+  }
+
+  return {
+    id: lowerModeId,
+    name: model.id,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    capabilities: {
+      vision: inputs.includes('image'),
       videoReasoning: false,
       realtime: false
     }
