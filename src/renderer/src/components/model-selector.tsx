@@ -22,12 +22,14 @@ function AppModelSelector({
   output,
   disableDefaultSelection = false,
   modelType = 'chat',
-  onSelect
+  onSelect,
+  className
 }: {
   output?: ModelIOType
   disableDefaultSelection?: boolean
   modelType?: string
   onSelect?: (model: ModelSchemaType) => void
+  className?: string
 }) {
   //@TODO show error message if no models are not loaded
   // fetch all the model list
@@ -51,7 +53,7 @@ function AppModelSelector({
   return (
     <ModelSelector onOpenChange={setModelSelectorOpen} open={modelSelectorOpen}>
       <ModelSelectorTrigger asChild>
-        <PromptInputButton className="border">
+        <PromptInputButton className={className}>
           <ModelSelectorLogo provider={model?.provider ?? ''} />
 
           {model?.name ? (

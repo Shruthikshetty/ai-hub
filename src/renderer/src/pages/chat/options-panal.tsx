@@ -142,7 +142,6 @@ const ChatOptionsPanel = ({
           <div className="p-4 flex flex-col gap-2">
             <h2 className="text-foreground font-semibold text-sm">TOOLS</h2>
             {/* search tool  */}
-
             <form.Field name="tools.search.enabled">
               {(field) => {
                 const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
@@ -163,7 +162,13 @@ const ChatOptionsPanel = ({
                         id={field.name}
                         name={field.name}
                         checked={field.state.value}
-                        onCheckedChange={(value) => field.handleChange(value)}
+                        onCheckedChange={(value) => {
+                          field.handleChange(value)
+                          // if search is disabled, clear the provider and model
+                          if (!value) {
+                            form.setFieldValue('tools.search.provider', '')
+                          }
+                        }}
                       />
                     </div>
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -247,7 +252,14 @@ const ChatOptionsPanel = ({
                         id={field.name}
                         name={field.name}
                         checked={field.state.value}
-                        onCheckedChange={(value) => field.handleChange(value)}
+                        onCheckedChange={(value) => {
+                          field.handleChange(value)
+                          // if image generation is disabled, clear the provider and model
+                          if (!value) {
+                            form.setFieldValue('tools.imageGeneration.provider', '')
+                            form.setFieldValue('tools.imageGeneration.modelId', '')
+                          }
+                        }}
                       />
                     </div>
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -255,46 +267,49 @@ const ChatOptionsPanel = ({
                 )
               }}
             </form.Field>
+            {/* image generation tool provider and model selector */}
+            <form.Subscribe selector={(state) => state.values.tools.imageGeneration.enabled}>
+              {(isImageGenerationEnabled) => {
+                if (!isImageGenerationEnabled) return null
+                // nest field for provider and model
+                return (
+                  <form.Field name="tools.imageGeneration.provider">
+                    {(providerField) => (
+                      <form.Field name="tools.imageGeneration.modelId">
+                        {(modelField) => {
+                          const isProviderInvalid =
+                            providerField.state.meta.isTouched && !providerField.state.meta.isValid
+                          const isModelInvalid =
+                            modelField.state.meta.isTouched && !modelField.state.meta.isValid
+                          return (
+                            <Field className="flex flex-col gap-1 my-2 animate-in fade-in slide-in-from-top-1">
+                              <AppModelSelector
+                                modelType="image"
+                                output="image"
+                                className="border border-input bg-input/30"
+                                disableDefaultSelection
+                                onSelect={(selected) => {
+                                  providerField.handleChange(selected.provider)
+                                  modelField.handleChange(selected.id)
+                                }}
+                              />
+                              {(isModelInvalid || isProviderInvalid) && (
+                                <p className="text-sm font-normal text-destructive">
+                                  Please select a model
+                                </p>
+                              )}
+                            </Field>
+                          )
+                        }}
+                      </form.Field>
+                    )}
+                  </form.Field>
+                )
+              }}
+            </form.Subscribe>
           </div>
-          <Separator />
-          {/* image generation tool provider and model selector */}
-          <form.Subscribe selector={(state) => state.values.tools.imageGeneration.enabled}>
-            {(isImageGenerationEnabled) => {
-              if (!isImageGenerationEnabled) return null
-              // nest field for provider and model
-              return (
-                <form.Field name="tools.imageGeneration.provider">
-                  {(providerField) => (
-                    <form.Field name="tools.imageGeneration.modelId">
-                      {(modelField) => {
-                        const isProviderInvalid =
-                          providerField.state.meta.isTouched && !providerField.state.meta.isValid
-                        const isModelInvalid =
-                          modelField.state.meta.isTouched && !modelField.state.meta.isValid
-                        return (
-                          <Field className="flex flex-col gap-1 my-2 animate-in fade-in slide-in-from-top-1">
-                            <AppModelSelector
-                              modelType="image"
-                              output="image"
-                              onSelect={(selected) => {
-                                providerField.handleChange(selected.provider)
-                                modelField.handleChange(selected.id)
-                              }}
-                            />
-                            {isProviderInvalid && (
-                              <FieldError errors={providerField.state.meta.errors} />
-                            )}
-                            {isModelInvalid && <FieldError errors={modelField.state.meta.errors} />}
-                          </Field>
-                        )
-                      }}
-                    </form.Field>
-                  )}
-                </form.Field>
-              )
-            }}
-          </form.Subscribe>
 
+          <Separator />
           {/* Metadata */}
           <div className="p-4 flex flex-col gap-2">
             <h2 className="text-foreground font-semibold text-sm">META DATA</h2>

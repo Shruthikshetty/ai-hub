@@ -187,6 +187,8 @@ function MessageParts({
               case 'input-streaming':
                 return <Shimmer key={`${message.id}-${index}`}>generating image ...</Shimmer>
               case 'output-available':
+                // in case the part.output is string in case of error
+                if (typeof part.output === 'string') return
                 return (
                   <img
                     src={(part?.output as { mediaUrl: string })?.mediaUrl}
