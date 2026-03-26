@@ -71,7 +71,7 @@ function AppModelSelector({
                 ?.filter((m) => m.provider === chef)
                 ?.map((m) => (
                   <ModelItem
-                    key={m.id}
+                    key={`${m.provider}-${m.id}`}
                     model={m}
                     onSelect={(selected) => {
                       setModel(modelType, selected)
