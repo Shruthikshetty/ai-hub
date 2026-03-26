@@ -14,6 +14,9 @@ declare global {
       removeStreamListeners: (requestId: number) => void
       streamReady: (requestId: number) => void
       getFilePath: (file: File) => string
+      downloadFile: (
+        relativePath: string
+      ) => Promise<{ success: boolean; filePath?: string; canceled?: boolean; error?: string }>
     }
   }
 }

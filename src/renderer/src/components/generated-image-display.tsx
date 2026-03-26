@@ -28,6 +28,14 @@ const GeneratedImageDisplay = ({
     }
   }, [image?.imageUrl])
 
+  /**
+   * Handles the download of the image
+   */
+  const handleDownload = async (): Promise<void> => {
+    if (!image?.relativePath) return
+    await window.api.downloadFile(image.relativePath)
+  }
+
   // generate random gradient for the image
   const gradientStyles = useMemo(() => generateTailwindGradient(), [])
   return (
@@ -62,7 +70,7 @@ const GeneratedImageDisplay = ({
         <div className="p-2 w-full flex justify-between gap-2">
           {/* left side buttons */}
           <div className="flex gap-2">
-            <ImageDetailsDialog image={image}>
+            <ImageDetailsDialog image={image} onDownload={handleDownload}>
               <Button size="icon" variant="secondary">
                 <Expand />
               </Button>
@@ -70,7 +78,7 @@ const GeneratedImageDisplay = ({
           </div>
           {/* right side buttons */}
           <div className="flex gap-2">
-            <Button size="icon" variant="secondary">
+            <Button size="icon" variant="secondary" onClick={handleDownload}>
               <Download />
             </Button>
             <Button size="icon" variant="default" className="bg-destructive/80 text-foreground">

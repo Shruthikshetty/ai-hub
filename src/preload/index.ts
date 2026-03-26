@@ -39,7 +39,13 @@ const api = {
   // Get the real filesystem path from a File object (from <input type="file">)
   // This avoids base64 encoding — the path string is sent to the backend which
   // does a stream copy directly.
-  getFilePath: (file: File): string => webUtils.getPathForFile(file)
+  getFilePath: (file: File): string => webUtils.getPathForFile(file),
+
+  // Download a file to a user-chosen location via native Save dialog
+  downloadFile: (
+    relativePath: string
+  ): Promise<{ success: boolean; filePath?: string; canceled?: boolean; error?: string }> =>
+    ipcRenderer.invoke('download-file', relativePath)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -6,12 +6,15 @@ import { Download, Trash } from 'lucide-react'
 
 const ImageDetailsDialog = ({
   image,
-  children
+  children,
+  onDownload
 }: {
   children: React.ReactNode
   image?: MediaGetSchema
+  onDownload: () => Promise<void>
 }) => {
   const [open, setOpen] = useState(false)
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>{children}</DialogTrigger>
@@ -32,7 +35,7 @@ const ImageDetailsDialog = ({
         <div className="shrink-0 flex flex-row items-center justify-between px-4 py-2 border-t bg-muted rounded-b-xl">
           <p className="text-sm text-muted-foreground">{image?.modelId}</p>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={onDownload}>
               Download
               <Download />
             </Button>
