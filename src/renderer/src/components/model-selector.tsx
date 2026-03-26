@@ -14,18 +14,20 @@ import { PromptInputButton } from './ai-elements/prompt-input'
 import ModelItem from './model-item'
 import { useFetchModels } from '@renderer/services/model'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
-import { ModelIOType } from '@common/schemas/model.schema'
+import { ModelIOType, ModelSchemaType } from '@common/schemas/model.schema'
 import { AVAILABLE_PROVIDER_LIST } from '@common/constants/global.constants'
 
 // lets you select the various models from all the available providers
 function AppModelSelector({
   output,
   disableDefaultSelection = false,
-  modelType = 'chat'
+  modelType = 'chat',
+  onSelect
 }: {
   output?: ModelIOType
   disableDefaultSelection?: boolean
   modelType?: string
+  onSelect?: (model: ModelSchemaType) => void
 }) {
   //@TODO show error message if no models are not loaded
   // fetch all the model list
@@ -71,7 +73,10 @@ function AppModelSelector({
                   <ModelItem
                     key={m.id}
                     model={m}
-                    onSelect={(selected) => setModel(modelType, selected)}
+                    onSelect={(selected) => {
+                      setModel(modelType, selected)
+                      onSelect?.(selected)
+                    }}
                     selectedModel={model}
                   />
                 ))}

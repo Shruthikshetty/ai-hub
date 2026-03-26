@@ -133,7 +133,6 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
 ]
 
 export const AVAILABLE_PROVIDER_LIST = [
-  'fireworks-ai',
   'openai',
   'ollama',
   'openrouter',
@@ -142,7 +141,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'groq',
   'huggingface',
   'xai',
-  'togetherai'
+  'togetherai',
+  'fireworks-ai'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
