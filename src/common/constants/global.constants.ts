@@ -129,6 +129,17 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://app.fireworks.ai',
     description: 'Fireworks AI provider models'
+  },
+  {
+    provider: 'lmstudio',
+    name: 'LM Studio',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/lmstudio.svg',
+    enabled: false,
+    apiKey: '',
+    server: true,
+    serverUrl: 'http://localhost:1234',
+    siteUrl: 'https://lmstudio.ai',
+    description: 'LM Studio provider models that you run locally'
   }
 ]
 
@@ -142,7 +153,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'huggingface',
   'xai',
   'togetherai',
-  'fireworks-ai'
+  'fireworks-ai',
+  'lmstudio'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
