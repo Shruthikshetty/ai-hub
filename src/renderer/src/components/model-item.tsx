@@ -19,10 +19,14 @@ const ModelItem = ({
   const handleSelect = useCallback(() => onSelect(model), [onSelect, model])
 
   return (
-    <ModelSelectorItem key={model.id} onSelect={handleSelect} value={model.id}>
+    <ModelSelectorItem
+      key={`${model.provider}:${model.id}`}
+      onSelect={handleSelect}
+      value={`${model.provider}:${model.id}`}
+    >
       <ModelSelectorLogo provider={model.provider} />
       <ModelSelectorName>{model.name}</ModelSelectorName>
-      {selectedModel?.id === model.id ? (
+      {selectedModel?.id === model.id && selectedModel?.provider === model.provider ? (
         <CheckIcon className="ml-auto size-4" />
       ) : (
         <div className="ml-auto size-4" />

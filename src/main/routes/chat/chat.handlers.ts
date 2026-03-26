@@ -53,7 +53,7 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
   }
 
   // get the tools
-  const tools = await getTools(conversation, model.provider)
+  const tools = await getTools(conversation)
   // const get the provider as per user model
   const modelProvider = await getProviderInstanceModel({
     provider: model.provider,

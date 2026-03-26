@@ -12,6 +12,7 @@ import { createHuggingFace } from '@ai-sdk/huggingface'
 import { createXai } from '@ai-sdk/xai'
 import { createTogetherAI } from '@ai-sdk/togetherai'
 import { createFireworks } from '@ai-sdk/fireworks'
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({
@@ -97,6 +98,17 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return fireworksInstance
+    }
+    case 'lmstudio': {
+      const baseURL = normalizeProviderUrl(
+        providerDetails?.serverUrl || 'http://localhost:1234',
+        '/v1'
+      )
+      const lmstudioInstance = createOpenAICompatible({
+        name: 'lmstudio',
+        baseURL
+      })
+      return lmstudioInstance
     }
     case 'vercel': // fall's to default
     default: {

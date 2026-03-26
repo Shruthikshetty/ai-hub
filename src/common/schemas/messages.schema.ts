@@ -83,6 +83,11 @@ const ProfileAccessToolSchema = ToolInvocationBase.extend({
   type: z.literal('tool-profile')
 }).and(ToolStateSchema)
 
+//image tool
+const ImageToolSchema = ToolInvocationBase.extend({
+  type: z.literal('tool-img_gen')
+}).and(ToolStateSchema)
+
 //added additional parts as required
 export const MessagePartSchema = z.union([
   TextUIPartSchema,
@@ -90,7 +95,8 @@ export const MessagePartSchema = z.union([
   StepStartUIPartSchema,
   FileUIPartSchema,
   SearchToolSchema,
-  ProfileAccessToolSchema
+  ProfileAccessToolSchema,
+  ImageToolSchema
 ])
 
 // metadata schema for message

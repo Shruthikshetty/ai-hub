@@ -1,5 +1,6 @@
 import { PROVIDERS_WITH_SEARCH_TOOL } from '@common/constants/global.constants'
 import { FetchConversationWithMessagesResponseType } from '@common/schemas/conversation.schema'
+import AppModelSelector from '@renderer/components/model-selector'
 import ResizableSidePanel from '@renderer/components/resizable-side-panel'
 import TokensUsedCard from '@renderer/components/tokens-used-card'
 import { Button } from '@renderer/components/ui/button'
@@ -25,7 +26,6 @@ import { useForm } from '@tanstack/react-form'
 import { Save, Trash } from 'lucide-react'
 import { memo, useEffect } from 'react'
 
-//@TODO add the rest of the options later
 /**
  * This panel contains additional options that can be passed to the model
  */
@@ -52,6 +52,11 @@ const ChatOptionsPanel = ({
         },
         profileAccess: {
           enabled: conversation?.tools?.profileAccess?.enabled ?? false
+        },
+        imageGeneration: {
+          enabled: conversation?.tools?.imageGeneration?.enabled ?? false,
+          provider: conversation?.tools?.imageGeneration?.provider ?? '',
+          modelId: conversation?.tools?.imageGeneration?.modelId ?? ''
         }
       },
       metadata: conversation?.metadata ?? true
@@ -75,6 +80,11 @@ const ChatOptionsPanel = ({
         },
         profileAccess: {
           enabled: conversation?.tools?.profileAccess?.enabled ?? false
+        },
+        imageGeneration: {
+          enabled: conversation?.tools?.imageGeneration?.enabled ?? false,
+          provider: conversation?.tools?.imageGeneration?.provider ?? '',
+          modelId: conversation?.tools?.imageGeneration?.modelId ?? ''
         }
       }
     })
@@ -152,7 +162,13 @@ const ChatOptionsPanel = ({
                         id={field.name}
                         name={field.name}
                         checked={field.state.value}
-                        onCheckedChange={(value) => field.handleChange(value)}
+                        onCheckedChange={(value) => {
+                          field.handleChange(value)
+                          // if search is disabled, clear the provider and model
+                          if (!value) {
+                            form.setFieldValue('tools.search.provider', '')
+                          }
+                        }}
                       />
                     </div>
                     {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -160,32 +176,7 @@ const ChatOptionsPanel = ({
                 )
               }}
             </form.Field>
-            {/* Profile Access Tool */}
-            <form.Field name="tools.profileAccess.enabled">
-              {(field) => {
-                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <div className="flex flex-row justify-between">
-                      <FieldLabel
-                        className="text-muted-foreground text-sm font-semibold"
-                        htmlFor={field.name}
-                      >
-                        Profile Access
-                      </FieldLabel>
-                      <Switch
-                        id={field.name}
-                        name={field.name}
-                        checked={field.state.value}
-                        onCheckedChange={(value) => field.handleChange(value)}
-                      />
-                    </div>
-                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                  </Field>
-                )
-              }}
-            </form.Field>
-            {/*TODO currently not useful for future use Dynamic Search Provider Field */}
+            {/* search tool provider and model selector */}
             <form.Subscribe selector={(state) => state.values.tools.search.enabled}>
               {(isSearchEnabled) => {
                 if (!isSearchEnabled) return null
@@ -218,16 +209,106 @@ const ChatOptionsPanel = ({
               }}
             </form.Subscribe>
 
-            <div className="flex items-center justify-between">
-              <Label
-                className="text-muted-foreground text-sm font-semibold"
-                htmlFor="image-generation"
-              >
-                Image generation
-              </Label>
-              <Switch id="image-generation" />
-            </div>
+            {/* Profile Access Tool */}
+            <form.Field name="tools.profileAccess.enabled">
+              {(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <div className="flex flex-row justify-between">
+                      <FieldLabel
+                        className="text-muted-foreground text-sm font-semibold"
+                        htmlFor={field.name}
+                      >
+                        Profile Access
+                      </FieldLabel>
+                      <Switch
+                        id={field.name}
+                        name={field.name}
+                        checked={field.state.value}
+                        onCheckedChange={(value) => field.handleChange(value)}
+                      />
+                    </div>
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                )
+              }}
+            </form.Field>
+
+            {/* image generation tool */}
+            <form.Field name="tools.imageGeneration.enabled">
+              {(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <div className="flex items-center justify-between">
+                      <FieldLabel
+                        className="text-muted-foreground text-sm font-semibold"
+                        htmlFor={field.name}
+                      >
+                        Image generation
+                      </FieldLabel>
+                      <Switch
+                        id={field.name}
+                        name={field.name}
+                        checked={field.state.value}
+                        onCheckedChange={(value) => {
+                          field.handleChange(value)
+                          // if image generation is disabled, clear the provider and model
+                          if (!value) {
+                            form.setFieldValue('tools.imageGeneration.provider', '')
+                            form.setFieldValue('tools.imageGeneration.modelId', '')
+                          }
+                        }}
+                      />
+                    </div>
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                )
+              }}
+            </form.Field>
+            {/* image generation tool provider and model selector */}
+            <form.Subscribe selector={(state) => state.values.tools.imageGeneration.enabled}>
+              {(isImageGenerationEnabled) => {
+                if (!isImageGenerationEnabled) return null
+                // nest field for provider and model
+                return (
+                  <form.Field name="tools.imageGeneration.provider">
+                    {(providerField) => (
+                      <form.Field name="tools.imageGeneration.modelId">
+                        {(modelField) => {
+                          const isProviderInvalid =
+                            providerField.state.meta.isTouched && !providerField.state.meta.isValid
+                          const isModelInvalid =
+                            modelField.state.meta.isTouched && !modelField.state.meta.isValid
+                          return (
+                            <Field className="flex flex-col gap-1 my-2 animate-in fade-in slide-in-from-top-1">
+                              <AppModelSelector
+                                modelType="image"
+                                output="image"
+                                className="border border-input bg-input/30"
+                                disableDefaultSelection
+                                onSelect={(selected) => {
+                                  providerField.handleChange(selected.provider)
+                                  modelField.handleChange(selected.id)
+                                }}
+                              />
+                              {(isModelInvalid || isProviderInvalid) && (
+                                <p className="text-sm font-normal text-destructive">
+                                  Please select a model
+                                </p>
+                              )}
+                            </Field>
+                          )
+                        }}
+                      </form.Field>
+                    )}
+                  </form.Field>
+                )
+              }}
+            </form.Subscribe>
           </div>
+
           <Separator />
           {/* Metadata */}
           <div className="p-4 flex flex-col gap-2">

@@ -100,6 +100,26 @@ function MessageParts({
                   } else {
                     return <Shimmer key={`${message.id}-${index}`}>accessing profile ...</Shimmer>
                   }
+                case 'tool-img_gen':
+                  if (part.state === 'output-available') {
+                    // in case the part.output is string in case of error
+                    if (typeof part.output === 'string') {
+                      return (
+                        <TaskItem key={`${message.id}-${index}`}>image generation failed</TaskItem>
+                      )
+                    }
+                    return (
+                      <TaskItem
+                        key={`${message.id}-${index}`}
+                        className="flex flex-col gap-1 text-muted-foreground"
+                      >
+                        <p>generated image :</p>
+                        <p>{JSON.stringify(part?.input)}</p>
+                      </TaskItem>
+                    )
+                  } else {
+                    return null
+                  }
                 default:
                   return null
               }
@@ -158,6 +178,24 @@ function MessageParts({
               case 'input-available':
               case 'input-streaming':
                 return <Shimmer key={`${message.id}-${index}`}>accessing profile ...</Shimmer>
+              default:
+                return null
+            }
+          case 'tool-img_gen':
+            switch (part.state) {
+              case 'input-available':
+              case 'input-streaming':
+                return <Shimmer key={`${message.id}-${index}`}>generating image ...</Shimmer>
+              case 'output-available':
+                // in case the part.output is string in case of error
+                if (typeof part.output === 'string') return
+                return (
+                  <img
+                    src={(part?.output as { mediaUrl: string })?.mediaUrl}
+                    alt="generated image"
+                    className="aspect-square w-32 object-cover rounded-sm"
+                  />
+                )
               default:
                 return null
             }

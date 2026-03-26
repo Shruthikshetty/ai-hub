@@ -21,6 +21,28 @@ export const chatOptionsValidationSchema = z.object({
             path: ['provider']
           })
         }
+      }),
+    imageGeneration: z
+      .object({
+        enabled: z.boolean(),
+        provider: z.string(),
+        modelId: z.string()
+      })
+      .superRefine((data, ctx) => {
+        if (data.enabled && !data.provider) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Provider is required when image generation is enabled',
+            path: ['provider']
+          })
+        }
+        if (data.enabled && !data.modelId) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Model is required when image generation is enabled',
+            path: ['modelId']
+          })
+        }
       })
   })
   // rest will be added here
