@@ -6,6 +6,7 @@ import { MediaGetSchema } from '@common/db-schemas/media.schema'
 import { Download, Expand, Trash } from 'lucide-react'
 import { Button } from './ui/button'
 import ImageDetailsDialog from './image-details-dialog'
+import { useDeleteGeneratedImage } from '@renderer/services/image-gen'
 
 /**
  * Component to display generated images
@@ -20,6 +21,8 @@ const GeneratedImageDisplay = ({
 }) => {
   // state to check if image is loaded
   const [loaded, setLoaded] = useState(false)
+  // hook to delete image
+  const { mutate } = useDeleteGeneratedImage()
   // reset loaded state when image url changes
   useEffect(() => {
     if (image?.imageUrl) {
@@ -27,6 +30,11 @@ const GeneratedImageDisplay = ({
       setLoaded(false)
     }
   }, [image?.imageUrl])
+
+  const handleDelete = async (): Promise<void> => {
+    if (!image?.id) return
+    mutate(image.id)
+  }
 
   /**
    * Handles the download of the image
@@ -66,7 +74,7 @@ const GeneratedImageDisplay = ({
       )}
 
       {/* Dark overlay on hover */}
-      <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+      <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex flex-col justify-between">
         <div className="p-2 w-full flex justify-between gap-2">
           {/* left side buttons */}
           <div className="flex gap-2">
@@ -81,11 +89,17 @@ const GeneratedImageDisplay = ({
             <Button size="icon" variant="secondary" onClick={handleDownload}>
               <Download />
             </Button>
-            <Button size="icon" variant="default" className="bg-destructive/80 text-foreground">
+            <Button
+              size="icon"
+              variant="default"
+              onClick={handleDelete}
+              className="bg-destructive/80 text-foreground"
+            >
               <Trash />
             </Button>
           </div>
         </div>
+        <p className="p-2 text-foreground/90">{image?.modelId}</p>
       </div>
     </div>
   )

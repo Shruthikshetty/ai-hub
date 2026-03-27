@@ -1,7 +1,7 @@
 /**
  * @file contains all the handlers for image generation routes
  */
-import { GenerateImageRoute } from './image-gen.routes'
+import { DeleteGeneratedImageRoute, GenerateImageRoute } from './image-gen.routes'
 import { AppRouteHandler } from '../../types'
 import { generateImage as aiGenerateImage } from 'ai'
 import { saveFile, deleteMediaFile } from '../../lib/file-storage'
@@ -9,6 +9,7 @@ import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import db from '../../db'
 import { media } from '../../db/schema'
+import { eq } from 'drizzle-orm'
 
 // handler for image generation
 export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
@@ -62,4 +63,35 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
 
   // return the image url
   return c.json({ imageUrl: mediaUrl, success: true }, HTTP_STATUS_CODES.OK)
+}
+
+// handler to delete the generated image
+export const deleteGeneratedImage: AppRouteHandler<DeleteGeneratedImageRoute> = async (c) => {
+  // get the id from request params
+  const { id } = c.req.valid('param')
+
+  // get the image from db
+  const image = await db.query.media.findFirst({
+    where: eq(media.id, id)
+  })
+
+  // if image is not found, return error
+  if (!image) {
+    return c.json(
+      {
+        message: 'Image not found',
+        success: false
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+
+  // delete the image from file storage
+  deleteMediaFile(image.relativePath)
+
+  // delete the image from db
+  await db.delete(media).where(eq(media.id, id))
+
+  // return success response
+  return c.json({ success: true, message: 'Successfully deleted the image' }, HTTP_STATUS_CODES.OK)
 }

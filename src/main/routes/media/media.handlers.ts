@@ -12,7 +12,7 @@ import db from '../../db'
 import { media, MediaGetSchema } from '../../db/schema'
 import { desc } from 'drizzle-orm'
 
-// handler for uploading media files
+// handler for uploading media files (local non db)
 export const uploadMedia: AppRouteHandler<UploadMediaRoute> = async (c) => {
   const { sourcePath, category } = c.req.valid('json')
 
@@ -32,7 +32,7 @@ export const uploadMedia: AppRouteHandler<UploadMediaRoute> = async (c) => {
   )
 }
 
-// handler for getting all the stored media by type image/video
+// handler for getting all the stored media by type image/video (db fetch)
 export const getMedia: AppRouteHandler<GetMediaRoute> = async (c) => {
   const { type } = c.req.valid('param')
 
@@ -65,7 +65,7 @@ export const getMedia: AppRouteHandler<GetMediaRoute> = async (c) => {
   )
 }
 
-// handler for deleting a media file
+// handler for deleting a media file (local non db )
 export const deleteMedia: AppRouteHandler<DeleteMediaRoute> = async (c) => {
   // get the relative path from the request body
   const { relativePath } = c.req.valid('json')
