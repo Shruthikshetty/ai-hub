@@ -35,7 +35,7 @@ export const getTools = async (
         tools['search'] = (modelProvider as OpenAIProvider).tools.webSearch() as any
         break
       case 'xai':
-        tools['search'] = (modelProvider as XaiProvider).tools.webSearch()
+        tools['search'] = (modelProvider as XaiProvider).tools.webSearch() as any
         break
       case 'google':
         tools['search'] = (modelProvider as GoogleGenerativeAIProvider).tools.googleSearch(
@@ -44,6 +44,9 @@ export const getTools = async (
         break
       case 'groq':
         tools['search'] = (modelProvider as GroqProvider).tools.browserSearch({}) as any
+        break
+      case 'vercel':
+        tools['search'] = (modelProvider as any).tools.perplexitySearch({ maxResults: 3 }) as any
         break
       default:
         break
