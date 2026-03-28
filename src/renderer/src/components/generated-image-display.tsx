@@ -72,35 +72,36 @@ const GeneratedImageDisplay = ({
           <Spinner className="size-10 text-white drop-shadow-lg" />
         </div>
       )}
-
       {/* Dark overlay on hover */}
-      <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex flex-col justify-between">
-        <div className="p-2 w-full flex justify-between gap-2">
-          {/* left side buttons */}
-          <div className="flex gap-2">
-            <ImageDetailsDialog image={image} onDownload={handleDownload}>
-              <Button size="icon" variant="secondary">
-                <Expand />
+      {!loading && image ? (
+        <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex flex-col justify-between">
+          <div className="p-2 w-full flex justify-between gap-2">
+            {/* left side buttons */}
+            <div className="flex gap-2">
+              <ImageDetailsDialog image={image} onDownload={handleDownload}>
+                <Button size="icon" variant="secondary">
+                  <Expand />
+                </Button>
+              </ImageDetailsDialog>
+            </div>
+            {/* right side buttons */}
+            <div className="flex gap-2">
+              <Button size="icon" variant="secondary" onClick={handleDownload}>
+                <Download />
               </Button>
-            </ImageDetailsDialog>
+              <Button
+                size="icon"
+                variant="default"
+                onClick={handleDelete}
+                className="bg-destructive/80 text-foreground"
+              >
+                <Trash />
+              </Button>
+            </div>
           </div>
-          {/* right side buttons */}
-          <div className="flex gap-2">
-            <Button size="icon" variant="secondary" onClick={handleDownload}>
-              <Download />
-            </Button>
-            <Button
-              size="icon"
-              variant="default"
-              onClick={handleDelete}
-              className="bg-destructive/80 text-foreground"
-            >
-              <Trash />
-            </Button>
-          </div>
+          <p className="p-2 text-foreground/90">{image?.modelId}</p>
         </div>
-        <p className="p-2 text-foreground/90">{image?.modelId}</p>
-      </div>
+      ) : null}
     </div>
   )
 }

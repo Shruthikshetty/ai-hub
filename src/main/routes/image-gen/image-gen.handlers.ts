@@ -86,11 +86,10 @@ export const deleteGeneratedImage: AppRouteHandler<DeleteGeneratedImageRoute> = 
     )
   }
 
-  // delete the image from file storage
-  deleteMediaFile(image.relativePath)
-
   // delete the image from db
   await db.delete(media).where(eq(media.id, id))
+  // delete the image from file storage
+  deleteMediaFile(image.relativePath)
 
   // return success response
   return c.json({ success: true, message: 'Successfully deleted the image' }, HTTP_STATUS_CODES.OK)

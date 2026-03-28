@@ -36,7 +36,7 @@ export const useGenerateImage = () => {
 export const useDeleteGeneratedImage = () => {
   const queryClient = useQueryClient()
   return useMutation<GenerateImageResponseSchemaType, ApiError, number>({
-    mutationKey: [MUTATION_KEYS.imageGenerate],
+    mutationKey: [MUTATION_KEYS.imageDelete],
     mutationFn: async (id) => {
       const response = await window.api.request(`/api/image-gen/${id}`, 'DELETE')
       if (!response.success) {

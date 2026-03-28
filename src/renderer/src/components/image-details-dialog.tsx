@@ -4,6 +4,13 @@ import { useState } from 'react'
 import { Button } from './ui/button'
 import { Download, Trash } from 'lucide-react'
 
+/**
+ * Component to display image details
+ * @param image - image to display
+ * @param children - children to display
+ * @param onDownload - handler to download image
+ * @returns ImageDetailsDialog component
+ */
 const ImageDetailsDialog = ({
   image,
   children,
@@ -17,7 +24,7 @@ const ImageDetailsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>{children}</DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         className="flex flex-col gap-0 p-0 overflow-hidden sm:max-w-none w-[90vw] max-h-[90vh]"
         crossSize={'lg'}

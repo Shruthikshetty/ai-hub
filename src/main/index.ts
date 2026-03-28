@@ -293,7 +293,14 @@ app.whenReady().then(() => {
   // Handle file download takes a relative path
   // shows the native Save dialog, and copies the file to the chosen destination.
   ipcMain.handle('download-file', async (_event, relativePath: string) => {
-    const sourcePath = path.join(mediaRoot, relativePath)
+    //prevent a Path Traversal attack
+    const cleaned = relativePath.replace(/^[/\\]+/, '')
+    const sourcePath = path.resolve(mediaRoot, cleaned)
+    const mediaRootWithSep = mediaRoot.endsWith(path.sep) ? mediaRoot : mediaRoot + path.sep
+
+    if (!sourcePath.startsWith(mediaRootWithSep) && sourcePath !== mediaRoot) {
+      return { success: false, error: 'Invalid file path' }
+    }
 
     if (!fs.existsSync(sourcePath)) {
       return { success: false, error: 'File not found' }
@@ -312,7 +319,7 @@ app.whenReady().then(() => {
     }
 
     try {
-      fs.copyFileSync(sourcePath, filePath)
+      await fs.promises.copyFile(sourcePath, filePath)
       return { success: true, filePath }
     } catch (err) {
       return { success: false, error: String(err) }
