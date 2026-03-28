@@ -2,6 +2,27 @@
 
 AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)** philosophy. You can run AI models of your choice from any available cloud provider (like OpenAI, Anthropic, etc.), or run local models completely offline using tools like [Ollama](https://ollama.com/).
 
+## 🚀 Key Features
+
+- **Local App, Your Keys**: AI Hub runs entirely on your machine — no servers, no telemetry. However, when using cloud providers, your prompts and responses are processed by those providers and may be subject to their data retention policies. For full privacy, use local providers like Ollama or LM Studio.
+- **Multi-Provider Support**: Seamlessly switch between 11+ AI providers — cloud or local.
+- **Advanced AI Chat**: Modular chat interface with multi-model support, conversation history, and context persistence.
+- **Built-in AI Tools**: Extend model capabilities with tools available within the chat:
+  - 🔍 **Web Search** — Ground model responses with real-time search results (supported on OpenAI, xAI).
+  - 👤 **User Profile Access** — Models can access your personal profile for more personalized responses.
+  - 🖼️ **Image Generation** — Generate images directly from the chat interface using supported models.
+- **Image Generation & Gallery**: Dedicated view for generating images with a full gallery, detailed metadata, and download/delete support.
+- **Reasoning Support**: Native support for reasoning/thinking models (e.g., DeepSeek, Grok).
+- **Secure Key Management**: API keys are encrypted at rest using AES encryption.
+- **Modern UI/UX**: Stunning interface with Light, Dark, and System theme support.
+
+## 🔌 Supported Providers
+
+AI Hub supports a wide range of cloud and local providers:
+
+- **Cloud Providers**: OpenAI, Google AI Studio, Open Router, Groq, xAI, Together AI, Fireworks AI, Vercel AI Gateway, Hugging Face.
+- **Local Providers**: Ollama, LM Studio.
+
 ## 🛠️ Tech Stack
 
 - **Runtime**: [Electron](https://www.electronjs.org/), [Node.js](https://nodejs.org/)
@@ -140,16 +161,16 @@ The central hub for all AI-powered modules.
 
 ### Chat Interface
 
-Intuitive conversational experience with multi-model support.
+Intuitive conversational experience with multi-model support and integrated tool capabilities.
 ![Chat Main](./resources/chat-main.png)
 
-Modify the model options.
-![Chat Options](./resources/chat-reasoning.png)
-
-### Image Generation
+### Image Generation & Details
 
 Create stunning visuals with built-in image generation capabilities using available image models.
 ![Image Generation](./resources/image-gen.png)
+
+View detailed metadata and actions for each generated image.
+![Image Details](./resources/image-details.png)
 
 ### Personal Profile
 

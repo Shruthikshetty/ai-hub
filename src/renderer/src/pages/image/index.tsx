@@ -45,13 +45,9 @@ const ImagePage = () => {
       {/* images grid */}
       <div className="grow overflow-auto min-h-0 w-full">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-          {isPending && <GeneratedImageDisplay imageUrl="" loading={true} />}
-          {mediaList?.data?.map((image, index) => (
-            <GeneratedImageDisplay
-              key={image?.imageUrl + index}
-              imageUrl={image.imageUrl}
-              loading={false}
-            />
+          {isPending && <GeneratedImageDisplay image={undefined} loading={true} />}
+          {mediaList?.data?.map((image) => (
+            <GeneratedImageDisplay key={image?.id} image={image} loading={false} />
           ))}
         </div>
       </div>

@@ -2,21 +2,47 @@ import { useEffect, useMemo, useState } from 'react'
 import { cn } from '../lib/utils'
 import { Spinner } from './ui/spinner'
 import { generateTailwindGradient } from '@renderer/lib/colors'
+import { MediaGetSchema } from '@common/db-schemas/media.schema'
+import { Download, Expand, Trash } from 'lucide-react'
+import { Button } from './ui/button'
+import ImageDetailsDialog from './image-details-dialog'
+import { useDeleteGeneratedImage } from '@renderer/services/image-gen'
 
 /**
  * Component to display generated images
  * with loading and pop up open modal
  */
-const GeneratedImageDisplay = ({ imageUrl, loading }: { imageUrl: string; loading: boolean }) => {
+const GeneratedImageDisplay = ({
+  image,
+  loading
+}: {
+  image?: MediaGetSchema
+  loading: boolean
+}) => {
   // state to check if image is loaded
   const [loaded, setLoaded] = useState(false)
+  // hook to delete image
+  const { mutate } = useDeleteGeneratedImage()
   // reset loaded state when image url changes
   useEffect(() => {
-    if (imageUrl) {
+    if (image?.imageUrl) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoaded(false)
     }
-  }, [imageUrl])
+  }, [image?.imageUrl])
+
+  const handleDelete = async (): Promise<void> => {
+    if (!image?.id) return
+    mutate(image.id)
+  }
+
+  /**
+   * Handles the download of the image
+   */
+  const handleDownload = async (): Promise<void> => {
+    if (!image?.relativePath) return
+    await window.api.downloadFile(image.relativePath)
+  }
 
   // generate random gradient for the image
   const gradientStyles = useMemo(() => generateTailwindGradient(), [])
@@ -28,9 +54,9 @@ const GeneratedImageDisplay = ({ imageUrl, loading }: { imageUrl: string; loadin
       style={gradientStyles}
     >
       {/* display image */}
-      {!loading && imageUrl ? (
+      {!loading && image?.imageUrl ? (
         <img
-          src={imageUrl}
+          src={image.imageUrl}
           alt="generated image"
           className={cn(
             'h-full w-full object-cover transition-opacity duration-300',
@@ -46,9 +72,42 @@ const GeneratedImageDisplay = ({ imageUrl, loading }: { imageUrl: string; loadin
           <Spinner className="size-10 text-white drop-shadow-lg" />
         </div>
       )}
-
       {/* Dark overlay on hover */}
-      <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      {!loading && image ? (
+        <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex flex-col justify-between group pointer-events-none group-hover:pointer-events-auto">
+          <div className="p-2 w-full flex justify-between gap-2">
+            {/* left side buttons */}
+            <div className="flex gap-2">
+              <ImageDetailsDialog image={image} onDownload={handleDownload} onDelete={handleDelete}>
+                <Button size="icon" variant="secondary" aria-label="view image details">
+                  <Expand />
+                </Button>
+              </ImageDetailsDialog>
+            </div>
+            {/* right side buttons */}
+            <div className="flex gap-2">
+              <Button
+                size="icon"
+                variant="secondary"
+                onClick={handleDownload}
+                aria-label="download image"
+              >
+                <Download />
+              </Button>
+              <Button
+                size="icon"
+                variant="default"
+                onClick={handleDelete}
+                className="bg-destructive/80 text-foreground"
+                aria-label="delete image"
+              >
+                <Trash />
+              </Button>
+            </div>
+          </div>
+          <p className="p-2 text-foreground/90">{image?.modelId}</p>
+        </div>
+      ) : null}
     </div>
   )
 }

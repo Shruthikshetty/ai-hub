@@ -4,6 +4,8 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cn } from '@renderer/lib/utils'
 import { Button } from './button'
 import { XIcon } from 'lucide-react'
+import { VariantProps } from 'class-variance-authority'
+import { buttonVariants } from './button-variants'
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -40,10 +42,12 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
+  crossSize = 'icon-sm',
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  crossSize?: VariantProps<typeof buttonVariants>['size']
 }) {
   return (
     <DialogPortal>
@@ -59,7 +63,7 @@ function DialogContent({
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
-            <Button variant="ghost" className="absolute top-2 right-2" size="icon-sm">
+            <Button variant="ghost" className="absolute top-2 right-2" size={crossSize}>
               <XIcon />
               <span className="sr-only">Close</span>
             </Button>

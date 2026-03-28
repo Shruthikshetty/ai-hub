@@ -6,7 +6,8 @@ import {
   utilityProcess,
   MessageChannelMain,
   protocol,
-  net
+  net,
+  dialog
 } from 'electron'
 import { join } from 'path'
 import path from 'node:path'
@@ -287,6 +288,42 @@ app.whenReady().then(() => {
 
     // Return the requestId immediately so the renderer can set up listeners
     return { requestId }
+  })
+
+  // Handle file download takes a relative path
+  // shows the native Save dialog, and copies the file to the chosen destination.
+  ipcMain.handle('download-file', async (_event, relativePath: string) => {
+    //prevent a Path Traversal attack
+    const cleaned = relativePath.replace(/^[/\\]+/, '')
+    const sourcePath = path.resolve(mediaRoot, cleaned)
+    const mediaRootWithSep = mediaRoot.endsWith(path.sep) ? mediaRoot : mediaRoot + path.sep
+
+    if (!sourcePath.startsWith(mediaRootWithSep) && sourcePath !== mediaRoot) {
+      return { success: false, error: 'Invalid file path' }
+    }
+
+    if (!fs.existsSync(sourcePath)) {
+      return { success: false, error: 'File not found' }
+    }
+
+    const ext = path.extname(sourcePath)
+    const defaultName = `ai-image-${Date.now()}${ext}`
+
+    const { filePath, canceled } = await dialog.showSaveDialog({
+      defaultPath: path.join(app.getPath('pictures'), defaultName),
+      filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'] }]
+    })
+
+    if (canceled || !filePath) {
+      return { success: false, canceled: true }
+    }
+
+    try {
+      await fs.promises.copyFile(sourcePath, filePath)
+      return { success: true, filePath }
+    } catch (err) {
+      return { success: false, error: String(err) }
+    }
   })
 
   createWindow()

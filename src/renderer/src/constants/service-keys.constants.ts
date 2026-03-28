@@ -19,5 +19,6 @@ export const MUTATION_KEYS = {
   deleteConversationById: 'delete-conversation-by-id',
   messageAdd: 'message-add',
   updateConversationById: 'update-conversation-by-id',
-  imageGenerate: 'image-generate'
+  imageGenerate: 'image-generate',
+  imageDelete: 'image-delete'
 }

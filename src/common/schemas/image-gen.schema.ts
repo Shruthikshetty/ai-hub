@@ -13,6 +13,13 @@ export const generateImageResponseSchema = z.object({
   success: z.boolean()
 })
 
+// delete image response schema
+export const deleteImageResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+})
+
 // extract the type
 export type GenerateImageRequestSchemaType = z.infer<typeof generateImageRequestSchema>
 export type GenerateImageResponseSchemaType = z.infer<typeof generateImageResponseSchema>
+export type DeleteImageResponseSchemaType = z.infer<typeof deleteImageResponseSchema>
