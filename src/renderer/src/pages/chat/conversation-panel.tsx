@@ -45,7 +45,7 @@ const ChatConversationsHistory = (props: {
   // hook to delete all conversations
   const { mutate: deleteAllConversations } = useDeleteAllConversations()
   // global loading state
-  const { setLoader } = useScreenLoader()
+  const setLoader = useScreenLoader((state) => state.setLoader)
   // get selected model
   const { getModel } = useSelectedModel()
   const selectedModel = getModel('chat')
