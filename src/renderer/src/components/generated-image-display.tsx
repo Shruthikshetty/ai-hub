@@ -78,7 +78,7 @@ const GeneratedImageDisplay = ({
           <div className="p-2 w-full flex justify-between gap-2">
             {/* left side buttons */}
             <div className="flex gap-2">
-              <ImageDetailsDialog image={image} onDownload={handleDownload}>
+              <ImageDetailsDialog image={image} onDownload={handleDownload} onDelete={handleDelete}>
                 <Button size="icon" variant="secondary">
                   <Expand />
                 </Button>

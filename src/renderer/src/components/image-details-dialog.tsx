@@ -14,11 +14,13 @@ import { Download, Trash } from 'lucide-react'
 const ImageDetailsDialog = ({
   image,
   children,
-  onDownload
+  onDownload,
+  onDelete
 }: {
   children: React.ReactNode
   image?: MediaGetSchema
   onDownload: () => Promise<void>
+  onDelete: () => Promise<void>
 }) => {
   const [open, setOpen] = useState(false)
 
@@ -46,7 +48,7 @@ const ImageDetailsDialog = ({
               Download
               <Download />
             </Button>
-            <Button variant="destructive">
+            <Button variant="destructive" onClick={onDelete}>
               Delete
               <Trash />
             </Button>
