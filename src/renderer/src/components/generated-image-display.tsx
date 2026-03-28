@@ -74,19 +74,24 @@ const GeneratedImageDisplay = ({
       )}
       {/* Dark overlay on hover */}
       {!loading && image ? (
-        <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex flex-col justify-between">
+        <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex flex-col justify-between group pointer-events-none group-hover:pointer-events-auto">
           <div className="p-2 w-full flex justify-between gap-2">
             {/* left side buttons */}
             <div className="flex gap-2">
               <ImageDetailsDialog image={image} onDownload={handleDownload} onDelete={handleDelete}>
-                <Button size="icon" variant="secondary">
+                <Button size="icon" variant="secondary" aria-label="view image details">
                   <Expand />
                 </Button>
               </ImageDetailsDialog>
             </div>
             {/* right side buttons */}
             <div className="flex gap-2">
-              <Button size="icon" variant="secondary" onClick={handleDownload}>
+              <Button
+                size="icon"
+                variant="secondary"
+                onClick={handleDownload}
+                aria-label="download image"
+              >
                 <Download />
               </Button>
               <Button
@@ -94,6 +99,7 @@ const GeneratedImageDisplay = ({
                 variant="default"
                 onClick={handleDelete}
                 className="bg-destructive/80 text-foreground"
+                aria-label="delete image"
               >
                 <Trash />
               </Button>

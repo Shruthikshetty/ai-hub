@@ -9,6 +9,7 @@ import { Download, Trash } from 'lucide-react'
  * @param image - image to display
  * @param children - children to display
  * @param onDownload - handler to download image
+ * @param onDelete - handler to delete image
  * @returns ImageDetailsDialog component
  */
 const ImageDetailsDialog = ({
