@@ -16,6 +16,18 @@ AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)**
 - **Secure Key Management**: API keys are encrypted at rest using AES encryption.
 - **Modern UI/UX**: Stunning interface with Light, Dark, and System theme support.
 
+## 📥 Download
+
+Get the latest version of AI Hub for your operating system:
+
+| Platform | Download |
+| :--- | :--- |
+| **Windows** | [Download .exe](https://github.com/shruthikshetty/ai-hub/releases/latest) |
+| **macOS** | [Download .dmg](https://github.com/shruthikshetty/ai-hub/releases/latest) |
+
+> [!TIP]
+> After downloading, just run the installer and you're ready to go! No complex setup required.
+
 ## 🔌 Supported Providers
 
 AI Hub supports a wide range of cloud and local providers:
