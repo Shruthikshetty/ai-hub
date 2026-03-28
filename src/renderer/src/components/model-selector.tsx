@@ -18,6 +18,7 @@ import useSelectedModel from '@renderer/state-management/selected-model.store'
 import { ModelIOType, ModelSchemaType } from '@common/schemas/model.schema'
 
 import { errorToast } from '@renderer/lib/toast-wrapper'
+import { Skeleton } from './ui/skeleton'
 
 // lets you select the various models from all the available providers
 function AppModelSelector({
@@ -34,8 +35,16 @@ function AppModelSelector({
   className?: string
 }) {
   // fetch all the model list
-  const { data: modelsData, error, isSuccess } = useFetchModels({ output })
-  const { data: providersData } = useFetchProviders()
+  const {
+    data: modelsData,
+    error,
+    isSuccess,
+    isLoading: modelsLoading
+  } = useFetchModels({ output })
+  // fetch all the provider list
+  const { data: providersData, isLoading: providersLoading } = useFetchProviders()
+  // get the loading state of both
+  const isLoading = modelsLoading || providersLoading
 
   // only show providers that are enabled
   const activeProviders = useMemo(
@@ -81,15 +90,19 @@ function AppModelSelector({
   return (
     <ModelSelector onOpenChange={setModelSelectorOpen} open={modelSelectorOpen}>
       <ModelSelectorTrigger asChild>
-        <PromptInputButton className={className}>
-          <ModelSelectorLogo provider={model?.provider ?? ''} />
+        {isLoading ? (
+          <Skeleton className="w-20 h-4 rounded-sm bg-accent-foreground" />
+        ) : (
+          <PromptInputButton className={className}>
+            <ModelSelectorLogo provider={model?.provider ?? ''} />
 
-          {model?.name ? (
-            <ModelSelectorName>{model?.name}</ModelSelectorName>
-          ) : (
-            <ModelSelectorName>Select a Model</ModelSelectorName>
-          )}
-        </PromptInputButton>
+            {model?.name ? (
+              <ModelSelectorName>{model?.name}</ModelSelectorName>
+            ) : (
+              <ModelSelectorName>Select a Model</ModelSelectorName>
+            )}
+          </PromptInputButton>
+        )}
       </ModelSelectorTrigger>
       <ModelSelectorContent>
         <ModelSelectorInput placeholder="Search models..." />
