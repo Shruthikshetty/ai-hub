@@ -10,6 +10,7 @@ interface ScreenLoaderState {
   hideLoader: () => void
   setLoader: (isLoading: boolean) => void
   delay: number
+  setDelay: (delay: number) => void
 }
 const initialState = {
   isLoading: false,

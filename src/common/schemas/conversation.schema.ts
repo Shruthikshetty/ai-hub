@@ -79,6 +79,9 @@ export type FetchAllConversationsResponseSchemaType = z.infer<
 >
 export type CreateConversationResponseSchemaType = z.infer<typeof createConversationResponseSchema>
 export type DeleteConversationResponseType = z.infer<typeof deleteConversationByIdSchema>
+export type DeleteAllConversationsResponseType = z.infer<
+  typeof deleteAllConversationsResponseSchema
+>
 export type FetchConversationWithMessagesResponseType = z.infer<typeof getMessagesByConversation>
 export type ConversationToolsSchemaType = z.infer<typeof conversationToolsSchema>
 export type ReasoningOptionsSchemaType = z.infer<typeof reasoningOptionsSchema>

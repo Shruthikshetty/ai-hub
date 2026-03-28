@@ -8,6 +8,7 @@ import {
 } from '@common/db-schemas/conversation.schema'
 import {
   CreateConversationResponseSchemaType,
+  DeleteAllConversationsResponseType,
   DeleteConversationResponseType,
   FetchAllConversationsResponseSchemaType,
   FetchConversationWithMessagesResponseType,
@@ -137,7 +138,7 @@ export const useUpdateConversationById = () => {
  */
 export const useDeleteAllConversations = () => {
   const queryClient = useQueryClient()
-  return useMutation<DeleteConversationResponseType, ApiError>({
+  return useMutation<DeleteAllConversationsResponseType, ApiError>({
     mutationKey: [MUTATION_KEYS.deleteAllConversations],
     mutationFn: async () => {
       const response = await window.api.request('/api/conversation', 'DELETE')

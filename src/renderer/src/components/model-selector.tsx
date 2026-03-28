@@ -85,7 +85,7 @@ function AppModelSelector({
     if (error) {
       errorToast('Error loading models check network / local instance')
     } else if (!modelsData?.data?.length && isSuccess) {
-      errorToast('No models found please add providers id not done yet')
+      errorToast('No models found, please add providers if not done yet')
     }
   }, [error, modelsData, isSuccess])
 

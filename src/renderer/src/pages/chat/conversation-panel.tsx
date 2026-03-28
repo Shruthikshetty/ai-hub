@@ -114,10 +114,6 @@ const ChatConversationsHistory = (props: {
     // ser loading true
     setLoader(true)
     deleteAllConversations(undefined, {
-      onSuccess: () => {
-        // create a new chat
-        handleNewChat()
-      },
       onSettled: () => {
         // ser loading false
         setLoader(false)

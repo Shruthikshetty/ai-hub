@@ -111,7 +111,7 @@ export const UIMessageSchema = z
     id: z.string(),
     role: z.enum(['user', 'assistant', 'system']),
     metadata: MessageMetadataSchema.nullish(),
-    parts: z.any()
+    parts: z.array(MessagePartSchema)
   })
   .loose()
 
