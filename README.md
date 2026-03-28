@@ -8,11 +8,11 @@ AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)**
 - **Multi-Provider Support**: Seamlessly switch between 11+ AI providers — cloud or local.
 - **Advanced AI Chat**: Modular chat interface with multi-model support, conversation history, and context persistence.
 - **Built-in AI Tools**: Extend model capabilities with tools available within the chat:
-  - 🔍 **Web Search** — Ground model responses with real-time search results (supported on OpenAI, xAI).
+  - 🔍 **Web Search** — Ground model responses with real-time search results (supported on OpenAI, xAI , groq (only openai/gpt-oss-20b, openai/gpt-oss-120b) , google).
   - 👤 **User Profile Access** — Models can access your personal profile for more personalized responses.
   - 🖼️ **Image Generation** — Generate images directly from the chat interface using supported models.
 - **Image Generation & Gallery**: Dedicated view for generating images with a full gallery, detailed metadata, and download/delete support.
-- **Reasoning Support**: Native support for reasoning/thinking models (e.g., DeepSeek, Grok).
+- **Reasoning Support**: Native support for reasoning/thinking models (e.g., Gpt-5, Grok).
 - **Secure Key Management**: API keys are encrypted at rest using AES encryption.
 - **Modern UI/UX**: Stunning interface with Light, Dark, and System theme support.
 

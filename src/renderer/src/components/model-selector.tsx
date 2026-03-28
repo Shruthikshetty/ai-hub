@@ -26,12 +26,14 @@ function AppModelSelector({
   disableDefaultSelection = false,
   modelType = 'chat',
   onSelect,
+  disabled,
   className
 }: {
   output?: ModelIOType
   disableDefaultSelection?: boolean
   modelType?: string
   onSelect?: (model: ModelSchemaType) => void
+  disabled?: boolean
   className?: string
 }) {
   // fetch all the model list
@@ -93,7 +95,7 @@ function AppModelSelector({
         {isLoading ? (
           <Skeleton className="w-20 h-4 rounded-sm bg-accent-foreground" />
         ) : (
-          <PromptInputButton className={className}>
+          <PromptInputButton className={className} disabled={disabled}>
             <ModelSelectorLogo provider={model?.provider ?? ''} />
 
             {model?.name ? (

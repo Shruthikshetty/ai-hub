@@ -22,9 +22,10 @@ import {
   chatOptionsValidationSchema
 } from '@renderer/schemas/chat-options-validation.schema'
 import { useUpdateConversationById } from '@renderer/services/conversation'
+import { useFetchProviders } from '@renderer/services/provider'
 import { useForm } from '@tanstack/react-form'
 import { Save, Trash } from 'lucide-react'
-import { memo, useEffect } from 'react'
+import { memo, useEffect, useMemo } from 'react'
 
 /**
  * This panel contains additional options that can be passed to the model
@@ -41,6 +42,20 @@ const ChatOptionsPanel = ({
 }) => {
   // hook to update conversation settings
   const { mutate: updateConversationById } = useUpdateConversationById()
+  // fetch the providers list
+  const { data: providers } = useFetchProviders()
+  // filter out the options for search which are enabled by user
+  const searchProvidersOptions = useMemo(() => {
+    if (!providers?.data) return []
+
+    return providers.data.reduce<string[]>((acc, provider) => {
+      if (provider.enabled && PROVIDERS_WITH_SEARCH_TOOL.has(provider.provider)) {
+        acc.push(provider.provider)
+      }
+      return acc
+    }, [])
+  }, [providers])
+
   // create a form to update the conversation settings
   const form = useForm({
     defaultValues: {
@@ -149,7 +164,7 @@ const ChatOptionsPanel = ({
                   <Field data-invalid={isInvalid}>
                     <p className="text-xs text-muted-foreground">
                       ❗Note : if your provider or model does not support search tool then it will
-                      not be used
+                      not be used (some tools will only support their provider models)
                     </p>
                     <div className="flex flex-row justify-between">
                       <FieldLabel
@@ -162,6 +177,7 @@ const ChatOptionsPanel = ({
                         id={field.name}
                         name={field.name}
                         checked={field.state.value}
+                        disabled={searchProvidersOptions.length === 0}
                         onCheckedChange={(value) => {
                           field.handleChange(value)
                           // if search is disabled, clear the provider and model
@@ -187,12 +203,13 @@ const ChatOptionsPanel = ({
                         <Select
                           onValueChange={(value) => field.handleChange(value)}
                           value={field.state.value}
+                          disabled={searchProvidersOptions.length === 0}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select a provider" />
                           </SelectTrigger>
                           <SelectContent>
-                            {PROVIDERS_WITH_SEARCH_TOOL.map((provider) => (
+                            {searchProvidersOptions.map((provider) => (
                               <SelectItem key={provider} value={provider}>
                                 {provider}
                               </SelectItem>

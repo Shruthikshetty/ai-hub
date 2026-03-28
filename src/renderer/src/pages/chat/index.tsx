@@ -82,7 +82,7 @@ const ChatPage = () => {
     }
   })
   // check if the model is generating
-  const isGenerating = status === 'submitted' || status === 'streaming'
+  const isGenerating = status !== 'ready' && status !== 'error'
 
   // Load messages when switching conversations
   useEffect(() => {
@@ -226,14 +226,18 @@ const ChatPage = () => {
             </PromptInputHeader>
             {/* BODY  */}
             <PromptInputBody>
-              <PromptInputTextarea onChange={(e) => setText(e.target.value)} value={text} />
+              <PromptInputTextarea
+                onChange={(e) => setText(e.target.value)}
+                value={text}
+                disabled={isGenerating}
+              />
             </PromptInputBody>
             {/* FOOTER */}
             <PromptInputFooter>
               {/* All tools go here */}
               <PromptInputTools>
                 <PromptInputActionMenu>
-                  <PromptInputActionMenuTrigger />
+                  <PromptInputActionMenuTrigger disabled={isGenerating} />
                   <PromptInputActionMenuContent align="start" side="top">
                     <PromptInputActionAddAttachments label="Add images or files" />
                   </PromptInputActionMenuContent>

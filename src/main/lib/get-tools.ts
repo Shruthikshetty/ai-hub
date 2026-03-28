@@ -9,6 +9,8 @@ import z from 'zod'
 import db from '../db'
 import { generateImage } from 'ai'
 import { deleteMediaFile, saveFile } from './file-storage'
+import { GoogleGenerativeAIProvider } from '@ai-sdk/google'
+import { GroqProvider } from '@ai-sdk/groq'
 
 /**
  * Generate tools as per the provider
@@ -34,6 +36,14 @@ export const getTools = async (
         break
       case 'xai':
         tools['search'] = (modelProvider as XaiProvider).tools.webSearch()
+        break
+      case 'google':
+        tools['search'] = (modelProvider as GoogleGenerativeAIProvider).tools.googleSearch(
+          {}
+        ) as any
+        break
+      case 'groq':
+        tools['search'] = (modelProvider as GroqProvider).tools.browserSearch({}) as any
         break
       default:
         break
