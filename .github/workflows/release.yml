@@ -9,11 +9,16 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
 
     permissions:
       contents: write
+
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: false
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
       - name: Checkout

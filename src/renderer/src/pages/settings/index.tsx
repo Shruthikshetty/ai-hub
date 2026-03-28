@@ -6,12 +6,16 @@ import ProfileSettings from './profile-settings'
 import { ProviderSettingsTab } from './provider-settings'
 import AppearanceTab from './appearance-setting'
 import SecurityTab from './security-settings'
+import { useLocation } from 'react-router'
 
 /**
  * Settings page
  */
 function Settings(): React.JSX.Element {
-  const [selectedTab, setSelectedTab] = useState<string>(SETTINGS_TABS[0].name)
+  // get active tab from state
+  const { activeTab } = useLocation().state || {}
+  // state to handle active tab
+  const [selectedTab, setSelectedTab] = useState<string>(activeTab || SETTINGS_TABS[0].name)
 
   // render tab content all tabs to be added here
   const renderTabContent = () => {

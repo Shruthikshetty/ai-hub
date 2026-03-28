@@ -9,6 +9,7 @@ import AppLogo from '@renderer/components/app-logo'
 import {
   HOME_INFO_CARD_ITEMS,
   QUICK_ACCESS_CARDS,
+  SETTINGS_TABS,
   SETTINGS_TRAY_ITEM,
   SIDE_TRAY_ITEMS
 } from '@renderer/constants/screen.constants'
@@ -87,12 +88,11 @@ function HomePage(): React.JSX.Element {
         >
           Start Chatting
         </Button>
-        {/* @TODO: Redirect to provider-specific settings when provider setup is selected. */}
         <Button
           variant={'secondary'}
           className="p-5"
           onClick={() => {
-            navigate(SETTINGS_TRAY_ITEM.path)
+            navigate(SETTINGS_TRAY_ITEM.path, { state: { activeTab: SETTINGS_TABS[1].name } })
           }}
         >
           Configure Providers
