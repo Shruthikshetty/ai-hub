@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ModelSelector,
   ModelSelectorContent,
@@ -13,9 +13,10 @@ import {
 import { PromptInputButton } from './ai-elements/prompt-input'
 import ModelItem from './model-item'
 import { useFetchModels } from '@renderer/services/model'
+import { useFetchProviders } from '@renderer/services/provider'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import { ModelIOType, ModelSchemaType } from '@common/schemas/model.schema'
-import { AVAILABLE_PROVIDER_LIST } from '@common/constants/global.constants'
+
 import { errorToast } from '@renderer/lib/toast-wrapper'
 
 // lets you select the various models from all the available providers
@@ -32,9 +33,26 @@ function AppModelSelector({
   onSelect?: (model: ModelSchemaType) => void
   className?: string
 }) {
-  //@TODO show error message if no models are not loaded
   // fetch all the model list
   const { data: modelsData, error, isSuccess } = useFetchModels({ output })
+  const { data: providersData } = useFetchProviders()
+
+  // only show providers that are enabled
+  const activeProviders = useMemo(
+    () => providersData?.data?.filter((p) => p.enabled) ?? [],
+    [providersData]
+  )
+
+  //Group models once O(M) instead of filtering in the render loop O(P*M) this
+  const modelsByProvider = useMemo(() => {
+    const groups: Record<string, ModelSchemaType[]> = {}
+    modelsData?.data?.forEach((m) => {
+      if (!groups[m.provider]) groups[m.provider] = []
+      groups[m.provider].push(m)
+    })
+    return groups
+  }, [modelsData])
+
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
   // selected model
   const { getModel, setModel } = useSelectedModel()
@@ -77,21 +95,22 @@ function AppModelSelector({
         <ModelSelectorInput placeholder="Search models..." />
         <ModelSelectorList>
           <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
-          {AVAILABLE_PROVIDER_LIST.map((chef) => (
-            <ModelSelectorGroup heading={chef} key={chef}>
-              {modelsData?.data
-                ?.filter((m) => m.provider === chef)
-                ?.map((m) => (
-                  <ModelItem
-                    key={`${m.provider}-${m.id}`}
-                    model={m}
-                    onSelect={(selected) => {
-                      setModel(modelType, selected)
-                      onSelect?.(selected)
-                    }}
-                    selectedModel={model}
-                  />
-                ))}
+          {activeProviders.map((provider) => (
+            <ModelSelectorGroup
+              heading={provider.name ?? provider.provider}
+              key={provider.provider}
+            >
+              {modelsByProvider[provider.provider]?.map((m) => (
+                <ModelItem
+                  key={`${m.provider}-${m.id}`}
+                  model={m}
+                  onSelect={(selected) => {
+                    setModel(modelType, selected)
+                    onSelect?.(selected)
+                  }}
+                  selectedModel={model}
+                />
+              ))}
             </ModelSelectorGroup>
           ))}
         </ModelSelectorList>
