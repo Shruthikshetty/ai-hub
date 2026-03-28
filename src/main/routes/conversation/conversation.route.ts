@@ -10,10 +10,12 @@ import {
 } from '../../constants/doc-constants'
 import {
   createConversationResponseSchema,
+  deleteAllConversationsResponseSchema,
   deleteConversationByIdSchema,
   fetchAllConversationsResponseSchema,
   getMessagesByConversation,
-  updateConversationResponseSchema
+  updateConversationResponseSchema,
+  emptyChatAttachmentsFolderResponseSchema
 } from '../../../common/schemas/conversation.schema'
 import {
   conversationsInsertSchema,
@@ -64,6 +66,25 @@ export const createConversation = createRoute({
       description: 'success response for creating a conversation'
     },
     [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
+// route to delete all conversations
+export const deleteAllConversations = createRoute({
+  tags: ['Conversation'],
+  method: 'delete',
+  path: '/conversation',
+  request: {},
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: deleteAllConversationsResponseSchema
+        }
+      },
+      description: 'success response for deleting all conversations'
+    },
     [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }
 })
@@ -184,9 +205,30 @@ export const updateConversation = createRoute({
   }
 })
 
+// route to empty chat attachments folder
+export const emptyChatAttachmentsFolder = createRoute({
+  tags: ['Conversation'],
+  method: 'delete',
+  path: '/conversation/attachments',
+  request: {},
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: emptyChatAttachmentsFolderResponseSchema
+        }
+      },
+      description: 'success response for emptying chat attachments folder'
+    },
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export all types
 export type GetConversationRoute = typeof getConversation
 export type CreateConversationRoute = typeof createConversation
 export type DeleteConversationRoute = typeof deleteConversation
 export type GetConversationMessagesRoute = typeof getConversationMessages
 export type UpdateConversationRoute = typeof updateConversation
+export type DeleteAllConversationsRoute = typeof deleteAllConversations
+export type EmptyChatAttachmentsFolderRoute = typeof emptyChatAttachmentsFolder

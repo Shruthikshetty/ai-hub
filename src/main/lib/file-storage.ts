@@ -153,3 +153,26 @@ export function deleteMediaFile(relativePath: string): boolean {
     return false
   }
 }
+
+/**
+ * Wipe every file (and sub-folder) inside the chat-attachments directory.
+ * The directory itself is recreated empty so future uploads still work.
+ * Returns the number of top-level entries that were removed.
+ */
+export function emptyChatAttachmentsFolder(): number {
+  const mediaRoot = getMediaRoot()
+  const dir = path.join(mediaRoot, FILE_STORAGE_CATEGORY.chatAttachment)
+
+  if (!fs.existsSync(dir)) {
+    // Nothing to clear — ensure the folder exists for future uploads
+    fs.mkdirSync(dir, { recursive: true })
+    return 0
+  }
+
+  const entries = fs.readdirSync(dir)
+  for (const entry of entries) {
+    fs.rmSync(path.join(dir, entry), { recursive: true, force: true })
+  }
+
+  return entries.length
+}

@@ -4,6 +4,7 @@ import { Button } from '@renderer/components/ui/button'
 import { Plus } from 'lucide-react'
 import {
   useAddConversation,
+  useDeleteAllConversations,
   useDeleteConversationById,
   useFetchConversations
 } from '@renderer/services/conversation'
@@ -14,6 +15,18 @@ import { Virtuoso } from 'react-virtuoso'
 import { cn } from '@renderer/lib/utils'
 import ResizableSidePanel from '@renderer/components/resizable-side-panel'
 import ConversationOptions from './conversation-options'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@renderer/components/ui/alert-dialog'
+import { useScreenLoader } from '@renderer/state-management/screen-loader.store'
 
 /**
  * This component contain the history of all the conversations
@@ -26,8 +39,12 @@ const ChatConversationsHistory = (props: {
   const { data: conversations } = useFetchConversations()
   // hook to create a new conversations
   const { mutate: newConversation } = useAddConversation()
-  // hooke to delete a conversation
+  // hook to delete a conversation
   const { mutate: deleteConversation } = useDeleteConversationById()
+  // hook to delete all conversations
+  const { mutate: deleteAllConversations } = useDeleteAllConversations()
+  // global loading state
+  const { setLoader } = useScreenLoader()
   // get selected model
   const { getModel } = useSelectedModel()
   const selectedModel = getModel('chat')
@@ -79,6 +96,21 @@ const ChatConversationsHistory = (props: {
         }
       }
     )
+  }
+  // handle delete all conversations
+  const handleDeleteAll = () => {
+    // ser loading true
+    setLoader(true)
+    deleteAllConversations(undefined, {
+      onSuccess: () => {
+        // create a new chat
+        handleNewChat()
+      },
+      onSettled: () => {
+        // ser loading false
+        setLoader(false)
+      }
+    })
   }
 
   return (
@@ -146,13 +178,39 @@ const ChatConversationsHistory = (props: {
       {/* Footer */}
       <div className="overflow-hidden">
         <Separator />
-        {/*@TODO IN PROGRESS will be implemented later */}
-        <Button
-          variant={'ghost'}
-          className="text-muted-foreground hover:bg-transparent! text-xs p-4 text-center w-full"
-        >
-          Clear all history
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant={'ghost'}
+              className="text-muted-foreground hover:bg-transparent! text-xs p-4 text-center w-full"
+            >
+              Clear all history
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete all your conversations.
+                and stored attachments.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel asChild>
+                <Button variant="outline">Cancel</Button>
+              </AlertDialogCancel>
+              <AlertDialogAction asChild>
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteAll}
+                  className="bg-destructive! text-foreground hover:bg-destructive/70!"
+                >
+                  Delete
+                </Button>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </ResizableSidePanel>
   )

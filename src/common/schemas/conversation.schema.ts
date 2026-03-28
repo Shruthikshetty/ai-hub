@@ -16,6 +16,18 @@ export const deleteConversationByIdSchema = z.object({
   message: z.string()
 })
 
+// response for delete all conversations
+export const deleteAllConversationsResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+})
+
+// response for emptying chat attachments folder
+export const emptyChatAttachmentsFolderResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+})
+
 // response to get all messages by conversation
 export const getMessagesByConversation = z.object({
   success: z.boolean(),

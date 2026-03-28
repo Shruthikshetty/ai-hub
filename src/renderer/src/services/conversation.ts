@@ -131,3 +131,27 @@ export const useUpdateConversationById = () => {
     }
   })
 }
+
+/**
+ * hook to delete all conversations
+ */
+export const useDeleteAllConversations = () => {
+  const queryClient = useQueryClient()
+  return useMutation<DeleteConversationResponseType, ApiError>({
+    mutationKey: [MUTATION_KEYS.deleteAllConversations],
+    mutationFn: async () => {
+      const response = await window.api.request('/api/conversation', 'DELETE')
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    onSuccess: () => {
+      successToast('All conversations deleted successfully')
+      return queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.conversationsFetch] })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to delete all conversations')
+    }
+  })
+}
