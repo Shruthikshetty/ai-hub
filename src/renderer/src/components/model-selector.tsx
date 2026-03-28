@@ -16,6 +16,7 @@ import { useFetchModels } from '@renderer/services/model'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import { ModelIOType, ModelSchemaType } from '@common/schemas/model.schema'
 import { AVAILABLE_PROVIDER_LIST } from '@common/constants/global.constants'
+import { errorToast } from '@renderer/lib/toast-wrapper'
 
 // lets you select the various models from all the available providers
 function AppModelSelector({
@@ -33,7 +34,7 @@ function AppModelSelector({
 }) {
   //@TODO show error message if no models are not loaded
   // fetch all the model list
-  const { data: modelsData } = useFetchModels({ output })
+  const { data: modelsData, error, isSuccess } = useFetchModels({ output })
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
   // selected model
   const { getModel, setModel } = useSelectedModel()
@@ -49,6 +50,15 @@ function AppModelSelector({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modelsData, disableDefaultSelection, modelType])
+
+  // handle no models
+  useEffect(() => {
+    if (error) {
+      errorToast('Error loading models check network / local instance')
+    } else if (!modelsData?.data?.length && isSuccess) {
+      errorToast('No models found please add providers id not done yet')
+    }
+  }, [error, modelsData, isSuccess])
 
   return (
     <ModelSelector onOpenChange={setModelSelectorOpen} open={modelSelectorOpen}>
