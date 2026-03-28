@@ -9,7 +9,7 @@ export function ScreenLoaderProvider({ children }: { children: React.ReactNode }
 
   return (
     <>
-      {isLoading ? (
+      {isLoading && (
         <div
           className="absolute inset-0 z-100 flex items-center justify-center bg-background/80 backdrop-blur-sm"
           onClick={(e) => {
@@ -19,8 +19,10 @@ export function ScreenLoaderProvider({ children }: { children: React.ReactNode }
         >
           <GradientLoader />
         </div>
-      ) : null}
-      {children}
+      )}
+      <div inert={isLoading} aria-hidden={isLoading} className="contents">
+        {children}
+      </div>
     </>
   )
 }
