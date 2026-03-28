@@ -27,6 +27,7 @@ import {
   AlertDialogTrigger
 } from '@renderer/components/ui/alert-dialog'
 import { useScreenLoader } from '@renderer/state-management/screen-loader.store'
+import { errorToast } from '@renderer/lib/toast-wrapper'
 
 /**
  * This component contain the history of all the conversations
@@ -36,7 +37,7 @@ const ChatConversationsHistory = (props: {
   setIsOpen: (isOpen: boolean) => void
 }) => {
   // fetch all the conversations
-  const { data: conversations } = useFetchConversations()
+  const { data: conversations, isPending, isSuccess } = useFetchConversations()
   // hook to create a new conversations
   const { mutate: newConversation } = useAddConversation()
   // hook to delete a conversation
@@ -52,6 +53,14 @@ const ChatConversationsHistory = (props: {
   const { conversation: selectedConversation, setConversation: setSelectedConversation } =
     useSelectedConversation()
 
+  //in case there are no conversations then create a new one
+  useEffect(() => {
+    if (!conversations?.data?.length && isSuccess && selectedModel?.id) {
+      handleNewChat()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPending, selectedModel?.id])
+
   // by default select the first conversation
   useEffect(() => {
     if (!selectedConversation && conversations?.data?.length) {
@@ -62,7 +71,10 @@ const ChatConversationsHistory = (props: {
   // handle new conversation
   const handleNewChat = () => {
     // in case model is not selected
-    if (!selectedModel?.id || !selectedModel?.provider) return
+    if (!selectedModel?.id || !selectedModel?.provider) {
+      errorToast('Please select a model')
+      return
+    }
     // create new conversation
     newConversation(
       {

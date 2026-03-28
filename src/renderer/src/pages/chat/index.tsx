@@ -238,7 +238,7 @@ const ChatPage = () => {
                     <PromptInputActionAddAttachments label="Add images or files" />
                   </PromptInputActionMenuContent>
                 </PromptInputActionMenu>
-                <AppModelSelector output="text" disableDefaultSelection />
+                <AppModelSelector output="text" />
               </PromptInputTools>
               {/* submit button */}
               <PromptInputSubmit
