@@ -104,16 +104,8 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
 // handler for deleting all conversations
 export const deleteAllConversations: AppRouteHandler<DeleteAllConversationsRoute> = async (c) => {
   // delete all the conversations
-  const deleted = await db.delete(conversations).returning()
-  if (!deleted) {
-    return c.json(
-      {
-        success: false,
-        message: 'something went wrong'
-      },
-      HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR
-    )
-  }
+  await db.delete(conversations)
+
   //empty the chat-attachments folder as all conversation context is gone
   try {
     clearChatAttachments()
