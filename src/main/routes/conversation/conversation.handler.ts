@@ -6,7 +6,9 @@ import {
   CreateConversationRoute,
   DeleteConversationRoute,
   GetConversationMessagesRoute,
-  UpdateConversationRoute
+  UpdateConversationRoute,
+  DeleteAllConversationsRoute,
+  EmptyChatAttachmentsFolderRoute
 } from './conversation.route'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
@@ -14,7 +16,10 @@ import { conversations } from '../../../common/db-schemas/conversation.schema'
 import { desc, eq } from 'drizzle-orm'
 import db from '../../db'
 import { messages } from '../../../common/db-schemas/message.schema'
-import { deleteMediaFile } from '../../lib/file-storage'
+import {
+  deleteMediaFile,
+  emptyChatAttachmentsFolder as clearChatAttachments
+} from '../../lib/file-storage'
 
 // handler for get conversation route @TODO pagination should be added
 export const getConversation: AppRouteHandler<GetConversationRoute> = async (c) => {
@@ -96,6 +101,28 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
   )
 }
 
+// handler for deleting all conversations
+export const deleteAllConversations: AppRouteHandler<DeleteAllConversationsRoute> = async (c) => {
+  // delete all the conversations
+  await db.delete(conversations)
+
+  //empty the chat-attachments folder as all conversation context is gone
+  try {
+    clearChatAttachments()
+  } catch {
+    // Best-effort cleanup — don't fail the response if file cleanup errors
+  }
+
+  // return success
+  return c.json(
+    {
+      success: true,
+      message: 'All conversations deleted successfully'
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
 //@TODO Pagination will be implemented later
 // handler for getting a conversation with all its messages
 export const getConversationMessages: AppRouteHandler<GetConversationMessagesRoute> = async (c) => {
@@ -160,6 +187,21 @@ export const updateConversationById: AppRouteHandler<UpdateConversationRoute> = 
     {
       success: true,
       data: updated
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+// handler for emptying the chat attachments folder
+export const emptyChatAttachmentsFolder: AppRouteHandler<EmptyChatAttachmentsFolderRoute> = async (
+  c
+) => {
+  const removed = clearChatAttachments()
+
+  return c.json(
+    {
+      success: true,
+      message: `Chat attachments folder cleared (${removed} entr${removed === 1 ? 'y' : 'ies'} removed)`
     },
     HTTP_STATUS_CODES.OK
   )

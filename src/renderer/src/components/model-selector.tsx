@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ModelSelector,
   ModelSelectorContent,
@@ -13,9 +13,12 @@ import {
 import { PromptInputButton } from './ai-elements/prompt-input'
 import ModelItem from './model-item'
 import { useFetchModels } from '@renderer/services/model'
+import { useFetchProviders } from '@renderer/services/provider'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import { ModelIOType, ModelSchemaType } from '@common/schemas/model.schema'
-import { AVAILABLE_PROVIDER_LIST } from '@common/constants/global.constants'
+
+import { errorToast } from '@renderer/lib/toast-wrapper'
+import { Skeleton } from './ui/skeleton'
 
 // lets you select the various models from all the available providers
 function AppModelSelector({
@@ -23,17 +26,44 @@ function AppModelSelector({
   disableDefaultSelection = false,
   modelType = 'chat',
   onSelect,
+  disabled,
   className
 }: {
   output?: ModelIOType
   disableDefaultSelection?: boolean
   modelType?: string
   onSelect?: (model: ModelSchemaType) => void
+  disabled?: boolean
   className?: string
 }) {
-  //@TODO show error message if no models are not loaded
   // fetch all the model list
-  const { data: modelsData } = useFetchModels({ output })
+  const {
+    data: modelsData,
+    error,
+    isSuccess,
+    isLoading: modelsLoading
+  } = useFetchModels({ output })
+  // fetch all the provider list
+  const { data: providersData, isLoading: providersLoading } = useFetchProviders()
+  // get the loading state of both
+  const isLoading = modelsLoading || providersLoading
+
+  // only show providers that are enabled
+  const activeProviders = useMemo(
+    () => providersData?.data?.filter((p) => p.enabled) ?? [],
+    [providersData]
+  )
+
+  //Group models once O(M) instead of filtering in the render loop O(P*M) this
+  const modelsByProvider = useMemo(() => {
+    const groups: Record<string, ModelSchemaType[]> = {}
+    modelsData?.data?.forEach((m) => {
+      if (!groups[m.provider]) groups[m.provider] = []
+      groups[m.provider].push(m)
+    })
+    return groups
+  }, [modelsData])
+
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
   // selected model
   const { getModel, setModel } = useSelectedModel()
@@ -50,38 +80,52 @@ function AppModelSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modelsData, disableDefaultSelection, modelType])
 
+  // handle no models
+  useEffect(() => {
+    if (error) {
+      errorToast('Error loading models check network / local instance')
+    } else if (!modelsData?.data?.length && isSuccess) {
+      errorToast('No models found, please add providers if not done yet')
+    }
+  }, [error, modelsData, isSuccess])
+
   return (
     <ModelSelector onOpenChange={setModelSelectorOpen} open={modelSelectorOpen}>
       <ModelSelectorTrigger asChild>
-        <PromptInputButton className={className}>
-          <ModelSelectorLogo provider={model?.provider ?? ''} />
+        {isLoading ? (
+          <Skeleton className="w-20 h-4 rounded-sm bg-accent-foreground" />
+        ) : (
+          <PromptInputButton className={className} disabled={disabled}>
+            <ModelSelectorLogo provider={model?.provider ?? ''} />
 
-          {model?.name ? (
-            <ModelSelectorName>{model?.name}</ModelSelectorName>
-          ) : (
-            <ModelSelectorName>Select a Model</ModelSelectorName>
-          )}
-        </PromptInputButton>
+            {model?.name ? (
+              <ModelSelectorName>{model?.name}</ModelSelectorName>
+            ) : (
+              <ModelSelectorName>Select a Model</ModelSelectorName>
+            )}
+          </PromptInputButton>
+        )}
       </ModelSelectorTrigger>
       <ModelSelectorContent>
         <ModelSelectorInput placeholder="Search models..." />
         <ModelSelectorList>
           <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
-          {AVAILABLE_PROVIDER_LIST.map((chef) => (
-            <ModelSelectorGroup heading={chef} key={chef}>
-              {modelsData?.data
-                ?.filter((m) => m.provider === chef)
-                ?.map((m) => (
-                  <ModelItem
-                    key={`${m.provider}-${m.id}`}
-                    model={m}
-                    onSelect={(selected) => {
-                      setModel(modelType, selected)
-                      onSelect?.(selected)
-                    }}
-                    selectedModel={model}
-                  />
-                ))}
+          {activeProviders.map((provider) => (
+            <ModelSelectorGroup
+              heading={provider.name ?? provider.provider}
+              key={provider.provider}
+            >
+              {modelsByProvider[provider.provider]?.map((m) => (
+                <ModelItem
+                  key={`${m.provider}-${m.id}`}
+                  model={m}
+                  onSelect={(selected) => {
+                    setModel(modelType, selected)
+                    onSelect?.(selected)
+                  }}
+                  selectedModel={model}
+                />
+              ))}
             </ModelSelectorGroup>
           ))}
         </ModelSelectorList>

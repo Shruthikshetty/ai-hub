@@ -16,6 +16,18 @@ export const deleteConversationByIdSchema = z.object({
   message: z.string()
 })
 
+// response for delete all conversations
+export const deleteAllConversationsResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+})
+
+// response for emptying chat attachments folder
+export const emptyChatAttachmentsFolderResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+})
+
 // response to get all messages by conversation
 export const getMessagesByConversation = z.object({
   success: z.boolean(),
@@ -67,6 +79,9 @@ export type FetchAllConversationsResponseSchemaType = z.infer<
 >
 export type CreateConversationResponseSchemaType = z.infer<typeof createConversationResponseSchema>
 export type DeleteConversationResponseType = z.infer<typeof deleteConversationByIdSchema>
+export type DeleteAllConversationsResponseType = z.infer<
+  typeof deleteAllConversationsResponseSchema
+>
 export type FetchConversationWithMessagesResponseType = z.infer<typeof getMessagesByConversation>
 export type ConversationToolsSchemaType = z.infer<typeof conversationToolsSchema>
 export type ReasoningOptionsSchemaType = z.infer<typeof reasoningOptionsSchema>

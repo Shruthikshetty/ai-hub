@@ -74,7 +74,7 @@ function MessageParts({
                   return (
                     <TaskItem key={`${message.id}-${index}`}>
                       searched the web{' '}
-                      {JSON.stringify((part as any)?.output?.action) ??
+                      {JSON.stringify((part as any)?.output?.action ?? (part as any)?.input) ??
                         'search completed details unavailable'}
                     </TaskItem>
                   )

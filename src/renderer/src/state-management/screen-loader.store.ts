@@ -9,14 +9,21 @@ interface ScreenLoaderState {
   showLoader: () => void
   hideLoader: () => void
   setLoader: (isLoading: boolean) => void
+  delay: number
+  setDelay: (delay: number) => void
+}
+const initialState = {
+  isLoading: false,
+  delay: 300
 }
 
 /**
  * hook to get the screen loader state
  */
 export const useScreenLoader = create<ScreenLoaderState>((set) => ({
-  isLoading: false,
+  ...initialState,
   showLoader: () => set({ isLoading: true }),
   hideLoader: () => set({ isLoading: false }),
+  setDelay: (delay: number) => set({ delay }),
   setLoader: (isLoading: boolean) => set({ isLoading })
 }))

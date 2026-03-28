@@ -10,6 +10,8 @@ const router = createRouter()
   .openapi(routes.deleteConversation, handlers.deleteConversationById)
   .openapi(routes.getConversationMessages, handlers.getConversationMessages)
   .openapi(routes.updateConversation, handlers.updateConversationById)
+  .openapi(routes.deleteAllConversations, handlers.deleteAllConversations)
+  .openapi(routes.emptyChatAttachmentsFolder, handlers.emptyChatAttachmentsFolder)
 
 // add all the routes
 export default router

@@ -16,6 +16,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { EXT_TO_MIME } from '../common/constants/global.constants'
 import icon from '../../resources/icon.png?asset'
 import { pathToFileURL } from 'node:url'
+import contextMenu from 'electron-context-menu'
 
 // Custom media:// protocol
 // Must be registered before app.ready
@@ -42,7 +43,8 @@ function createWindow(): void {
     ...(process.platform !== 'darwin' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      spellcheck: true
     }
   })
 
@@ -70,6 +72,15 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  // electron-context-menu might be exported as .default in some build environments sets up spell check and copy paste
+  const contextMenuFunc =
+    (contextMenu as unknown as { default?: typeof contextMenu }).default || contextMenu
+  if (typeof contextMenuFunc === 'function') {
+    contextMenuFunc({
+      showInspectElement: is.dev
+    })
+  }
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
