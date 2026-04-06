@@ -274,6 +274,14 @@ export async function getModelListFromProvider(
         )
         break
       }
+      case 'poe': {
+        response = await axios.get('https://api.poe.com/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        console.log(response.data)
+        break
+      }
       case 'huggingface': {
         // Each request targets one pipeline_tag — HuggingFace only supports one at a time.
         // Fire them all in parallel and merge the results.
