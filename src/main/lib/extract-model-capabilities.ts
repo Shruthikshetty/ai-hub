@@ -5,6 +5,7 @@ import {
   GoogleModel,
   GroqModel,
   HuggingFaceModel,
+  PoeModel,
   TogetherAiModel
 } from './get-model-list'
 
@@ -365,6 +366,27 @@ export function buildFireworksAiModel(
       vision: inputs.includes('image'),
       videoReasoning: false,
       realtime: false
+    }
+  }
+}
+
+/**
+ * function to build a model record for a Poe AI model
+ */
+export function buildPoeModel(
+  model: PoeModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  return {
+    id: model.id,
+    name: model.id,
+    provider,
+    inputs: model.architecture.input_modalities,
+    outputs: model.architecture.output_modalities,
+    capabilities: {
+      realtime: false,
+      vision: model.architecture.input_modalities.includes('image'),
+      videoReasoning: model.architecture.input_modalities.includes('video')
     }
   }
 }

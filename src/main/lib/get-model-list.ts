@@ -9,6 +9,7 @@ import {
   buildGroqModel,
   buildHuggingFaceModel,
   buildOpenAiModel,
+  buildPoeModel,
   buildTogetherAiModel,
   buildXaiModel
 } from './extract-model-capabilities'
@@ -184,6 +185,36 @@ export type FireworksAiModel = {
 type FireworksAiResponse = { models: FireworksAiModel[] }
 
 /**
+ * poe ai model type
+ * full types https://api.poe.com/v1/models
+ */
+export type PoeModel = {
+  id: string
+  object: 'model'
+  created: number
+  owned_by: string
+  root: string
+  description: string
+  supported_features: string[]
+  supported_endpoints: string[]
+  metadata: {
+    display_name: string
+    image: {
+      url?: string
+      alt: string
+      width: number
+      height: number
+    }
+    url?: string
+  }
+  architecture: {
+    input_modalities: ('text' | 'image' | 'video' | 'audio')[]
+    output_modalities: ('text' | 'image' | 'video' | 'audio')[]
+    modality: string
+  }
+}
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -209,6 +240,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<GoogleResponse>
       | AxiosResponse<TogetherAiResponse>
       | AxiosResponse<FireworksAiResponse>
+      | AxiosResponse<OpenAiResponse<PoeModel>>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -379,6 +411,11 @@ export async function getModelListFromProvider(
         return data.map((model: FireworksAiModel) =>
           buildFireworksAiModel(model, provider.provider)
         )
+      }
+      case 'poe': {
+        const data = (response.data as OpenAiResponse<PoeModel>).data
+        if (!data || !Array.isArray(data)) return []
+        return data.map((model: PoeModel) => buildPoeModel(model, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
