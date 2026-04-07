@@ -110,6 +110,17 @@ export async function getProviderInstanceModel({
       })
       return gatewayInstance
     }
+    case 'custom': {
+      const baseURL = normalizeProviderUrl(
+        providerDetails?.serverUrl || 'http://localhost:8080',
+        '/v1'
+      )
+      const customInstance = createOpenAICompatible({
+        name: 'custom',
+        baseURL
+      })
+      return customInstance
+    }
     case 'poe': // fall back as default
     case 'openai': // fall back as default
     default: {

@@ -150,6 +150,17 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://poe.com/api',
     description: 'Poe provider models'
+  },
+  {
+    provider: 'custom',
+    name: 'Custom',
+    icon: 'https://models.dev/logos/custom.svg',
+    enabled: false,
+    apiKey: '',
+    server: true,
+    serverUrl: 'http://localhost:8080',
+    siteUrl: null,
+    description: 'A custom provider you host must follow OpenAI specifications to run.'
   }
 ]
 
@@ -165,7 +176,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'togetherai',
   'fireworks-ai',
   'lmstudio',
-  'poe'
+  'poe',
+  'custom'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const

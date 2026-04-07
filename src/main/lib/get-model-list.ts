@@ -279,7 +279,6 @@ export async function getModelListFromProvider(
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
         })
-        console.log(response.data)
         break
       }
       case 'huggingface': {
