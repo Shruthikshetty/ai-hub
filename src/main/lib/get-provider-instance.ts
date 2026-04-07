@@ -121,7 +121,13 @@ export async function getProviderInstanceModel({
       })
       return customInstance
     }
-    case 'poe': // fall back as default
+    case 'poe': {
+      const poeInstance = createOpenAI({
+        baseURL: 'https://api.poe.com/v1',
+        apiKey
+      })
+      return poeInstance
+    }
     case 'openai': // fall back as default
     default: {
       const openaiInstance = createOpenAI({
