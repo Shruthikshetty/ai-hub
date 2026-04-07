@@ -1,6 +1,7 @@
 import db from './index'
 import { users, providers } from './schema'
 import { AVAILABLE_PROVIDERS_DEFAULT_DETAILS } from '../../common/constants/global.constants'
+import { count } from 'drizzle-orm'
 
 export async function seed(): Promise<void> {
   try {
@@ -18,14 +19,16 @@ export async function seed(): Promise<void> {
     }
 
     // seed providers
-    const existingProviders = await db.select().from(providers).limit(1)
+    const [{ providerCount }] = await db.select({ providerCount: count() }).from(providers)
 
-    if (existingProviders.length === 0) {
-      console.log('Seeding default providers...')
-      await db.insert(providers).values(AVAILABLE_PROVIDERS_DEFAULT_DETAILS)
-      console.log('Default providers seeded successfully')
+    if (providerCount === AVAILABLE_PROVIDERS_DEFAULT_DETAILS.length) {
+      console.log('Providers up to date, skipping seed')
     } else {
-      console.log('Providers already exist, skipping seed')
+      console.log('Syncing providers...')
+      for (const provider of AVAILABLE_PROVIDERS_DEFAULT_DETAILS) {
+        await db.insert(providers).values(provider).onConflictDoNothing()
+      }
+      console.log('Providers synced successfully')
     }
   } catch (error) {
     console.error('Seed failed:', error)

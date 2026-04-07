@@ -35,12 +35,6 @@ export async function getProviderInstanceModel({
 
   //all the custom providers go here
   switch (provider as ModelProviderType) {
-    case 'openai': {
-      const openaiInstance = createOpenAI({
-        apiKey
-      })
-      return openaiInstance
-    }
     case 'ollama': {
       const baseURL = normalizeProviderUrl(
         providerDetails?.serverUrl || 'http://localhost:11434',
@@ -110,12 +104,36 @@ export async function getProviderInstanceModel({
       })
       return lmstudioInstance
     }
-    case 'vercel': // fall's to default
-    default: {
+    case 'vercel': {
       const gatewayInstance = createGateway({
         apiKey
       })
       return gatewayInstance
+    }
+    case 'custom': {
+      const baseURL = normalizeProviderUrl(
+        providerDetails?.serverUrl || 'http://localhost:8080',
+        '/v1'
+      )
+      const customInstance = createOpenAICompatible({
+        name: 'custom',
+        baseURL
+      })
+      return customInstance
+    }
+    case 'poe': {
+      const poeInstance = createOpenAI({
+        baseURL: 'https://api.poe.com/v1',
+        apiKey
+      })
+      return poeInstance
+    }
+    case 'openai': // fall back as default
+    default: {
+      const openaiInstance = createOpenAI({
+        apiKey
+      })
+      return openaiInstance
     }
   }
 }

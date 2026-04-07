@@ -140,6 +140,27 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     serverUrl: 'http://localhost:1234',
     siteUrl: 'https://lmstudio.ai',
     description: 'LM Studio provider models that you run locally'
+  },
+  {
+    provider: 'poe',
+    name: 'Poe',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/poe.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://poe.com/api',
+    description: 'Poe provider models'
+  },
+  {
+    provider: 'custom',
+    name: 'Custom',
+    icon: 'https://models.dev/logos/custom.svg',
+    enabled: false,
+    apiKey: '',
+    server: true,
+    serverUrl: 'http://localhost:8080',
+    siteUrl: null,
+    description: 'A custom provider you host must follow OpenAI specifications to run.'
   }
 ]
 
@@ -154,7 +175,9 @@ export const AVAILABLE_PROVIDER_LIST = [
   'xai',
   'togetherai',
   'fireworks-ai',
-  'lmstudio'
+  'lmstudio',
+  'poe',
+  'custom'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
