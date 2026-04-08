@@ -14,6 +14,7 @@ import { createTogetherAI } from '@ai-sdk/togetherai'
 import { createFireworks } from '@ai-sdk/fireworks'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { createMistral } from '@ai-sdk/mistral'
+import { createCerebras } from '@ai-sdk/cerebras'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({
@@ -134,6 +135,12 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return mistralInstance
+    }
+    case 'cerebras': {
+      const cerebrasInstance = createCerebras({
+        apiKey
+      })
+      return cerebrasInstance
     }
     case 'openai': // fall back as default
     default: {

@@ -171,6 +171,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     serverUrl: 'http://localhost:8080',
     siteUrl: null,
     description: 'A custom provider you host must follow OpenAI specifications to run.'
+  },
+  {
+    provider: 'cerebras',
+    name: 'Cerebras',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/cerebras.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://cloud.cerebras.ai',
+    description: 'Cerebras provider models'
   }
 ]
 
@@ -188,6 +198,7 @@ export const AVAILABLE_PROVIDER_LIST = [
   'lmstudio',
   'poe',
   'mistral',
+  'cerebras',
   'custom'
 ] as const
 
