@@ -13,6 +13,7 @@ import { createXai } from '@ai-sdk/xai'
 import { createTogetherAI } from '@ai-sdk/togetherai'
 import { createFireworks } from '@ai-sdk/fireworks'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
+import { createMistral } from '@ai-sdk/mistral'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({
@@ -127,6 +128,12 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return poeInstance
+    }
+    case 'mistral': {
+      const mistralInstance = createMistral({
+        apiKey
+      })
+      return mistralInstance
     }
     case 'openai': // fall back as default
     default: {

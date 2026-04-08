@@ -152,6 +152,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     description: 'Poe provider models'
   },
   {
+    provider: 'mistral',
+    name: 'Mistral',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/mistral.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://console.mistral.ai/home',
+    description: 'Mistral provider models'
+  },
+  {
     provider: 'custom',
     name: 'Custom',
     icon: 'https://models.dev/logos/custom.svg',
@@ -177,6 +187,7 @@ export const AVAILABLE_PROVIDER_LIST = [
   'fireworks-ai',
   'lmstudio',
   'poe',
+  'mistral',
   'custom'
 ] as const
 

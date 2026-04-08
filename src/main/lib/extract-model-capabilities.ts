@@ -5,6 +5,7 @@ import {
   GoogleModel,
   GroqModel,
   HuggingFaceModel,
+  MistralModel,
   PoeModel,
   TogetherAiModel
 } from './get-model-list'
@@ -387,6 +388,41 @@ export function buildPoeModel(
       realtime: false,
       vision: model.architecture.input_modalities.includes('image'),
       videoReasoning: model.architecture.input_modalities.includes('video')
+    }
+  }
+}
+
+/**
+ * function to build a model record for a Mistral AI model
+ */
+export function buildMistralModel(
+  model: MistralModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+
+  if (model.capabilities?.vision) {
+    inputs.push('image')
+  }
+  //outputs
+  if (model.id.includes('tts')) {
+    outputs.push('audio')
+  } else if (model.id.includes('embed')) {
+    outputs.push('embedding')
+  } else {
+    outputs.push('text')
+  }
+  return {
+    id: model.id,
+    name: model.id,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    capabilities: {
+      realtime: model.id.includes('realtime'),
+      vision: !!model.capabilities?.vision,
+      videoReasoning: false
     }
   }
 }

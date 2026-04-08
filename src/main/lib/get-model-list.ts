@@ -8,6 +8,7 @@ import {
   buildGoogleModel,
   buildGroqModel,
   buildHuggingFaceModel,
+  buildMistralModel,
   buildOpenAiModel,
   buildPoeModel,
   buildTogetherAiModel,
@@ -215,6 +216,30 @@ export type PoeModel = {
 }
 
 /**
+ * Mistral model type
+ * full types https://docs.mistral.ai/api-reference/list-models
+ */
+export type MistralModel = {
+  id: string
+  object: 'model'
+  created: number
+  owned_by: string
+  capabilities: {
+    completion_chat: boolean
+    completion_fim: boolean
+    function_calling: boolean
+    fine_tuning: boolean
+    vision: boolean
+    classification: boolean
+  }
+  name?: string
+  description?: string
+  max_context_length: number
+  default_model_temperature: number
+  type: string
+}
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -308,6 +333,13 @@ export async function getModelListFromProvider(
       }
       case 'poe': {
         response = await axios.get('https://api.poe.com/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        break
+      }
+      case 'mistral': {
+        response = await axios.get('https://api.mistral.ai/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
         })
@@ -414,8 +446,13 @@ export async function getModelListFromProvider(
       }
       case 'poe': {
         const data = (response.data as OpenAiResponse<PoeModel>).data
-        if (!data || !Array.isArray(data)) return []
+        if (!data) return []
         return data.map((model: PoeModel) => buildPoeModel(model, provider.provider))
+      }
+      case 'mistral': {
+        const data = (response.data as OpenAiResponse<MistralModel>).data
+        if (!data) return []
+        return data.map((model: MistralModel) => buildMistralModel(model, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
