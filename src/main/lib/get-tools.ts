@@ -112,7 +112,7 @@ export const getTools = async (
           //Store to db — if this fails, clean up the saved file to avoid orphans
           try {
             await db.insert(media).values({
-              imageUrl: mediaUrl,
+              mediaUrl: mediaUrl,
               relativePath: relativePath,
               type: 'image',
               prompt: prompt,

@@ -55,7 +55,7 @@ const VideoPage = () => {
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
           {/* Video player will go here */}
           {mediaList?.data?.map(
-            (video) => video?.imageUrl && <video key={video?.id} src={video?.imageUrl} controls />
+            (video) => video?.mediaUrl && <video key={video?.id} src={video?.mediaUrl} controls />
           )}
         </div>
       </div>

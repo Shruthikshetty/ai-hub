@@ -25,11 +25,11 @@ const GeneratedImageDisplay = ({
   const { mutate } = useDeleteGeneratedImage()
   // reset loaded state when image url changes
   useEffect(() => {
-    if (image?.imageUrl) {
+    if (image?.mediaUrl) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoaded(false)
     }
-  }, [image?.imageUrl])
+  }, [image?.mediaUrl])
 
   const handleDelete = async (): Promise<void> => {
     if (!image?.id) return
@@ -54,9 +54,9 @@ const GeneratedImageDisplay = ({
       style={gradientStyles}
     >
       {/* display image */}
-      {!loading && image?.imageUrl ? (
+      {!loading && image?.mediaUrl ? (
         <img
-          src={image.imageUrl}
+          src={image.mediaUrl}
           alt="generated image"
           className={cn(
             'h-full w-full object-cover transition-opacity duration-300',

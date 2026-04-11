@@ -53,7 +53,7 @@ export const generateVideo: AppRouteHandler<GenerateVideoRoute> = async (c) => {
   //Store to db — if this fails, clean up the saved file to avoid orphans
   try {
     await db.insert(media).values({
-      imageUrl: mediaUrl,
+      mediaUrl: mediaUrl,
       relativePath: relativePath,
       type: 'video',
       prompt: prompt,

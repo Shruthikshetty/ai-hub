@@ -37,7 +37,7 @@ const ImageDetailsDialog = ({
         </DialogHeader>
         <div className="flex flex-1 min-h-0 items-center justify-center overflow-hidden">
           <img
-            src={image?.imageUrl}
+            src={image?.mediaUrl}
             alt="generated image"
             className="max-h-[75vh] max-w-full object-contain"
           />
