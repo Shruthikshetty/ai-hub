@@ -2,10 +2,10 @@
  * @file contains constants used globally throwout the app
  */
 
-// File storage category
 export const FILE_STORAGE_CATEGORY = {
   profileImg: 'profile-img',
   imageGen: 'img-gen',
+  videoGen: 'video-gen',
   chatAttachment: 'chat-attachments'
 } as const
 
@@ -204,6 +204,7 @@ export const AVAILABLE_PROVIDER_LIST = [
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
 
+//order matters
 export const MEDIA_TYPE = ['image', 'video'] as const
 
 export const MEDIA_REQUEST_TYPES = [...MEDIA_TYPE, 'all'] as const

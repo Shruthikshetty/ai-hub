@@ -21,5 +21,7 @@ export const MUTATION_KEYS = {
   updateConversationById: 'update-conversation-by-id',
   imageGenerate: 'image-generate',
   imageDelete: 'image-delete',
+  videoGenerate: 'video-generate',
+  videoDelete: 'video-delete',
   deleteAllConversations: 'delete-all-conversations'
 }

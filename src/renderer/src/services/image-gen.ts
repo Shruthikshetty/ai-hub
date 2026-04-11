@@ -2,6 +2,7 @@
  * This @file contains all image generation service
  */
 
+import { MEDIA_TYPE } from '@common/constants/global.constants'
 import type {
   GenerateImageRequestSchemaType,
   GenerateImageResponseSchemaType
@@ -47,7 +48,7 @@ export const useDeleteGeneratedImage = () => {
     onSuccess: () => {
       successToast('Image deleted successfully')
       // invalidate media fetch
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.mediaFetch] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.mediaFetch, MEDIA_TYPE[0]] })
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to delete image')
