@@ -11,6 +11,7 @@ import { useState } from 'react'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import { useFetchMedia } from '@renderer/services/media'
 import { useGenerateVideo } from '@renderer/services/video-gen'
+import GeneratedVideoDisplay from '@renderer/components/generated-video-display'
 
 /**
  * This is the main tab of video generation
@@ -45,17 +46,16 @@ const VideoPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-between h-full p-4 overflow-hidden w-full mx-auto">
-      {isPending && (
-        <div className="flex items-center justify-center h-full">
-          <p>Generating video...</p>
-        </div>
-      )}
       {/* video grid */}
       <div className="grow overflow-auto min-h-0 w-full">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+          {isPending ? <GeneratedVideoDisplay loading={true} /> : null}
           {/* Video player will go here */}
           {mediaList?.data?.map(
-            (video) => video?.mediaUrl && <video key={video?.id} src={video?.mediaUrl} controls />
+            (video) =>
+              video?.mediaUrl && (
+                <GeneratedVideoDisplay key={video?.id} video={video} loading={false} />
+              )
           )}
         </div>
       </div>

@@ -38,7 +38,7 @@ export const useDeleteVideo = () => {
   // get query client
   const queryClient = useQueryClient()
 
-  return useMutation<void, ApiError, string>({
+  return useMutation<void, ApiError, number>({
     mutationKey: [MUTATION_KEYS.videoDelete],
     mutationFn: async (id) => {
       const response = await window.api.request(`/api/video-gen/${id}`, 'DELETE')
