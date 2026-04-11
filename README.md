@@ -12,6 +12,7 @@ AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)**
   - 👤 **User Profile Access** — Models can access your personal profile for more personalized responses.
   - 🖼️ **Image Generation** — Generate images directly from the chat interface using supported models.
 - **Image Generation & Gallery**: Dedicated view for generating images with a full gallery, detailed metadata, and download/delete support.
+- **Video Generation & Gallery**: Dedicated view for generating videos with a full gallery, hover-to-play grid, and detailed metadata support.
 - **Reasoning Support**: Native support for reasoning/thinking models (e.g., GPT-5, Grok).
 - **Secure Key Management**: API keys are encrypted at rest using AES encryption.
 - **Modern UI/UX**: Stunning interface with Light, Dark, and System theme support.
@@ -20,10 +21,10 @@ AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)**
 
 Get the latest version of AI Hub for your operating system:
 
-| Platform | Download |
-| :--- | :--- |
+| Platform    | Download                                                                  |
+| :---------- | :------------------------------------------------------------------------ |
 | **Windows** | [Download .exe](https://github.com/shruthikshetty/ai-hub/releases/latest) |
-| **macOS** | [Download .dmg](https://github.com/shruthikshetty/ai-hub/releases/latest) |
+| **macOS**   | [Download .dmg](https://github.com/shruthikshetty/ai-hub/releases/latest) |
 
 > [!TIP]
 > After downloading, just run the installer and you're ready to go! No complex setup required.
@@ -183,6 +184,11 @@ Create stunning visuals with built-in image generation capabilities using availa
 
 View detailed metadata and actions for each generated image.
 ![Image Details](./resources/image-details.png)
+
+### Video Generation
+
+Generate dynamic videos directly from prompts using supported models. Browse your creations in a gallery featuring an organic hover-to-play tile interface.
+![Video Generation](./resources/video-gen.png)
 
 ### Personal Profile
 

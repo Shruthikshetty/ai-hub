@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { MediaGetSchema } from '@common/db-schemas/media.schema'
 import { generateTailwindGradient } from '@renderer/lib/colors'
 import { Spinner } from './ui/spinner'
@@ -20,6 +20,7 @@ const GeneratedVideoDisplay = ({
   loading: boolean
 }) => {
   const [loaded, setLoaded] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
   // hook to delete video
   const { mutate } = useDeleteVideo()
 
@@ -48,23 +49,26 @@ const GeneratedVideoDisplay = ({
 
   return (
     <div
-      className="flex-1 overflow-hidden flex items-center justify-center relative group rounded-xl shadow-md border-border border"
+      className="aspect-video w-full overflow-hidden flex items-center justify-center relative group rounded-xl shadow-md border-border border"
       style={gradientStyles}
+      onMouseEnter={() => videoRef.current?.play()}
+      onMouseLeave={() => videoRef.current?.pause()}
     >
       {/* display video */}
       {!loading && video?.mediaUrl ? (
         <video
-          autoPlay
+          ref={videoRef}
+          muted
+          loop
           className={cn(
             'w-full h-full bg-black/80 object-contain transition-opacity duration-300',
             loaded ? 'opacity-100' : 'opacity-0'
           )}
-          style={{ maxHeight: 'calc(90vh - 120px)' }}
           onLoadedData={() => setLoaded(true)}
           key={video.mediaUrl}
         >
           <source src={video.mediaUrl} type="video/mp4" />
-          Your browser does not support the video tag.
+          App does not support the video tag.
         </video>
       ) : null}
 

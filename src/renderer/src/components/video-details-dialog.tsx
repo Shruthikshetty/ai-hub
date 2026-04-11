@@ -37,7 +37,7 @@ const VideoDetailsDialog = ({
         </DialogHeader>
         <div className="flex flex-1 min-h-0 items-center justify-center overflow-hidden bg-black/80">
           {video?.mediaUrl ? (
-            <video controls autoPlay className="max-h-[75vh] max-w-full object-contain">
+            <video controls autoPlay className="max-h-[75vh] w-full">
               <source src={video.mediaUrl} type="video/mp4" />
               App does not support the video tag.
             </video>
