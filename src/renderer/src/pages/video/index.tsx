@@ -32,7 +32,10 @@ const VideoPage = () => {
 
   // handler to handle submit
   const handleSubmit = () => {
-    if (!model) return
+    // make sanity check
+    const trimmedPrompt = prompt.trim()
+    if (!model || !trimmedPrompt) return
+    // call the generate video api
     generateVideo(
       { prompt, model },
       {

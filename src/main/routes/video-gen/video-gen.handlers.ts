@@ -9,7 +9,7 @@ import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import db from '../../db'
 import { media } from '../../db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 // handler for video generation
 export const generateVideo: AppRouteHandler<GenerateVideoRoute> = async (c) => {
@@ -76,7 +76,7 @@ export const deleteGeneratedVideo: AppRouteHandler<DeleteGeneratedVideoRoute> = 
 
   // get the video from db
   const video = await db.query.media.findFirst({
-    where: eq(media.id, id)
+    where: and(eq(media.id, id), eq(media.type, 'video'))
   })
 
   // if video is not found, return error
@@ -90,10 +90,20 @@ export const deleteGeneratedVideo: AppRouteHandler<DeleteGeneratedVideoRoute> = 
     )
   }
 
-  // delete the video from db
-  await db.delete(media).where(eq(media.id, id))
   // delete the video from file storage
-  deleteMediaFile(video.relativePath)
+  const deleted = deleteMediaFile(video.relativePath)
+  if (!deleted) {
+    return c.json(
+      {
+        message: 'Failed to delete video',
+        success: false
+      },
+      HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR
+    )
+  }
+
+  // delete the video from db
+  await db.delete(media).where(and(eq(media.id, id), eq(media.type, 'video')))
 
   // return success response
   return c.json({ success: true, message: 'Successfully deleted the video' }, HTTP_STATUS_CODES.OK)
