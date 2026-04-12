@@ -11,7 +11,7 @@ import { z } from 'zod'
 export const media = sqliteTable('media', {
   id: integer().primaryKey({ autoIncrement: true }),
   prompt: text().notNull(),
-  imageUrl: text().notNull(),
+  mediaUrl: text().notNull(),
   relativePath: text().notNull(),
   modelId: text().notNull(),
   provider: text().notNull(),

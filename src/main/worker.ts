@@ -15,6 +15,7 @@ import provider from './routes/provider/provider.index'
 import conversation from './routes/conversation/conversation.index'
 import message from './routes/message/message.index'
 import image from './routes/image-gen/image-gen.index'
+import video from './routes/video-gen/video-gen.index'
 
 import { runMigrations } from './db/migrate'
 import { seed } from './db/seed'
@@ -37,7 +38,7 @@ const migrationPromise =
 configureOpenApi(app)
 
 // all routes go here
-const routes = [base, profile, chat, media, model, provider, conversation, message, image]
+const routes = [base, profile, chat, media, model, provider, conversation, message, image, video]
 
 routes.forEach((route) => {
   if (route === base) {

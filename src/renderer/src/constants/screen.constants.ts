@@ -15,7 +15,8 @@ import {
   Sun,
   Moon,
   Monitor,
-  LucideIcon
+  LucideIcon,
+  Video
 } from 'lucide-react'
 
 // side tray items (do not change order add new items at the end)
@@ -29,6 +30,11 @@ export const SIDE_TRAY_ITEMS = [
     name: 'Image',
     path: '/image',
     icon: Image
+  },
+  {
+    name: 'Video',
+    path: '/video',
+    icon: Video
   }
 ] as const
 

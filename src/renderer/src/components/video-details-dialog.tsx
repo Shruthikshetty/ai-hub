@@ -5,21 +5,21 @@ import { Button } from './ui/button'
 import { Download, Trash } from 'lucide-react'
 
 /**
- * Component to display image details
- * @param image - image to display
+ * Component to display video details
+ * @param video - video to display
  * @param children - children to display
- * @param onDownload - handler to download image
- * @param onDelete - handler to delete image
- * @returns ImageDetailsDialog component
+ * @param onDownload - handler to download video
+ * @param onDelete - handler to delete video
+ * @returns VideoDetailsDialog component
  */
-const ImageDetailsDialog = ({
-  image,
+const VideoDetailsDialog = ({
+  video,
   children,
   onDownload,
   onDelete
 }: {
   children: React.ReactNode
-  image?: MediaGetSchema
+  video?: MediaGetSchema
   onDownload: () => Promise<void>
   onDelete: () => Promise<void>
 }) => {
@@ -33,17 +33,18 @@ const ImageDetailsDialog = ({
         crossSize={'lg'}
       >
         <DialogHeader className="shrink-0 bg-accent p-4">
-          <DialogTitle className="text-xs line-clamp-5">{image?.prompt}</DialogTitle>
+          <DialogTitle className="text-xs line-clamp-5">{video?.prompt}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-1 min-h-0 items-center justify-center overflow-hidden">
-          <img
-            src={image?.mediaUrl}
-            alt="generated image"
-            className="max-h-[75vh] max-w-full object-contain"
-          />
+        <div className="flex flex-1 min-h-0 items-center justify-center overflow-hidden bg-black/80">
+          {video?.mediaUrl ? (
+            <video controls autoPlay className="max-h-[75vh] w-full">
+              <source src={video.mediaUrl} type="video/mp4" />
+              App does not support the video tag.
+            </video>
+          ) : null}
         </div>
         <div className="shrink-0 flex flex-row items-center justify-between px-4 py-2 border-t bg-muted rounded-b-xl">
-          <p className="text-sm text-muted-foreground">{image?.modelId}</p>
+          <p className="text-sm text-muted-foreground">{video?.modelId}</p>
           <div className="flex gap-2">
             <Button variant="outline" onClick={onDownload}>
               Download
@@ -60,4 +61,4 @@ const ImageDetailsDialog = ({
   )
 }
 
-export default ImageDetailsDialog
+export default VideoDetailsDialog
