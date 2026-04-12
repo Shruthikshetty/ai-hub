@@ -163,9 +163,7 @@
       "indexes": {
         "providers_provider_unique": {
           "name": "providers_provider_unique",
-          "columns": [
-            "provider"
-          ],
+          "columns": ["provider"],
           "isUnique": true
         }
       },
@@ -311,12 +309,8 @@
           "name": "message_conversationId_conversations_id_fk",
           "tableFrom": "message",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "conversationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["conversationId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
