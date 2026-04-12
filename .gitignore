@@ -19,4 +19,5 @@ electron.vite.config.*.mjs
 
 # misc 
 backlog.txt
+/plans/
 
