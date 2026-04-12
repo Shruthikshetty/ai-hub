@@ -17,6 +17,7 @@ import { EXT_TO_MIME } from '../common/constants/global.constants'
 import icon from '../../resources/icon.png?asset'
 import { pathToFileURL } from 'node:url'
 import contextMenu from 'electron-context-menu'
+import { registerRealtimeRoutes } from './routes/realtime/realtime.route'
 
 // Custom media:// protocol
 // Must be registered before app.ready
@@ -336,6 +337,8 @@ app.whenReady().then(() => {
       return { success: false, error: String(err) }
     }
   })
+
+  registerRealtimeRoutes()
 
   createWindow()
 

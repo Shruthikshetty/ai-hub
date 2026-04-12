@@ -45,7 +45,10 @@ const api = {
   downloadFile: (
     relativePath: string
   ): Promise<{ success: boolean; filePath?: string; canceled?: boolean; error?: string }> =>
-    ipcRenderer.invoke('download-file', relativePath)
+    ipcRenderer.invoke('download-file', relativePath),
+
+  getRealtimeToken: (): Promise<{ success: boolean; client_secret?: string; error?: string }> =>
+    ipcRenderer.invoke('realtime:getToken')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

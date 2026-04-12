@@ -17,6 +17,7 @@ declare global {
       downloadFile: (
         relativePath: string
       ) => Promise<{ success: boolean; filePath?: string; canceled?: boolean; error?: string }>
+      getRealtimeToken: () => Promise<{ success: boolean; client_secret?: string; error?: string }>
     }
   }
 }

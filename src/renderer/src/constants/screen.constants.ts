@@ -16,7 +16,8 @@ import {
   Moon,
   Monitor,
   LucideIcon,
-  Video
+  Video,
+  AudioWaveform
 } from 'lucide-react'
 
 // side tray items (do not change order add new items at the end)
@@ -35,6 +36,11 @@ export const SIDE_TRAY_ITEMS = [
     name: 'Video',
     path: '/video',
     icon: Video
+  },
+  {
+    name: 'Realtime',
+    path: '/realtime',
+    icon: AudioWaveform
   }
 ] as const
 
