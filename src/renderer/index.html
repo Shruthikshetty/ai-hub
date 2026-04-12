@@ -8,9 +8,10 @@
       http-equiv="Content-Security-Policy"
       content="
         default-src 'self';
-        script-src 'self';
+        script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval';
+        worker-src 'self' blob:;
         style-src 'self' 'unsafe-inline';
-        connect-src 'self' blob:;
+        connect-src 'self' blob: https://api.openai.com;
         img-src 'self' data: blob: media:
           https://unpkg.com
           https://models.dev;
