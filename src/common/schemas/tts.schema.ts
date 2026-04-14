@@ -1,9 +1,9 @@
-import { z } from 'zod'
+import { z } from '@hono/zod-openapi'
 import { modelSchema } from './model.schema'
 
 // request schema for generating speech from text
 export const generateSpeechFromTextRequestSchema = z.object({
-  text: z.string().openapi({
+  text: z.string().trim().min(1, 'text is required').openapi({
     description: 'text to generate speech from',
     example: 'Hello, how are you?'
   }),

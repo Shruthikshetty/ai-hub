@@ -86,7 +86,7 @@ const VoiceMessageAction = ({
 
     // generate speech
     generateSpeech(
-      { text, chatId: chatId.toString(), messageId: message.id, model, voice: 'nova' }, //@TODO voice is temporary hardcoded
+      { text, chatId: chatId.toString(), messageId: message.id, model }, //@TODO voice is temporary hardcoded
       {
         onSuccess: (result) => {
           const mediaUrl = result?.data?.mediaUrl

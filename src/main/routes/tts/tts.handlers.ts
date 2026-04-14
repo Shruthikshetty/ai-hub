@@ -60,9 +60,8 @@ export const generateSpeechFromText: AppRouteHandler<GenerateSpeechFromTextRoute
       prompt: text,
       mediaUrl,
       relativePath,
-      // fixed values @TODO will be modified later
-      modelId: 'gpt-4o-mini-tts',
-      provider: 'openai',
+      modelId: model.id,
+      provider: model.provider,
       // optional files required if tts to be linked to chat message
       chatId: chatId ?? null,
       messageId: messageId ?? null

@@ -13,10 +13,15 @@ const CopyMessageAction = ({ message }: { message: AppUIMessage }) => {
   const [copied, setCopied] = useState(false)
 
   // function to handle copy to clipboard
-  const handleCopy = (content: string) => {
-    // copied
-    navigator.clipboard.writeText(content)
-    setCopied(true)
+  const handleCopy = async (content: string) => {
+    try {
+      // copy to clipboard
+      await navigator.clipboard.writeText(content)
+      setCopied(true)
+    } catch {
+      // in case of error show copy icon
+      setCopied(false)
+    }
   }
 
   // if copied show ticket check icon else copy icon
@@ -24,7 +29,9 @@ const CopyMessageAction = ({ message }: { message: AppUIMessage }) => {
     return (
       <MessageAction
         label="Copy"
-        onClick={() => handleCopy(getMessageText(message))}
+        onClick={() => {
+          handleCopy(getMessageText(message))
+        }}
         tooltip="Copy to clipboard"
       >
         <Check className="size-4" />
@@ -35,7 +42,9 @@ const CopyMessageAction = ({ message }: { message: AppUIMessage }) => {
     return (
       <MessageAction
         label="Copy"
-        onClick={() => handleCopy(getMessageText(message))}
+        onClick={() => {
+          handleCopy(getMessageText(message))
+        }}
         tooltip="Copy to clipboard"
       >
         <CopyIcon className="size-4" />

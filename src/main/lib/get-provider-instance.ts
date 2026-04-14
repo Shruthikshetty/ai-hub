@@ -117,10 +117,11 @@ export async function getProviderInstanceModel({
         providerDetails?.serverUrl || 'http://localhost:8080',
         '/v1'
       )
-      const customInstance = createOpenAICompatible({
+      const customInstance = createOpenAI({
         name: 'custom',
         baseURL
       })
+
       return customInstance
     }
     case 'poe': {
