@@ -2,7 +2,6 @@
  * @file contains all the handlers related to tts routes
  */
 
-import { openai } from '@ai-sdk/openai'
 import { experimental_generateSpeech as generateSpeech } from 'ai'
 import { AppRouteHandler } from '../../types'
 import { GenerateSpeechFromTextRoute } from './tts.routes'
@@ -11,16 +10,35 @@ import { FILE_STORAGE_CATEGORY } from '../../../common/constants/global.constant
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import db from '../../db'
 import { media } from '../../db/schema'
+import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 
 // handler to generate speech from text
 export const generateSpeechFromText: AppRouteHandler<GenerateSpeechFromTextRoute> = async (c) => {
   // get text, optional chatId and optional messageId from body
-  const { text, chatId, messageId } = c.req.valid('json')
+  const { text, chatId, messageId, model, voice } = c.req.valid('json')
+
+  // get the provider as per user model
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const modelProvider: any = await getProviderInstanceModel({
+    provider: model.provider
+  })
+
+  // check if provider is capable of generating tts
+  if (!modelProvider?.speech) {
+    return c.json(
+      {
+        message: 'This provider / model is not capable of generating tts',
+        success: false
+      },
+      HTTP_STATUS_CODES.BAD_REQUEST
+    )
+  }
+
   // generate speech @TODO will be modified and made selectable model and voice
   const { audio } = await generateSpeech({
-    model: openai.speech('gpt-4o-mini-tts'),
+    model: modelProvider.speech(model.id),
     text,
-    voice: 'nova'
+    voice: voice
   })
 
   // determine storage category:

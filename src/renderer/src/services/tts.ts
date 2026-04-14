@@ -22,8 +22,20 @@ export const useGenerateSpeech = () => {
     GenerateSpeechFromTextRequestSchemaType
   >({
     mutationKey: [MUTATION_KEYS.speechGenerate],
-    mutationFn: async ({ text, chatId, messageId }: GenerateSpeechFromTextRequestSchemaType) => {
-      const response = await window.api.request('/api/tts', 'POST', { text, chatId, messageId })
+    mutationFn: async ({
+      text,
+      chatId,
+      messageId,
+      model,
+      voice
+    }: GenerateSpeechFromTextRequestSchemaType) => {
+      const response = await window.api.request('/api/tts', 'POST', {
+        text,
+        chatId,
+        messageId,
+        model,
+        voice
+      })
       if (!response.success) {
         throw response
       }

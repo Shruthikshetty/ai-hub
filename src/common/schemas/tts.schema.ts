@@ -1,10 +1,16 @@
 import { z } from 'zod'
+import { modelSchema } from './model.schema'
 
 // request schema for generating speech from text
 export const generateSpeechFromTextRequestSchema = z.object({
   text: z.string().openapi({
     description: 'text to generate speech from',
     example: 'Hello, how are you?'
+  }),
+  model: modelSchema,
+  voice: z.string().optional().openapi({
+    description: 'voice to generate speech from',
+    example: 'nova'
   }),
   chatId: z.string().optional().openapi({
     description:

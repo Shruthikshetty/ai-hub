@@ -6,6 +6,7 @@ import { Loader2, Volume2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useGenerateSpeech } from '@renderer/services/tts'
 import { useGetMediaByMessageId } from '@renderer/services/media'
+import { ModelSchemaType } from '@common/schemas/model.schema'
 
 /**
  * Component to handle voice message action.
@@ -13,7 +14,15 @@ import { useGetMediaByMessageId } from '@renderer/services/media'
  * so it will be passing chat id and message and
  * will generate and link the tts file to the chat message
  */
-const VoiceMessageAction = ({ message, chatId }: { message: AppUIMessage; chatId?: number }) => {
+const VoiceMessageAction = ({
+  message,
+  chatId,
+  model
+}: {
+  message: AppUIMessage
+  chatId?: number
+  model: ModelSchemaType | null
+}) => {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const cachedUrlRef = useRef<string | null>(null)
@@ -61,7 +70,7 @@ const VoiceMessageAction = ({ message, chatId }: { message: AppUIMessage; chatId
   // handler to read aloud
   const handleReadAloud = (text: string) => {
     // return in case no chatId
-    if (!chatId) return
+    if (!chatId || !model) return
 
     // If already speaking, stop playback
     if (isSpeaking) {
@@ -77,7 +86,7 @@ const VoiceMessageAction = ({ message, chatId }: { message: AppUIMessage; chatId
 
     // generate speech
     generateSpeech(
-      { text, chatId: chatId.toString(), messageId: message.id },
+      { text, chatId: chatId.toString(), messageId: message.id, model, voice: 'nova' }, //@TODO voice is temporary hardcoded
       {
         onSuccess: (result) => {
           const mediaUrl = result?.data?.mediaUrl
