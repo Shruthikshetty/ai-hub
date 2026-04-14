@@ -3,8 +3,13 @@
  */
 
 import { MEDIA_REQUEST_TYPES } from '@common/constants/global.constants'
-import { GetMediaResponseType, MediaUploadResponseSchemaType } from '@common/schemas/media.schema'
+import {
+  GetMediaByMessageIdResponseType,
+  GetMediaResponseType,
+  MediaUploadResponseSchemaType
+} from '@common/schemas/media.schema'
 import { ApiError, FileStorageCategory } from '@common/types'
+import { FETCH_MEDIA_BY_MESSAGE_ID_STALE_TIME } from '@renderer/constants/config.constants'
 import { MUTATION_KEYS, QUERY_KEYS } from '@renderer/constants/service-keys.constants'
 import { uploadMediaFile } from '@renderer/lib/media-upload'
 import { errorToast } from '@renderer/lib/toast-wrapper'
@@ -43,5 +48,24 @@ export function useFetchMedia({ type = 'all' }: { type?: (typeof MEDIA_REQUEST_T
       }
       return response
     }
+  })
+}
+
+/**
+ * Fetch the stored media record for a specific message.
+ * currently this only stores tts files.
+ */
+export function useGetMediaByMessageId(messageId: string) {
+  return useQuery<GetMediaByMessageIdResponseType, ApiError>({
+    queryKey: [QUERY_KEYS.mediaTtsFetch, messageId],
+    queryFn: async () => {
+      const response = await window.api.request('/api/media/message/' + messageId, 'GET')
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    enabled: !!messageId,
+    staleTime: FETCH_MEDIA_BY_MESSAGE_ID_STALE_TIME
   })
 }

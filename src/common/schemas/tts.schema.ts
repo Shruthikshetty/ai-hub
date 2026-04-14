@@ -8,18 +8,21 @@ export const generateSpeechFromTextRequestSchema = z.object({
   }),
   chatId: z.string().optional().openapi({
     description:
-      'if provided, audio is saved to disk under chat-audio/<chatId>/ and a mediaUrl is returned instead of base64',
-    example: 'abc-123'
+      'if provided, audio is saved under chat-attachments/<chatId>/ and linked back to the chat in DB',
+    example: '150'
+  }),
+  messageId: z.string().optional().openapi({
+    description:
+      'if provided, the media DB record is linked to this message for deduplication on reload',
+    example: 'abc-uuid-123'
   })
 })
 
-// response schema for generating speech from text
+// response schema — audio is always saved to disk; mediaUrl is always returned
 export const generateSpeechFromTextResponseSchema = z.object({
   success: z.boolean(),
   data: z.object({
-    mediaUrl: z.string().optional(),
-    base64: z.string().optional(),
-    mimeType: z.string().optional()
+    mediaUrl: z.string()
   })
 })
 

@@ -6,7 +6,8 @@ export const FILE_STORAGE_CATEGORY = {
   profileImg: 'profile-img',
   imageGen: 'img-gen',
   videoGen: 'video-gen',
-  chatAttachment: 'chat-attachments'
+  chatAttachment: 'chat-attachments',
+  ttsGen: 'tts-gen'
 } as const
 
 // MIME lookup for common image types
@@ -19,7 +20,10 @@ export const EXT_TO_MIME: Record<string, string> = {
   svg: 'image/svg+xml',
   bmp: 'image/bmp',
   avif: 'image/avif',
-  ico: 'image/x-icon'
+  ico: 'image/x-icon',
+  mp3: 'audio/mpeg',
+  mp4: 'video/mp4',
+  webm: 'video/webm'
 }
 
 // For AES, this is always 16 bytes
@@ -205,7 +209,7 @@ export const AVAILABLE_PROVIDER_LIST = [
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
 
 //order matters
-export const MEDIA_TYPE = ['image', 'video'] as const
+export const MEDIA_TYPE = ['image', 'video', 'tts'] as const
 
 export const MEDIA_REQUEST_TYPES = [...MEDIA_TYPE, 'all'] as const
 

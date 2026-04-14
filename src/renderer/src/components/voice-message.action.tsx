@@ -3,19 +3,36 @@ import { MessageAction } from './ai-elements/message'
 import { AppUIMessage } from '@common/schemas/messages.schema'
 import { cn } from '@renderer/lib/utils'
 import { Loader2, Volume2 } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGenerateSpeech } from '@renderer/services/tts'
+import { useGetMediaByMessageId } from '@renderer/services/media'
 
 /**
- * Component to handle voice message action
- * @param message - message to play
- * @returns Voice message action component
+ * Component to handle voice message action.
+ * this component is supposed to be used in a message actions
+ * so it will be passing chat id and message and
+ * will generate and link the tts file to the chat message
  */
 const VoiceMessageAction = ({ message, chatId }: { message: AppUIMessage; chatId?: number }) => {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const cachedUrlRef = useRef<string | null>(null)
+
   const { mutate: generateSpeech, isPending } = useGenerateSpeech()
+
+  // hook to get the media by message currently voice file only
+  const { data: existingMedia, isLoading: isFetchingExisting } = useGetMediaByMessageId(message.id)
+
+  // derive loading state
+  const isLoading = isPending || isFetchingExisting
+
+  // store the media url in ref for catching
+  useEffect(() => {
+    const mediaUrl = existingMedia?.data?.mediaUrl
+    if (mediaUrl && !cachedUrlRef.current) {
+      cachedUrlRef.current = mediaUrl
+    }
+  }, [existingMedia])
 
   /** Stop and clean up the current audio instance */
   const stopAudio = () => {
@@ -52,7 +69,7 @@ const VoiceMessageAction = ({ message, chatId }: { message: AppUIMessage; chatId
       return
     }
 
-    // use the cached url if already exist
+    // use the cached url if it already exists
     if (cachedUrlRef.current) {
       playAudio(cachedUrlRef.current)
       return
@@ -60,7 +77,7 @@ const VoiceMessageAction = ({ message, chatId }: { message: AppUIMessage; chatId
 
     // generate speech
     generateSpeech(
-      { text, chatId: chatId.toString() },
+      { text, chatId: chatId.toString(), messageId: message.id },
       {
         onSuccess: (result) => {
           const mediaUrl = result?.data?.mediaUrl
@@ -78,10 +95,10 @@ const VoiceMessageAction = ({ message, chatId }: { message: AppUIMessage; chatId
       className="active:scale-95 transition-all"
       label={isSpeaking ? 'Stop' : 'Read Aloud'}
       tooltip={isSpeaking ? 'Stop speaking' : 'Read aloud'}
-      disabled={isPending}
+      disabled={isLoading}
       onClick={() => handleReadAloud(getMessageText(message))}
     >
-      {isPending ? (
+      {isLoading ? (
         <Loader2 className="animate-spin size-4" />
       ) : (
         <Volume2
