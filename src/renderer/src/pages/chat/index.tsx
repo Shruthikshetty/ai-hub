@@ -41,6 +41,7 @@ import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
 import { useFetchModels } from '@renderer/services/model'
 import ChatOptionsPanel from './options-panal'
 import CopyMessageAction from '@renderer/components/copy-message-action'
+import VoiceMessageAction from '@renderer/components/voice-message.action'
 
 //@TODO conversation metadata like system prompt, tools, reasoning etc. still need to be restored on switch
 // stable transport instance
@@ -219,6 +220,7 @@ const ChatPage = () => {
                     {message.role === 'assistant' && (
                       <MessageActions>
                         <CopyMessageAction message={message} />
+                        <VoiceMessageAction message={message} chatId={selectedConversation?.id} />
                       </MessageActions>
                     )}
                   </>
