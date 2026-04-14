@@ -35,6 +35,17 @@ const VoiceMessageAction = ({
   // derive loading state
   const isLoading = isPending || isFetchingExisting
 
+  // stop audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.src = ''
+        audioRef.current = null
+      }
+    }
+  }, [])
+
   // store the media url in ref for catching
   useEffect(() => {
     const mediaUrl = existingMedia?.data?.mediaUrl
@@ -47,6 +58,8 @@ const VoiceMessageAction = ({
   const stopAudio = () => {
     if (audioRef.current) {
       audioRef.current.pause()
+      audioRef.current.removeEventListener('ended', stopAudio)
+      audioRef.current.removeEventListener('error', stopAudio)
       audioRef.current.src = ''
       audioRef.current = null
     }
@@ -60,11 +73,18 @@ const VoiceMessageAction = ({
     // create new audio instance
     const audio = new Audio(mediaUrl)
     audioRef.current = audio
-    audio.addEventListener('ended', stopAudio)
-    audio.addEventListener('error', stopAudio)
+
+    audio.addEventListener('ended', stopAudio, { once: true }) // stop audio when it ends
+    audio.addEventListener('error', stopAudio, { once: true }) // stop audio when it fails
+
     // play audio
-    audio.play()
-    setIsSpeaking(true)
+    audio
+      .play()
+      .then(() => setIsSpeaking(true))
+      .catch((err) => {
+        console.error('Audio playback failed', err)
+        stopAudio()
+      })
   }
 
   // handler to read aloud

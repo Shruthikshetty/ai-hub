@@ -10,7 +10,7 @@ export const FILE_STORAGE_CATEGORY = {
   ttsGen: 'tts-gen'
 } as const
 
-// MIME lookup for common image types
+// MIME lookup for supported media file extensions
 export const EXT_TO_MIME: Record<string, string> = {
   png: 'image/png',
   jpg: 'image/jpeg',
