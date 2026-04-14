@@ -99,6 +99,16 @@ Start the app in development mode with hot-reload:
 npm run dev
 ```
 
+### 📖 API Documentation
+
+AI Hub uses **Zod OpenAPI** to generate a standard OpenAPI 3.0 specification. During local development, you can access the interactive API reference:
+
+- **Interactive UI**: [http://localhost:3000/reference](http://localhost:3000/reference) (Powered by [Scalar](https://scalar.com/))
+- **OpenAPI Spec**: [http://localhost:3000/doc](http://localhost:3000/doc)
+
+> [!NOTE]
+> This is only available when running the app in development mode (`bun run dev`).
+
 ### Database Management
 
 Commands for managing your local SQLite database with Drizzle:

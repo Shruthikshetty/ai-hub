@@ -16,7 +16,8 @@ import {
   mediaDeleteResponseSchema,
   mediaDeleteSchema,
   mediaUploadResponseSchema,
-  mediaUploadSchema
+  mediaUploadSchema,
+  getMediaByMessageIdResponseSchema
 } from '../../../common/schemas/media.schema'
 import { MEDIA_REQUEST_TYPES } from '../../../common/constants/global.constants'
 
@@ -116,7 +117,41 @@ export const deleteMedia = createRoute({
   }
 })
 
+// get TTS media record for a specific message by message id
+export const getMediaByMessageId = createRoute({
+  tags: ['Media'],
+  method: 'get',
+  path: '/media/message/{messageId}',
+  request: {
+    params: z.object({
+      messageId: z.string().openapi({
+        param: {
+          name: 'messageId',
+          in: 'path',
+          required: true,
+          description: 'message id to look media associated with message id for tts'
+        },
+        example: 'abc-uuid-123'
+      })
+    })
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: getMediaByMessageIdResponseSchema
+        }
+      },
+      description: 'TTS media record for the message'
+    },
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 //types all types
 export type UploadMediaRoute = typeof uploadMedia
 export type GetMediaRoute = typeof getMedia
 export type DeleteMediaRoute = typeof deleteMedia
+export type GetMediaByMessageIdRoute = typeof getMediaByMessageId

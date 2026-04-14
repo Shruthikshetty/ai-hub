@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "84bd54ea-dca7-48c0-bdbd-69a728216b5b",
-  "prevId": "86ac41a9-46d0-4e28-9510-036544178cf7",
+  "id": "e442a23f-60df-46ea-9771-147ae74a2bfe",
+  "prevId": "84bd54ea-dca7-48c0-bdbd-69a728216b5b",
   "tables": {
     "users": {
       "name": "users",
@@ -163,7 +163,9 @@
       "indexes": {
         "providers_provider_unique": {
           "name": "providers_provider_unique",
-          "columns": ["provider"],
+          "columns": [
+            "provider"
+          ],
           "isUnique": true
         }
       },
@@ -309,8 +311,12 @@
           "name": "message_conversationId_conversations_id_fk",
           "tableFrom": "message",
           "tableTo": "conversations",
-          "columnsFrom": ["conversationId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "conversationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -369,6 +375,20 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "chatId": {
+          "name": "chatId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "messageId": {
+          "name": "messageId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {

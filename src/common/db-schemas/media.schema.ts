@@ -16,6 +16,8 @@ export const media = sqliteTable('media', {
   modelId: text().notNull(),
   provider: text().notNull(),
   type: text({ enum: MEDIA_TYPE }).notNull(),
+  chatId: text(),
+  messageId: text(),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
 

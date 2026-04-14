@@ -8,7 +8,8 @@ export const QUERY_KEYS = {
   conversationsFetch: 'conversations-fetch',
   conversationMessagesFetch: 'conversation-messages-fetch',
   messageFetch: 'message-fetch',
-  mediaFetch: 'media-fetch'
+  mediaFetch: 'media-fetch',
+  mediaTtsFetch: 'media-tts-fetch'
 }
 
 export const MUTATION_KEYS = {
@@ -23,5 +24,6 @@ export const MUTATION_KEYS = {
   imageDelete: 'image-delete',
   videoGenerate: 'video-generate',
   videoDelete: 'video-delete',
-  deleteAllConversations: 'delete-all-conversations'
+  deleteAllConversations: 'delete-all-conversations',
+  speechGenerate: 'speech-generate'
 }

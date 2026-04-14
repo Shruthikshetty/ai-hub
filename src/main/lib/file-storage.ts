@@ -22,6 +22,13 @@ import { randomUUID } from 'node:crypto'
 import { EXT_TO_MIME, FILE_STORAGE_CATEGORY } from '../../common/constants/global.constants'
 import { MediaUploadSchemaType } from '../../common/schemas/media.schema'
 
+/**
+ * Same as MediaUploadSchemaType but with an optional chatId.
+ * When chatId is provided, it replaces the date-based subfolder so all
+ * files for a chat live under category/<chatId>/ and can be deleted together.
+ */
+export type SaveFileOptions = MediaUploadSchemaType & { chatId?: string }
+
 //types
 export interface SaveFileResult {
   /** Relative path from media root, e.g. "profile-img/avatar.png" */
@@ -57,8 +64,8 @@ function getExtension(filePath: string): string {
  * Stream-copy a file from sourcePath to the appropriate location in app data.
  * Uses Node.js streams so even large files (MBs) are handled efficiently.
  */
-export async function saveFile(options: MediaUploadSchemaType): Promise<SaveFileResult> {
-  const { sourcePath, category, base64, extension } = options
+export async function saveFile(options: SaveFileOptions): Promise<SaveFileResult> {
+  const { sourcePath, category, base64, extension, chatId } = options
 
   // get the extension
   let ext = extension
@@ -91,14 +98,14 @@ export async function saveFile(options: MediaUploadSchemaType): Promise<SaveFile
     absolutePath = path.join(dir, filename)
     relativePath = `${category}/${filename}`
   } else {
-    // Other categories (e.g. imageGen): date-based folder with UUID filename
-    const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
-    const dir = path.join(mediaRoot, category, today)
+    // if chatId provided use it as subfolder; otherwise use date-based folder
+    const subfolder = chatId ?? new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+    const dir = path.join(mediaRoot, category, subfolder)
     fs.mkdirSync(dir, { recursive: true })
 
     const filename = `${randomUUID()}.${ext}`
     absolutePath = path.join(dir, filename)
-    relativePath = `${category}/${today}/${filename}`
+    relativePath = `${category}/${subfolder}/${filename}`
   }
 
   // Write file — use base64 data if provided, otherwise stream-copy from sourcePath
@@ -175,4 +182,19 @@ export function emptyChatAttachmentsFolder(): number {
   }
 
   return entries.length
+}
+
+/**
+ * Delete all files stored for a specific chat (attachments, audio, etc.).
+ * Call this alongside your chat-delete logic to avoid orphaned files.
+ * Returns true if the folder existed and was removed, false if it wasn't found.
+ */
+export function deleteChatFolder(chatId: string): boolean {
+  const mediaRoot = getMediaRoot()
+  const dir = path.join(mediaRoot, FILE_STORAGE_CATEGORY.chatAttachment, chatId)
+
+  if (!fs.existsSync(dir)) return false
+
+  fs.rmSync(dir, { recursive: true, force: true })
+  return true
 }

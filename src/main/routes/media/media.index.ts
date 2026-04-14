@@ -11,5 +11,6 @@ const router = createRouter()
   .openapi(routes.uploadMedia, handlers.uploadMedia)
   .openapi(routes.getMedia, handlers.getMedia)
   .openapi(routes.deleteMedia, handlers.deleteMedia)
+  .openapi(routes.getMediaByMessageId, handlers.getMediaByMessageId)
 
 export default router

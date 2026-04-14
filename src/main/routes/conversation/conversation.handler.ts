@@ -18,6 +18,7 @@ import db from '../../db'
 import { messages } from '../../../common/db-schemas/message.schema'
 import {
   deleteMediaFile,
+  deleteChatFolder,
   emptyChatAttachmentsFolder as clearChatAttachments
 } from '../../lib/file-storage'
 
@@ -73,6 +74,8 @@ export const deleteConversationById: AppRouteHandler<DeleteConversationRoute> = 
         }
       }
     }
+    // wipe the chat-specific folder (voice files etc)
+    deleteChatFolder(id.toString())
   } catch {
     // Silent fail — don't block deletion if cleanup errors
   }

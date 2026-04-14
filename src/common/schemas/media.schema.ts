@@ -38,6 +38,12 @@ export const getMediaResponseSchema = z.object({
   data: z.array(mediaGetSchema)
 })
 
+// schema to get a single media record by messageId
+export const getMediaByMessageIdResponseSchema = z.object({
+  success: z.boolean(),
+  data: mediaGetSchema.nullable()
+})
+
 export const mediaDeleteSchema = z.object({
   /** Relative path from media root, e.g. "profile/avatar.png" */
   relativePath: z.string()
@@ -53,5 +59,6 @@ export const mediaDeleteResponseSchema = z.object({
 export type MediaUploadSchemaType = z.infer<typeof mediaUploadSchema>
 export type MediaUploadResponseSchemaType = z.infer<typeof mediaUploadResponseSchema>
 export type GetMediaResponseType = z.infer<typeof getMediaResponseSchema>
+export type GetMediaByMessageIdResponseType = z.infer<typeof getMediaByMessageIdResponseSchema>
 export type MediaDeleteSchemaType = z.infer<typeof mediaDeleteSchema>
 export type MediaDeleteResponseSchemaType = z.infer<typeof mediaDeleteResponseSchema>
