@@ -41,7 +41,7 @@ export const getMediaResponseSchema = z.object({
 // schema to get a single media record by messageId
 export const getMediaByMessageIdResponseSchema = z.object({
   success: z.boolean(),
-  data: mediaGetSchema
+  data: mediaGetSchema.nullable()
 })
 
 export const mediaDeleteSchema = z.object({

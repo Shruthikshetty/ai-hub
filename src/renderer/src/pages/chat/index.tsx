@@ -217,12 +217,13 @@ const ChatPage = () => {
                       />
                     </MessageContent>
                     {/* actions for assistant messages  */}
-                    {message.role === 'assistant' && (
-                      <MessageActions>
-                        <CopyMessageAction message={message} />
-                        <VoiceMessageAction message={message} chatId={selectedConversation?.id} />
-                      </MessageActions>
-                    )}
+                    {message.role === 'assistant' &&
+                      (index !== messages.length - 1 || !isGenerating) && (
+                        <MessageActions>
+                          <CopyMessageAction message={message} />
+                          <VoiceMessageAction message={message} chatId={selectedConversation?.id} />
+                        </MessageActions>
+                      )}
                   </>
                 </Message>
               ))}

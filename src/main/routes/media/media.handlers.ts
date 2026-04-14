@@ -104,21 +104,12 @@ export const getMediaByMessageId: AppRouteHandler<GetMediaByMessageIdRoute> = as
   })
 
   // if no record found return null
-  if (!record) {
-    return c.json(
-      {
-        success: false,
-        message: 'Media not found'
-      },
-      HTTP_STATUS_CODES.NOT_FOUND
-    )
-  }
 
   // send response with the record
   return c.json(
     {
       success: true,
-      data: record
+      data: record ?? null // if no record found return null
     },
     HTTP_STATUS_CODES.OK
   )
