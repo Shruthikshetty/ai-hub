@@ -16,7 +16,7 @@ import { PromptInputAttachmentsDisplay } from '@renderer/components/ai-elements/
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { createIPCStreamTransport } from '@renderer/lib/custom-transports'
-import { Message, MessageContent } from '@renderer/components/ai-elements/message'
+import { Message, MessageActions, MessageContent } from '@renderer/components/ai-elements/message'
 import {
   Conversation,
   ConversationContent,
@@ -40,6 +40,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
 import { useFetchModels } from '@renderer/services/model'
 import ChatOptionsPanel from './options-panal'
+import CopyMessageAction from '@renderer/components/copy-message-action'
 
 //@TODO conversation metadata like system prompt, tools, reasoning etc. still need to be restored on switch
 // stable transport instance
@@ -206,13 +207,21 @@ const ChatPage = () => {
             <ConversationContent>
               {messages.map((message, index) => (
                 <Message key={message.id} from={message.role}>
-                  <MessageContent>
-                    <MessageParts
-                      message={message}
-                      status={status}
-                      isLastMessage={index === messages.length - 1}
-                    />
-                  </MessageContent>
+                  <>
+                    <MessageContent>
+                      <MessageParts
+                        message={message}
+                        status={status}
+                        isLastMessage={index === messages.length - 1}
+                      />
+                    </MessageContent>
+                    {/* actions for assistant messages  */}
+                    {message.role === 'assistant' && (
+                      <MessageActions>
+                        <CopyMessageAction message={message} />
+                      </MessageActions>
+                    )}
+                  </>
                 </Message>
               ))}
               <ConversationScrollButton />

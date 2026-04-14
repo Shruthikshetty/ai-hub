@@ -44,6 +44,7 @@ function MessageParts({
   // check if there are any tool parts
   const toolCalls = message.parts.filter((part) => part.type.startsWith('tool-'))
   const hasToolCalls = toolCalls.length > 0
+
   return (
     <>
       {/* role based icon */}
