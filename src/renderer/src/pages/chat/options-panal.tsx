@@ -79,11 +79,7 @@ const ChatOptionsPanel = ({
         speech: {
           enabled: conversation?.additionalOptions?.speech?.enabled ?? false,
           voice: conversation?.additionalOptions?.speech?.voice ?? undefined,
-          model: {
-            id: conversation?.additionalOptions?.speech?.model?.id,
-            name: conversation?.additionalOptions?.speech?.model?.name,
-            provider: conversation?.additionalOptions?.speech?.model?.provider
-          }
+          model: conversation?.additionalOptions?.speech?.model ?? undefined
         }
       },
       metadata: conversation?.metadata ?? true

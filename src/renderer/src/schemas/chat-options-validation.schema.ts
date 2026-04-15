@@ -63,7 +63,7 @@ export const chatOptionsValidationSchema = z.object({
           ctx.addIssue({
             code: 'custom',
             message: 'Model is required when speech is enabled',
-            path: ['model']
+            path: ['enabled']
           })
         }
       })
