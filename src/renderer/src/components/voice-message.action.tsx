@@ -133,7 +133,7 @@ const VoiceMessageAction = ({
     )
   }
   // early return don't show any option in case off voice is not enabled
-  if (!conversation?.additionalOptions?.speech.enabled) return
+  if (!conversation?.additionalOptions?.speech?.enabled) return
   //else return the option
   return (
     <MessageAction
