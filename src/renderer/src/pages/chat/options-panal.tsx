@@ -1,4 +1,5 @@
 import { PROVIDERS_WITH_SEARCH_TOOL } from '@common/constants/global.constants'
+import { VOICE_OPTIONS } from '@common/constants/voices.constants'
 import { FetchConversationWithMessagesResponseType } from '@common/schemas/conversation.schema'
 import AppModelSelector from '@renderer/components/model-selector'
 import ResizableSidePanel from '@renderer/components/resizable-side-panel'
@@ -74,6 +75,13 @@ const ChatOptionsPanel = ({
           modelId: conversation?.tools?.imageGeneration?.modelId ?? ''
         }
       },
+      additionalOptions: {
+        speech: {
+          enabled: conversation?.additionalOptions?.speech?.enabled ?? false,
+          voice: conversation?.additionalOptions?.speech?.voice ?? undefined,
+          model: conversation?.additionalOptions?.speech?.model ?? undefined
+        }
+      },
       metadata: conversation?.metadata ?? true
     } as ChatOptionsValidationSchema,
     validators: { onSubmit: chatOptionsValidationSchema },
@@ -88,6 +96,13 @@ const ChatOptionsPanel = ({
     form.reset({
       systemPrompt: conversation?.systemPrompt ?? null,
       metadata: conversation?.metadata ?? true,
+      additionalOptions: {
+        speech: {
+          enabled: conversation?.additionalOptions?.speech?.enabled ?? false,
+          voice: conversation?.additionalOptions?.speech?.voice ?? undefined,
+          model: conversation?.additionalOptions?.speech?.model ?? undefined
+        }
+      },
       tools: {
         search: {
           enabled: conversation?.tools?.search?.enabled ?? false,
@@ -318,6 +333,140 @@ const ChatOptionsPanel = ({
                             </Field>
                           )
                         }}
+                      </form.Field>
+                    )}
+                  </form.Field>
+                )
+              }}
+            </form.Subscribe>
+          </div>
+
+          {/* Additional options */}
+          <div className="p-4 flex flex-col gap-2">
+            <h2 className="text-foreground font-semibold text-sm">ADDITIONAL OPTIONS</h2>
+
+            {/* Speech Tool */}
+            <form.Field name="additionalOptions.speech.enabled">
+              {(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <div className="flex items-center justify-between">
+                      <FieldLabel
+                        className="text-muted-foreground text-sm font-semibold"
+                        htmlFor={field.name}
+                      >
+                        Speech (Text-to-Speech)
+                      </FieldLabel>
+                      <Switch
+                        id={field.name}
+                        name={field.name}
+                        checked={field.state.value}
+                        onCheckedChange={(value) => {
+                          field.handleChange(value)
+                          // if speech is disabled, clear the model and voice fields
+                          if (!value) {
+                            form.setFieldValue('additionalOptions.speech.model', undefined)
+                            form.setFieldValue('additionalOptions.speech.voice', undefined)
+                          }
+                        }}
+                      />
+                    </div>
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                )
+              }}
+            </form.Field>
+
+            {/* Speech model + voice selector — visible only when speech is enabled */}
+            <form.Subscribe selector={(state) => state.values.additionalOptions.speech.enabled}>
+              {(isSpeechEnabled) => {
+                if (!isSpeechEnabled) return null
+                return (
+                  <form.Field name="additionalOptions.speech.model.provider">
+                    {(providerField) => (
+                      <form.Field name="additionalOptions.speech.model.id">
+                        {(modelIdField) => (
+                          <form.Field name="additionalOptions.speech.model.name">
+                            {(modelNameField) => {
+                              const isProviderInvalid =
+                                providerField.state.meta.isTouched &&
+                                !providerField.state.meta.isValid
+                              const isModelInvalid =
+                                modelIdField.state.meta.isTouched &&
+                                !modelIdField.state.meta.isValid
+
+                              // derive available voices for the selected provider
+                              const selectedProvider = providerField.state.value as
+                                | string
+                                | undefined
+                              const voiceOptions: readonly string[] =
+                                selectedProvider && selectedProvider in VOICE_OPTIONS
+                                  ? VOICE_OPTIONS[selectedProvider as keyof typeof VOICE_OPTIONS]
+                                  : []
+
+                              return (
+                                <Field className="flex flex-col gap-2 my-2 animate-in fade-in slide-in-from-top-1">
+                                  <p className="text-xs text-muted-foreground">
+                                    ❗Note : if you get an error try switching the model and try
+                                    selecting a voice (only openai is supported currently)
+                                  </p>
+                                  {/* Model selector */}
+                                  <AppModelSelector
+                                    modelType="tts"
+                                    output="audio"
+                                    className="border border-input bg-input/30"
+                                    disableDefaultSelection
+                                    onSelect={(selected) => {
+                                      providerField.handleChange(selected.provider)
+                                      modelIdField.handleChange(selected.id)
+                                      modelNameField.handleChange(selected.name)
+                                      // reset voice when provider changes
+                                      form.setFieldValue(
+                                        'additionalOptions.speech.voice',
+                                        undefined
+                                      )
+                                    }}
+                                  />
+                                  {(isModelInvalid || isProviderInvalid) && (
+                                    <p className="text-sm font-normal text-destructive">
+                                      Please select a model
+                                    </p>
+                                  )}
+                                  {/* Voice selector — only shown when provider has known voices */}
+                                  {voiceOptions.length > 0 && (
+                                    <form.Field name="additionalOptions.speech.voice">
+                                      {(voiceField) => (
+                                        <Field className="flex flex-col gap-1">
+                                          <FieldLabel className="text-muted-foreground text-xs font-semibold">
+                                            Voice
+                                          </FieldLabel>
+                                          <Select
+                                            value={voiceField.state.value ?? ''}
+                                            onValueChange={(value) =>
+                                              voiceField.handleChange(value)
+                                            }
+                                          >
+                                            <SelectTrigger className="border border-input bg-input/30">
+                                              <SelectValue placeholder="Select a voice" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              {voiceOptions.map((voice) => (
+                                                <SelectItem key={voice} value={voice}>
+                                                  {voice}
+                                                </SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                        </Field>
+                                      )}
+                                    </form.Field>
+                                  )}
+                                </Field>
+                              )
+                            }}
+                          </form.Field>
+                        )}
                       </form.Field>
                     )}
                   </form.Field>

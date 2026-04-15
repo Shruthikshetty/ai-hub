@@ -70,6 +70,21 @@ export const conversationToolsSchema = z.object({
     .optional()
 })
 
+//conversation additional options
+export const conversationAdditionalOptions = z.object({
+  speech: z.object({
+    enabled: z.boolean().default(false),
+    voice: z.string().optional(),
+    model: z
+      .object({
+        id: z.string(),
+        name: z.string(),
+        provider: z.string()
+      })
+      .optional()
+  })
+})
+
 // reasoning options
 export const reasoningOptionsSchema = z.enum(REASONING_OPTIONS)
 
@@ -84,5 +99,6 @@ export type DeleteAllConversationsResponseType = z.infer<
 >
 export type FetchConversationWithMessagesResponseType = z.infer<typeof getMessagesByConversation>
 export type ConversationToolsSchemaType = z.infer<typeof conversationToolsSchema>
+export type ConversationAdditionalOptionType = z.infer<typeof conversationAdditionalOptions>
 export type ReasoningOptionsSchemaType = z.infer<typeof reasoningOptionsSchema>
 export type UpdateConversationResponseSchemaType = z.infer<typeof updateConversationResponseSchema>
