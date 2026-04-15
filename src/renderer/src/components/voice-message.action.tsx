@@ -6,7 +6,7 @@ import { Loader2, Volume2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useGenerateSpeech } from '@renderer/services/tts'
 import { useGetMediaByMessageId } from '@renderer/services/media'
-import { ModelSchemaType } from '@common/schemas/model.schema'
+import { ConversationsGetSchema } from '@common/db-schemas/conversation.schema'
 
 /**
  * Component to handle voice message action.
@@ -16,12 +16,10 @@ import { ModelSchemaType } from '@common/schemas/model.schema'
  */
 const VoiceMessageAction = ({
   message,
-  chatId,
-  model
+  conversation
 }: {
   message: AppUIMessage
-  chatId?: number
-  model: ModelSchemaType | null
+  conversation: ConversationsGetSchema | undefined | null
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -90,7 +88,7 @@ const VoiceMessageAction = ({
   // handler to read aloud
   const handleReadAloud = (text: string) => {
     // return in case no chatId
-    if (!chatId || !model) return
+    if (!conversation?.id || !conversation.additionalOptions?.speech?.model) return
 
     // If already speaking, stop playback
     if (isSpeaking) {
@@ -106,7 +104,23 @@ const VoiceMessageAction = ({
 
     // generate speech
     generateSpeech(
-      { text, chatId: chatId.toString(), messageId: message.id, model }, //@TODO voice is temporary hardcoded
+      {
+        text,
+        chatId: conversation?.id.toString(),
+        messageId: message.id,
+        model: {
+          id: conversation.additionalOptions?.speech?.model.id,
+          name: conversation.additionalOptions?.speech?.model.name,
+          provider: conversation.additionalOptions?.speech?.model.provider,
+          inputs: ['text'],
+          outputs: ['audio'],
+          capabilities: {
+            realtime: false,
+            videoReasoning: false,
+            vision: false
+          }
+        }
+      },
       {
         onSuccess: (result) => {
           const mediaUrl = result?.data?.mediaUrl
@@ -118,7 +132,9 @@ const VoiceMessageAction = ({
       }
     )
   }
-
+  // early return don't show any option in case off voice is not enabled
+  if (!conversation?.additionalOptions?.speech.enabled) return
+  //else return the option
   return (
     <MessageAction
       className="active:scale-95 transition-all"

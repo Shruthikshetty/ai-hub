@@ -1,0 +1,1 @@
+ALTER TABLE `conversations` ADD `additionalOptions` text DEFAULT '{"speech":{"enabled":false}}';

@@ -44,8 +44,30 @@ export const chatOptionsValidationSchema = z.object({
           })
         }
       })
+  }),
+  additionalOptions: z.object({
+    speech: z
+      .object({
+        enabled: z.boolean(),
+        voice: z.string().optional(),
+        model: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            provider: z.string()
+          })
+          .optional()
+      })
+      .superRefine((data, ctx) => {
+        if (data.enabled && !data.model) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Model is required when speech is enabled',
+            path: ['model']
+          })
+        }
+      })
   })
-  // rest will be added here
 })
 
 // type for the chat options validation schema

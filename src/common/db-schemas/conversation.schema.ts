@@ -4,11 +4,13 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import type { ConversationToolsSchemaType } from '../schemas/conversation.schema'
+import type {
+  ConversationAdditionalOptionType,
+  ConversationToolsSchemaType
+} from '../schemas/conversation.schema'
 import { REASONING_OPTIONS } from '../constants/global.constants'
 
 //tables ----------->
-//@TODO setting or option will be later added
 export const conversations = sqliteTable('conversations', {
   id: integer().primaryKey({ autoIncrement: true }),
   title: text().default('New Chat'),
@@ -20,6 +22,11 @@ export const conversations = sqliteTable('conversations', {
   tools: text({ mode: 'json' })
     .$type<ConversationToolsSchemaType>()
     .default({ search: { enabled: false }, imageGeneration: { enabled: false } }),
+  additionalOptions: text({ mode: 'json' })
+    .$type<ConversationAdditionalOptionType>()
+    .default({
+      speech: { enabled: false }
+    }),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()

@@ -223,20 +223,7 @@ const ChatPage = () => {
                           <CopyMessageAction message={message} />
                           <VoiceMessageAction
                             message={message}
-                            chatId={selectedConversation?.id}
-                            //@TODO temp hardcoded
-                            model={{
-                              id: 'gpt-4o-mini-tts',
-                              name: 'gpt-4o-mini-tts',
-                              provider: 'openai',
-                              inputs: ['text'],
-                              outputs: ['audio'],
-                              capabilities: {
-                                realtime: false,
-                                videoReasoning: false,
-                                vision: false
-                              }
-                            }} // this has to be a tts model
+                            conversation={selectedConversation}
                           />
                         </MessageActions>
                       )}
