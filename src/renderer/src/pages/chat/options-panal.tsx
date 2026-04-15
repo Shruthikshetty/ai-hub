@@ -409,7 +409,7 @@ const ChatOptionsPanel = ({
                                 <Field className="flex flex-col gap-2 my-2 animate-in fade-in slide-in-from-top-1">
                                   <p className="text-xs text-muted-foreground">
                                     ❗Note : if you get an error try switching the model and try
-                                    selecting a voice
+                                    selecting a voice (only openai is supported currently)
                                   </p>
                                   {/* Model selector */}
                                   <AppModelSelector
