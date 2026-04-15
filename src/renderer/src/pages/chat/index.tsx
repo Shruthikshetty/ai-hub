@@ -223,7 +223,7 @@ const ChatPage = () => {
                           <CopyMessageAction message={message} />
                           <VoiceMessageAction
                             message={message}
-                            conversation={selectedConversation}
+                            conversation={defaultMessages?.data}
                           />
                         </MessageActions>
                       )}
