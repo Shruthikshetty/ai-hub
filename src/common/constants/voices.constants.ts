@@ -16,6 +16,7 @@ export const VOICE_OPTIONS = {
     'marin',
     'cedar'
   ],
+  //@TODO dose not support tts speech endpoint
   xai: ['ara', 'eve', 'leo', 'rex', 'sal']
   //update the rest of the providers
 } as const
