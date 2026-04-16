@@ -426,3 +426,28 @@ export function buildMistralModel(
     }
   }
 }
+
+/**
+ * function to build a custom model record for custom providers
+ * uses basic id based segregation
+ */
+export function buildCustomModel(
+  modelId: string,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const isTTS = modelId.toLowerCase().includes('tts')
+  const outputs: ModelIOType[] = isTTS ? ['audio'] : ['text']
+
+  return {
+    id: modelId,
+    name: modelId,
+    provider,
+    inputs: ['text'],
+    outputs,
+    capabilities: {
+      realtime: false,
+      vision: false,
+      videoReasoning: false
+    }
+  }
+}

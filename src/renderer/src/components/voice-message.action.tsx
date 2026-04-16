@@ -108,6 +108,7 @@ const VoiceMessageAction = ({
         text,
         chatId: conversation?.id.toString(),
         messageId: message.id,
+        voice: conversation.additionalOptions?.speech?.voice,
         model: {
           id: conversation.additionalOptions?.speech?.model.id,
           name: conversation.additionalOptions?.speech?.model.name,

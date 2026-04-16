@@ -3,6 +3,7 @@ import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
 import {
+  buildCustomModel,
   buildFireworksAiModel,
   buildGatewayModel,
   buildGoogleModel,
@@ -460,6 +461,11 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<MistralModel>).data
         if (!data) return []
         return data.map((model: MistralModel) => buildMistralModel(model, provider.provider))
+      }
+      case 'custom': {
+        const data = (response.data as OpenAiResponse<OpenAiModel>).data
+        if (!data) return []
+        return data.map((model: OpenAiModel) => buildCustomModel(model.id, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
