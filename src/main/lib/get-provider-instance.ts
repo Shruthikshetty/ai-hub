@@ -119,7 +119,8 @@ export async function getProviderInstanceModel({
       )
       const customInstance = createOpenAI({
         name: 'custom',
-        baseURL
+        baseURL,
+        apiKey: 'none' // @TODO: does not support auth
       })
 
       return customInstance
