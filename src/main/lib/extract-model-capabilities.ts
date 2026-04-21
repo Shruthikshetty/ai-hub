@@ -436,7 +436,16 @@ export function buildCustomModel(
   provider: ModelSchemaType['provider']
 ): ModelSchemaType {
   const isTTS = modelId.toLowerCase().includes('tts')
-  const outputs: ModelIOType[] = isTTS ? ['audio'] : ['text']
+  const outputs: ModelIOType[] = []
+
+  // output extraction
+  if (modelId.toLowerCase().includes('image')) {
+    outputs.push('image')
+  } else if (isTTS) {
+    outputs.push('audio')
+  } else {
+    outputs.push('text')
+  }
 
   return {
     id: modelId,
