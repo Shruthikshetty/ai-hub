@@ -46,11 +46,21 @@ export function createIPCStreamTransport(apiPath: string): DefaultChatTransport<
           // Since our fetch already returned a Response, the SDK may never call
           // cancel() on the stream reader — so we hook the signal directly here
           // as a reliable fallback to kill the IPC stream.
-          options?.signal?.addEventListener('abort', () => {
+          //
+          // IMPORTANT: startStream() is awaited above, so stop() may have already
+          // aborted the signal before we reach this point. addEventListener('abort')
+          // does NOT fire retroactively, so we must check signal.aborted first.
+          if (options?.signal?.aborted) {
             window.api.stopStream(requestId)
             window.api.removeStreamListeners(requestId)
             controller.close()
-          })
+          } else {
+            options?.signal?.addEventListener('abort', () => {
+              window.api.stopStream(requestId)
+              window.api.removeStreamListeners(requestId)
+              controller.close()
+            })
+          }
         },
         cancel() {
           // Fallback: called if the SDK does cancel the reader explicitly.

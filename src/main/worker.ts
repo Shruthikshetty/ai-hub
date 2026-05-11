@@ -77,12 +77,26 @@ process.parentPort.on('message', async (e) => {
 
   if (type === 'hono-request') {
     await migrationPromise
+
+    // AbortController lets us cancel the upstream fetch when the user presses Stop
+    const abortController = new AbortController()
+
+    // Listen for an abort signal forwarded from main (user pressed Stop)
+    const onAbort = (msgEvent: Electron.MessageEvent): void => {
+      if (msgEvent.data?.type === 'abort') {
+        abortController.abort()
+      }
+    }
+    port.on('message', onAbort)
+    port.start()
+
     try {
       const res = await app.fetch(
         new Request(`http://localhost${path}`, {
           method,
           headers: body ? { 'Content-Type': 'application/json' } : undefined,
-          body: body ? JSON.stringify(body) : undefined
+          body: body ? JSON.stringify(body) : undefined,
+          signal: abortController.signal
         })
       )
       const contentType = res.headers.get('content-type') || ''
@@ -94,23 +108,38 @@ process.parentPort.on('message', async (e) => {
         // Stream the response chunks back through the port
         const reader = res.body.getReader()
         const decoder = new TextDecoder()
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          port.postMessage({ type: 'chunk', data: decoder.decode(value, { stream: true }) })
+        try {
+          while (true) {
+            // Check abort before each read
+            if (abortController.signal.aborted) break
+            const { done, value } = await reader.read()
+            if (done) break
+            port.postMessage({ type: 'chunk', data: decoder.decode(value, { stream: true }) })
+          }
+        } finally {
+          // Always cancel the reader on exit (abort or natural end)
+          reader.cancel()
         }
-        // Flush any remaining buffered bytes from incomplete multi-byte UTF-8 sequences
-        const remaining = decoder.decode()
-        if (remaining) {
-          port.postMessage({ type: 'chunk', data: remaining })
+
+        if (!abortController.signal.aborted) {
+          // Flush any remaining buffered bytes from incomplete multi-byte UTF-8 sequences
+          const remaining = decoder.decode()
+          if (remaining) {
+            port.postMessage({ type: 'chunk', data: remaining })
+          }
+          port.postMessage({ type: 'end' })
         }
-        port.postMessage({ type: 'end' })
         port.close()
       } else {
         port.postMessage({ type: 'complete', data: null })
         port.close()
       }
     } catch (error) {
+      // Suppress abort errors — they are expected when the user presses Stop
+      if (abortController.signal.aborted) {
+        port.close()
+        return
+      }
       console.error('Worker request failed:', error)
       port.postMessage({ type: 'error', data: String(error) })
       port.close()

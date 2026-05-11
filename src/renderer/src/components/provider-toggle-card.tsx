@@ -91,19 +91,19 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
           </div>
           {/* hide option shown if enabled */}
           {provider.enabled ? (
-            <>
-              {provider.hide ? (
-                <EyeClosed
-                  className="text-muted-foreground hover:text-foreground active:scale-95 cursor-pointer transition-transform duration-50"
-                  onClick={() => toggleHideProvider(false)}
-                />
-              ) : (
-                <Eye
-                  className="text-muted-foreground hover:text-foreground active:scale-95 cursor-pointer transition-transform duration-50"
-                  onClick={() => toggleHideProvider(true)}
-                />
-              )}
-            </>
+            <button
+              aria-label={
+                provider.hide
+                  ? 'Show provider in model selector'
+                  : 'Hide provider from model selector'
+              }
+              aria-pressed={!!provider.hide}
+              disabled={isPending}
+              className="text-muted-foreground hover:text-foreground active:scale-95 cursor-pointer transition-transform duration-50"
+              onClick={() => toggleHideProvider(!provider.hide)}
+            >
+              {provider.hide ? <EyeClosed /> : <Eye />}
+            </button>
           ) : null}
         </div>
       </CardHeader>

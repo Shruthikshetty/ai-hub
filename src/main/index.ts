@@ -301,6 +301,8 @@ app.whenReady().then(() => {
     // Listen for renderer abort signal (user pressed Stop)
     ipcMain.once(`stream-abort-${requestId}`, () => {
       cleanup()
+      // Signal the worker to cancel its reader loop before closing the port
+      port1.postMessage({ type: 'abort' })
       port1.close()
       // Send a stream-end so the renderer's ReadableStream closes gracefully
       event.sender.send(`stream-end-${requestId}`)
