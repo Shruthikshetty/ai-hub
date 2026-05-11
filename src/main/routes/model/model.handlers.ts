@@ -6,15 +6,16 @@ import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { GetModelsRoute } from './model.route'
 import db from '../../db'
 import { getModelListFromProvider } from '../../lib/get-model-list'
+import { and } from 'drizzle-orm'
 
 // handler to get all the list of models available
 export const getModels: AppRouteHandler<GetModelsRoute> = async (c) => {
   // get the valid outputs from query params
   const { output } = c.req.valid('query')
 
-  // get all the providers that are enabled
+  // get all the providers that are enabled and not hidden
   const enabledProviders = await db.query.providers.findMany({
-    where: (providers, { eq }) => eq(providers.enabled, true)
+    where: (providers, { eq }) => and(eq(providers.enabled, true), eq(providers.hide, false))
   })
 
   // map over providers and fetch the model list concurrently

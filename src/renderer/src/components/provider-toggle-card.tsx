@@ -9,7 +9,7 @@ import { Switch } from './ui/switch'
 import { cn } from '@renderer/lib/utils'
 import { useUpdateProviderById } from '@renderer/services/provider'
 import { hiddenText } from '@renderer/lib/format.utils'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Eye, EyeClosed } from 'lucide-react'
 
 export default function ProviderToggleCard({ provider }: { provider: ProviderGetSchema }) {
   const defaultValue = provider.server ? provider.serverUrl : provider.apiKey || ''
@@ -24,6 +24,16 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
       data: {
         enabled: true,
         ...(provider.server ? { serverUrl: value } : { apiKey: value })
+      },
+      id: provider.id
+    })
+  }
+
+  //toggle hide provider
+  const toggleHideProvider = (hide: boolean) => {
+    mutate({
+      data: {
+        hide: hide
       },
       id: provider.id
     })
@@ -79,6 +89,22 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
               </CardDescription>
             </div>
           </div>
+          {/* hide option shown if enabled */}
+          {provider.enabled ? (
+            <>
+              {provider.hide ? (
+                <EyeClosed
+                  className="text-muted-foreground hover:text-foreground active:scale-95 cursor-pointer transition-transform duration-50"
+                  onClick={() => toggleHideProvider(false)}
+                />
+              ) : (
+                <Eye
+                  className="text-muted-foreground hover:text-foreground active:scale-95 cursor-pointer transition-transform duration-50"
+                  onClick={() => toggleHideProvider(true)}
+                />
+              )}
+            </>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent>
