@@ -15,6 +15,7 @@ import { createFireworks } from '@ai-sdk/fireworks'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { createMistral } from '@ai-sdk/mistral'
 import { createCerebras } from '@ai-sdk/cerebras'
+import { createElevenLabs } from '@ai-sdk/elevenlabs'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({
@@ -143,6 +144,12 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return cerebrasInstance
+    }
+    case 'elevenlabs': {
+      const elevenlabsInstance = createElevenLabs({
+        apiKey
+      })
+      return elevenlabsInstance
     }
     case 'openai': // fall back as default
     default: {

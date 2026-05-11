@@ -48,9 +48,9 @@ function AppModelSelector({
   // get the loading state of both
   const isLoading = modelsLoading || providersLoading
 
-  // only show providers that are enabled
+  // only show providers that are enabled and not hidden
   const activeProviders = useMemo(
-    () => providersData?.data?.filter((p) => p.enabled) ?? [],
+    () => providersData?.data?.filter((p) => p.enabled && !p.hide) ?? [],
     [providersData]
   )
 
