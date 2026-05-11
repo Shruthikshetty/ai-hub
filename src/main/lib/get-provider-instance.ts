@@ -2,7 +2,7 @@ import { createOpenAI } from '@ai-sdk/openai'
 import { ModelProviderType, ModelSchemaType } from '../../common/schemas/model.schema'
 import db from '../db'
 import { decryptText } from '../../common/utils/encryption.util'
-import { createGateway } from 'ai'
+import { createGateway, LanguageModel } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
 import { normalizeProviderUrl } from '../../common/utils/url.util'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
@@ -15,7 +15,7 @@ import { createFireworks } from '@ai-sdk/fireworks'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { createMistral } from '@ai-sdk/mistral'
 import { createCerebras } from '@ai-sdk/cerebras'
-import { createElevenLabs } from '@ai-sdk/elevenlabs'
+import { createElevenLabs, ElevenLabsProvider } from '@ai-sdk/elevenlabs'
 
 // get the model based on the provider
 export async function getProviderInstanceModel({
@@ -149,7 +149,12 @@ export async function getProviderInstanceModel({
       const elevenlabsInstance = createElevenLabs({
         apiKey
       })
-      return elevenlabsInstance
+      /* type casting just to prevent type error but this is not callable directly
+       * should not cause a issue since user will not be able to pass elevenlabs models in chat endpoint
+       */
+      return elevenlabsInstance as ElevenLabsProvider & {
+        (input: string): LanguageModel
+      }
     }
     case 'openai': // fall back as default
     default: {
