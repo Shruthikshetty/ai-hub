@@ -400,7 +400,7 @@ const ChatOptionsPanel = ({
                               const selectedProvider = providerField.state.value as
                                 | string
                                 | undefined
-                              const voiceOptions: readonly string[] =
+                              const voiceOptions: readonly { id: string; label: string }[] =
                                 selectedProvider && selectedProvider in VOICE_OPTIONS
                                   ? VOICE_OPTIONS[selectedProvider as keyof typeof VOICE_OPTIONS]
                                   : []
@@ -452,8 +452,8 @@ const ChatOptionsPanel = ({
                                             </SelectTrigger>
                                             <SelectContent>
                                               {voiceOptions.map((voice) => (
-                                                <SelectItem key={voice} value={voice}>
-                                                  {voice}
+                                                <SelectItem key={voice.id} value={voice.id}>
+                                                  {voice.label}
                                                 </SelectItem>
                                               ))}
                                             </SelectContent>

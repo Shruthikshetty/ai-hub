@@ -241,6 +241,7 @@ app.whenReady().then(() => {
     const cleanup = (): void => {
       clearTimeout(inactivityTimeout)
       ipcMain.removeAllListeners(`stream-ready-${requestId}`)
+      ipcMain.removeAllListeners(`stream-abort-${requestId}`)
     }
 
     const resetInactivityTimeout = (): void => {
@@ -296,6 +297,16 @@ app.whenReady().then(() => {
       }
     })
     port1.start()
+
+    // Listen for renderer abort signal (user pressed Stop)
+    ipcMain.once(`stream-abort-${requestId}`, () => {
+      cleanup()
+      // Signal the worker to cancel its reader loop before closing the port
+      port1.postMessage({ type: 'abort' })
+      port1.close()
+      // Send a stream-end so the renderer's ReadableStream closes gracefully
+      event.sender.send(`stream-end-${requestId}`)
+    })
 
     // Return the requestId immediately so the renderer can set up listeners
     return { requestId }

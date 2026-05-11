@@ -185,6 +185,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://cloud.cerebras.ai',
     description: 'Cerebras provider models'
+  },
+  {
+    provider: 'elevenlabs',
+    name: 'ElevenLabs',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/elevenlabs.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://elevenlabs.io/app/developers',
+    description: 'ElevenLabs provider voice and tts models'
   }
 ]
 
@@ -203,7 +213,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'poe',
   'mistral',
   'cerebras',
-  'custom'
+  'custom',
+  'elevenlabs'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const

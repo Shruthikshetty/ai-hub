@@ -261,8 +261,8 @@ const ChatPage = () => {
               </PromptInputTools>
               {/* submit button */}
               <PromptInputSubmit
-                //@TODO stop will not work
                 onStop={stop}
+                className={isGenerating ? 'bg-destructive' : ''}
                 disabled={
                   !isGenerating && (!selectedModel?.id || !selectedConversation?.id || !text.trim())
                 }

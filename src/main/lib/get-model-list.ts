@@ -3,6 +3,7 @@ import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
 import {
+  buildCustomModel,
   buildFireworksAiModel,
   buildGatewayModel,
   buildGoogleModel,
@@ -240,6 +241,38 @@ export type MistralModel = {
 }
 
 /**
+ * eleven labs model type
+ * doc https://elevenlabs.io/docs/api-reference/models/list
+ **/
+export type ElevenLabsModel = {
+  model_id: string
+  name: string
+  can_be_finetuned: boolean
+  can_do_text_to_speech: boolean
+  can_do_voice_conversion: boolean
+  can_use_style: boolean
+  can_use_speaker_boost: boolean
+  serves_pro_voices: boolean
+  token_cost_factor: number
+  description: string
+  requires_alpha_access: boolean
+  max_characters_request_free_user?: number
+  max_characters_request_subscribed_user?: number
+  maximum_text_length_per_request?: number
+  languages: Array<{
+    language_id: string
+    name: string
+  }>
+  model_rates: {
+    character_cost_multiplier: number
+    cost_discount_multiplier: number
+  }
+  concurrency_group: string
+}
+
+type ElevenLabsResponse = ElevenLabsModel[]
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -266,6 +299,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<TogetherAiResponse>
       | AxiosResponse<FireworksAiResponse>
       | AxiosResponse<OpenAiResponse<PoeModel>>
+      | AxiosResponse<ElevenLabsResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -349,6 +383,13 @@ export async function getModelListFromProvider(
         response = await axios.get('https://api.cerebras.ai/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
+        })
+        break
+      }
+      case 'elevenlabs': {
+        response = await axios.get('https://api.elevenlabs.io/v1/models', {
+          headers: { 'xi-api-key': apiKey },
+          timeout: 4000 //4 seconds
         })
         break
       }
@@ -460,6 +501,22 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<MistralModel>).data
         if (!data) return []
         return data.map((model: MistralModel) => buildMistralModel(model, provider.provider))
+      }
+      case 'elevenlabs': {
+        const data = response.data as ElevenLabsResponse
+        if (!data) return []
+        return data.map((model: ElevenLabsModel) => ({
+          id: model.model_id,
+          name: model.name,
+          provider: provider.provider,
+          inputs: ['text'],
+          outputs: ['audio']
+        }))
+      }
+      case 'custom': {
+        const data = (response.data as OpenAiResponse<OpenAiModel>).data
+        if (!data) return []
+        return data.map((model: OpenAiModel) => buildCustomModel(model.id, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

@@ -31,6 +31,11 @@ const api = {
     ipcRenderer.removeAllListeners(`stream-error-${requestId}`)
   },
 
+  // Signal main process to abort an active stream (e.g. user pressed Stop)
+  stopStream: (requestId: number): void => {
+    ipcRenderer.send(`stream-abort-${requestId}`)
+  },
+
   // Signal to main process that stream listeners are attached and ready
   streamReady: (requestId: number): void => {
     ipcRenderer.send(`stream-ready-${requestId}`)
