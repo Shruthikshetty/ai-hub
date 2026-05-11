@@ -41,10 +41,20 @@ export function createIPCStreamTransport(apiPath: string): DefaultChatTransport<
 
           // Signal main process that listeners are attached — flush buffered chunks
           window.api.streamReady(requestId)
+
+          // Direct abort-signal listener: useChat's stop() aborts this signal.
+          // Since our fetch already returned a Response, the SDK may never call
+          // cancel() on the stream reader — so we hook the signal directly here
+          // as a reliable fallback to kill the IPC stream.
+          options?.signal?.addEventListener('abort', () => {
+            window.api.stopStream(requestId)
+            window.api.removeStreamListeners(requestId)
+            controller.close()
+          })
         },
         cancel() {
-          // Clean up IPC listeners when the consumer aborts/cancels the stream
-          // (e.g., user navigates away or React component unmounts)
+          // Fallback: called if the SDK does cancel the reader explicitly.
+          window.api.stopStream(requestId)
           window.api.removeStreamListeners(requestId)
         }
       })
