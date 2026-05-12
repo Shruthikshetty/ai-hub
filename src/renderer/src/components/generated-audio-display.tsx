@@ -5,6 +5,7 @@ import { Button } from './ui/button'
 import { generateTailwindGradient } from '@renderer/lib/colors'
 import { Spinner } from './ui/spinner'
 import Waveform from './waveform'
+import AudioDetailsDialog from './audio-details-dialog'
 
 /**
  * Card component to display a single generated audio item.
@@ -54,6 +55,11 @@ const GeneratedAudioDisplay = ({
   const handleDownload = async () => {
     if (!media?.relativePath) return
     await window.api.downloadFile(media.relativePath)
+  }
+
+  // delete audio file
+  const handleDelete = async (): Promise<void> => {
+    // @TODO: call delete mutation when available
   }
 
   return (
@@ -119,15 +125,17 @@ const GeneratedAudioDisplay = ({
           {/* divider */}
           <span className="mx-1 h-4 w-px bg-border" />
 
-          {/* expand — wires up to modal later */}
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            aria-label="expand audio details"
-            disabled={loading || !media}
-          >
-            <Expand className="size-4" />
-          </Button>
+          {/* expand — opens audio details dialog */}
+          <AudioDetailsDialog audio={media} onDownload={handleDownload} onDelete={handleDelete}>
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              aria-label="expand audio details"
+              disabled={loading || !media}
+            >
+              <Expand className="size-4" />
+            </Button>
+          </AudioDetailsDialog>
 
           {/* download */}
           <Button
@@ -147,6 +155,7 @@ const GeneratedAudioDisplay = ({
             aria-label="delete audio"
             className="text-destructive hover:bg-destructive/10"
             disabled={loading || !media}
+            onClick={handleDelete}
           >
             <Trash2 className="size-4" />
           </Button>
