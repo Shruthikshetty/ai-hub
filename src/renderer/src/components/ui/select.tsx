@@ -25,10 +25,14 @@ function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.V
 function SelectTrigger({
   className,
   size = 'default',
+  hideIcon = false,
   children,
+  customIcon,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: 'sm' | 'default'
+  hideIcon?: boolean
+  customIcon?: React.ReactNode
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -40,10 +44,13 @@ function SelectTrigger({
       )}
       {...props}
     >
+      {customIcon && <span>{customIcon}</span>}
       {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4" />
-      </SelectPrimitive.Icon>
+      {!hideIcon && (
+        <SelectPrimitive.Icon asChild>
+          <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4" />
+        </SelectPrimitive.Icon>
+      )}
     </SelectPrimitive.Trigger>
   )
 }

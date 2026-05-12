@@ -1,4 +1,3 @@
-import { ModelIOType } from '@common/schemas/model.schema'
 import {
   PromptInput,
   PromptInputBody,
@@ -20,6 +19,8 @@ import { useGenerateSpeech } from '@renderer/services/tts'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import { useState } from 'react'
 import { VOICE_OPTIONS } from '@common/constants/voices.constants'
+import GeneratedAudioDisplay from '@renderer/components/generated-audio-display'
+import { Volume2 } from 'lucide-react'
 
 // landing page for tts - text to speech conversion tab
 const TTSPage = () => {
@@ -29,8 +30,7 @@ const TTSPage = () => {
   const [voice, setVoice] = useState('')
 
   // get selected model from global store
-  const getModel = useSelectedModel((state) => state.getModel)
-  const model = getModel('audio' as ModelIOType)
+  const model = useSelectedModel((state) => state.models['audio'])
 
   // derive the voice options for the selected model
   const voiceOptions = VOICE_OPTIONS?.[model?.provider as keyof typeof VOICE_OPTIONS] ?? []
@@ -65,14 +65,12 @@ const TTSPage = () => {
       <h2 className="text-md md:text-lg font-medium text-center w-full">TTS - (Text To Speech)</h2>
       {/* audio grid */}
       <div className="grow overflow-auto min-h-0 w-full">
-        {isPending ? <p>Generating Audio...</p> : null}
-        {mediaList?.data?.map((media) => (
-          <div key={media.id} className="relative">
-            <audio controls className="w-full">
-              <source src={media.mediaUrl} type="audio/mp3" />
-            </audio>
-          </div>
-        ))}
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-2">
+          {isPending && <GeneratedAudioDisplay media={undefined} loading={true} />}
+          {mediaList?.data?.map((media) => (
+            <GeneratedAudioDisplay key={media.id} media={media} loading={false} />
+          ))}
+        </div>
       </div>
 
       {/* input area */}
@@ -89,9 +87,15 @@ const TTSPage = () => {
         <PromptInputFooter>
           {/* All tools go here */}
           <PromptInputTools>
+            {/* model selector */}
             <AppModelSelector modelType="audio" output="audio" />
+            {/* voice selector */}
             <Select value={voice} onValueChange={(value) => setVoice(value)}>
-              <SelectTrigger className="border border-input bg-input/30">
+              <SelectTrigger
+                hideIcon
+                customIcon={<Volume2 />}
+                className="border-0 hover:bg-input/50! bg-transparent!"
+              >
                 <SelectValue placeholder="Select a voice" />
               </SelectTrigger>
               <SelectContent>
