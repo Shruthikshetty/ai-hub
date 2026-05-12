@@ -10,7 +10,7 @@ import { FILE_STORAGE_CATEGORY } from '../../../common/constants/global.constant
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import db from '../../db'
 import { media } from '../../db/schema'
-import { getProviderInstanceModel } from '../../lib/get-provider-instance'
+import { getProviderInstanceTTS } from '../../lib/get-provider-instance'
 
 // handler to generate speech from text
 export const generateSpeechFromText: AppRouteHandler<GenerateSpeechFromTextRoute> = async (c) => {
@@ -18,8 +18,7 @@ export const generateSpeechFromText: AppRouteHandler<GenerateSpeechFromTextRoute
   const { text, chatId, messageId, model, voice } = c.req.valid('json')
 
   // get the provider as per user model
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const modelProvider: any = await getProviderInstanceModel({
+  const modelProvider = await getProviderInstanceTTS({
     provider: model.provider
   })
 

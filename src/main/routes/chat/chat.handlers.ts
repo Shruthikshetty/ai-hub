@@ -62,7 +62,7 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
 
   // stream the response from ai model
   const result = streamText({
-    model: modelProvider?.(model.id),
+    model: modelProvider(model.id),
     messages: coreMessages,
     tools,
     stopWhen: stepCountIs(20),

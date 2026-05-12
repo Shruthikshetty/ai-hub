@@ -23,7 +23,7 @@ export async function generateTitle({
   try {
     const modelProvider = await getProviderInstanceModel({ provider: model.provider })
     const result = await generateText({
-      model: modelProvider?.(model.id),
+      model: modelProvider(model.id),
       prompt: `Generate a very short title (max 7 words) for a conversation that starts with: "${message}". Reply with ONLY the title, no quotes.`
     })
     // up date the conversation title

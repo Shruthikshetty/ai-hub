@@ -2,7 +2,7 @@ import { createOpenAI } from '@ai-sdk/openai'
 import { ModelProviderType, ModelSchemaType } from '../../common/schemas/model.schema'
 import db from '../db'
 import { decryptText } from '../../common/utils/encryption.util'
-import { createGateway, LanguageModel } from 'ai'
+import { createGateway } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
 import { normalizeProviderUrl } from '../../common/utils/url.util'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
@@ -15,9 +15,9 @@ import { createFireworks } from '@ai-sdk/fireworks'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { createMistral } from '@ai-sdk/mistral'
 import { createCerebras } from '@ai-sdk/cerebras'
-import { createElevenLabs, ElevenLabsProvider } from '@ai-sdk/elevenlabs'
+import { createElevenLabs } from '@ai-sdk/elevenlabs'
 
-// get the model based on the provider
+// get the provider instance based on the provider
 export async function getProviderInstanceModel({
   provider,
   toolAccess
@@ -145,16 +145,53 @@ export async function getProviderInstanceModel({
       })
       return cerebrasInstance
     }
+    case 'openai': // fall back as default
+    default: {
+      const openaiInstance = createOpenAI({
+        apiKey
+      })
+      return openaiInstance
+    }
+  }
+}
+
+// get provider instance for tts
+export async function getProviderInstanceTTS({
+  provider
+}: {
+  provider: ModelSchemaType['provider']
+}) {
+  // get the provider details
+  const providerDetails = await db.query.providers.findFirst({
+    where: (providers, { eq }) => eq(providers.provider, provider)
+  })
+  // extract api key
+  let apiKey: string | undefined
+  // if key exists decrypt it
+  if (providerDetails?.apiKey) {
+    apiKey = decryptText(providerDetails.apiKey)
+  }
+
+  // all the tts providers go here
+  switch (provider) {
     case 'elevenlabs': {
       const elevenlabsInstance = createElevenLabs({
         apiKey
       })
-      /* type casting just to prevent type error but this is not callable directly
-       * should not cause a issue since user will not be able to pass elevenlabs models in chat endpoint
-       */
-      return elevenlabsInstance as ElevenLabsProvider & {
-        (input: string): LanguageModel
-      }
+      return elevenlabsInstance
+    }
+    case 'custom': {
+      const baseURL = normalizeProviderUrl(
+        providerDetails?.serverUrl || 'http://localhost:8080',
+        '/v1'
+      )
+      const customInstance = createOpenAI({
+        name: 'custom',
+        baseURL,
+        apiKey: 'none' // @TODO: does not support auth
+      })
+
+      return customInstance
     }
     case 'openai': // fall back as default
     default: {
