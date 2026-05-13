@@ -15,7 +15,8 @@ import {
   buildOpenAiModel,
   buildPoeModel,
   buildTogetherAiModel,
-  buildXaiModel
+  buildXaiModel,
+  buildAlibabaModel
 } from './extract-model-capabilities'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
@@ -446,6 +447,16 @@ export async function getModelListFromProvider(
         })
         break
       }
+      case 'alibaba': {
+        response = await axios.get(
+          'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/models',
+          {
+            headers: { Authorization: `Bearer ${apiKey}` },
+            timeout: 2000 //2 seconds
+          }
+        )
+        break
+      }
       case 'huggingface': {
         // Each request targets one pipeline_tag — HuggingFace only supports one at a time.
         // Fire them all in parallel and merge the results.
@@ -575,6 +586,11 @@ export async function getModelListFromProvider(
         const data = (response.data as CohereResponse).models
         if (!data) return []
         return data.map((model: CohereModel) => buildCohereModel(model, provider.provider))
+      }
+      case 'alibaba': {
+        const data = (response.data as OpenAiResponse<OpenAiModel>).data
+        if (!data) return []
+        return data.map((model: OpenAiModel) => buildAlibabaModel(model.id, provider.provider))
       }
       case 'custom': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

@@ -523,3 +523,44 @@ export function buildCohereModel(
     }
   }
 }
+
+/**
+ * function to build a model record for an Alibaba DashScope model
+ * @TODO better extraction to be looked at
+ */
+export function buildAlibabaModel(
+  modelId: string,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+  const lowerModeId = modelId.toLowerCase()
+
+  if (lowerModeId.includes('omni')) {
+    inputs.push('image')
+  }
+
+  // outputs extraction
+  if (lowerModeId.includes('embed')) {
+    outputs.push('embedding')
+  } else if (lowerModeId.includes('tts')) {
+    outputs.push('audio')
+  } else if (lowerModeId.includes('image')) {
+    outputs.push('image')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: modelId,
+    name: modelId,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    capabilities: {
+      realtime: modelId.includes('realtime'),
+      vision: inputs.includes('image'),
+      videoReasoning: false
+    }
+  }
+}

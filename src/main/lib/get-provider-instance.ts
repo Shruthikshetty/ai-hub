@@ -5,7 +5,7 @@ import { decryptText } from '../../common/utils/encryption.util'
 import { createGateway } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
 import { normalizeProviderUrl } from '../../common/utils/url.util'
-import { createOpenRouter } from '@openrouter/ai-sdk-provider'
+import { createOpenRouter, LanguageModelV3 } from '@openrouter/ai-sdk-provider'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createGroq } from '@ai-sdk/groq'
 import { createHuggingFace } from '@ai-sdk/huggingface'
@@ -17,6 +17,7 @@ import { createMistral } from '@ai-sdk/mistral'
 import { createCerebras } from '@ai-sdk/cerebras'
 import { createElevenLabs } from '@ai-sdk/elevenlabs'
 import { createCohere } from '@ai-sdk/cohere'
+import { createAlibaba } from '@ai-sdk/alibaba'
 
 // get the provider instance based on the provider
 export async function getProviderInstanceModel({
@@ -81,7 +82,7 @@ export async function getProviderInstanceModel({
        *https://ai-sdk.dev/providers/ai-sdk-providers/xai
        */
       if (toolAccess) {
-        return xaiInstance.responses
+        return xaiInstance.responses as unknown as (id: string) => LanguageModelV3
       }
       return xaiInstance
     }
@@ -162,6 +163,12 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return cohereInstance
+    }
+    case 'alibaba': {
+      const alibabaInstance = createAlibaba({
+        apiKey
+      })
+      return alibabaInstance
     }
     case 'openai': // fall back as default
     default: {
