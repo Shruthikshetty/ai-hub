@@ -1,5 +1,6 @@
 import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
 import {
+  CohereModel,
   FireworksAiModel,
   GatewayModel,
   GoogleModel,
@@ -482,6 +483,38 @@ export function buildNvidiaModel(
     name: model,
     provider,
     inputs: ['text'],
+    outputs: outputs,
+    capabilities: {
+      realtime: false,
+      vision: false,
+      videoReasoning: false
+    }
+  }
+}
+
+/**
+ * function to build a model record for a Cohere model
+ */
+
+export function buildCohereModel(
+  model: CohereModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+
+  //outputs extraction
+  if (model.endpoints.includes('embed')) {
+    outputs.push('embedding')
+  } else if (model.endpoints.includes('chat')) {
+    outputs.push('text')
+  }
+
+  return {
+    id: model.name,
+    name: model.name,
+    provider,
+    inputs: inputs,
     outputs: outputs,
     capabilities: {
       realtime: false,

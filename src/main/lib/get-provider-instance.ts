@@ -16,6 +16,7 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { createMistral } from '@ai-sdk/mistral'
 import { createCerebras } from '@ai-sdk/cerebras'
 import { createElevenLabs } from '@ai-sdk/elevenlabs'
+import { createCohere } from '@ai-sdk/cohere'
 
 // get the provider instance based on the provider
 export async function getProviderInstanceModel({
@@ -155,6 +156,12 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return cerebrasInstance
+    }
+    case 'cohere': {
+      const cohereInstance = createCohere({
+        apiKey
+      })
+      return cohereInstance
     }
     case 'openai': // fall back as default
     default: {

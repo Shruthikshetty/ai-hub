@@ -3,6 +3,7 @@ import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
 import {
+  buildCohereModel,
   buildCustomModel,
   buildFireworksAiModel,
   buildGatewayModel,
@@ -274,6 +275,42 @@ export type ElevenLabsModel = {
 type ElevenLabsResponse = ElevenLabsModel[]
 
 /**
+ * cohere model type
+ * docs https://docs.cohere.com/reference/list-models
+ */
+
+export type CohereModel = {
+  name: string
+  is_deprecated: boolean
+  endpoints: ('chat' | 'embed' | 'classify' | 'summarize' | 'rerank' | 'rate' | 'generate')[]
+  finetuned: boolean
+  context_length: number
+  tokenizer_url?: string
+  default_endpoints: (
+    | 'chat'
+    | 'embed'
+    | 'classify'
+    | 'summarize'
+    | 'rerank'
+    | 'rate'
+    | 'generate'
+  )[]
+  features: string[]
+  sampling_defaults: {
+    temperature: number
+    k: number
+    p: number
+    frequency_penalty: number
+    presence_penalty: number
+    max_tokens_per_doc: number
+  }
+}
+
+type CohereResponse = {
+  models: CohereModel[]
+}
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -301,6 +338,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<FireworksAiResponse>
       | AxiosResponse<OpenAiResponse<PoeModel>>
       | AxiosResponse<ElevenLabsResponse>
+      | AxiosResponse<CohereResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -396,6 +434,13 @@ export async function getModelListFromProvider(
       }
       case 'nvidia': {
         response = await axios.get('https://integrate.api.nvidia.com/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        break
+      }
+      case 'cohere': {
+        response = await axios.get('https://api.cohere.ai/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
         })
@@ -525,6 +570,11 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
         if (!data) return []
         return data.map((model: OpenAiModel) => buildNvidiaModel(model.id, provider.provider))
+      }
+      case 'cohere': {
+        const data = (response.data as CohereResponse).models
+        if (!data) return []
+        return data.map((model: CohereModel) => buildCohereModel(model, provider.provider))
       }
       case 'custom': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

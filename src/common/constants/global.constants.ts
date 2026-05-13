@@ -205,6 +205,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://build.nvidia.com/explore/discover',
     description: 'Nvidia hosted models over 40+ different models'
+  },
+  {
+    provider: 'cohere',
+    name: 'Cohere',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/cohere.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://dashboard.cohere.com',
+    description: 'Cohere provider models'
   }
 ]
 
@@ -225,7 +235,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'cerebras',
   'custom',
   'elevenlabs',
-  'nvidia'
+  'nvidia',
+  'cohere'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
