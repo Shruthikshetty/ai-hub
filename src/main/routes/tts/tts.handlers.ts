@@ -11,7 +11,7 @@ import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import db from '../../db'
 import { media } from '../../db/schema'
 import { getProviderInstanceTTS } from '../../lib/get-provider-instance'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 
 // handler to generate speech from text
 export const generateSpeechFromText: AppRouteHandler<GenerateSpeechFromTextRoute> = async (c) => {
@@ -82,7 +82,7 @@ export const deleteGeneratedTTSAudio: AppRouteHandler<DeleteGeneratedTTSAudioRou
 
   // get the audio from db
   const ttsAudio = await db.query.media.findFirst({
-    where: eq(media.id, id)
+    where: and(eq(media.id, id), eq(media.type, 'tts'))
   })
 
   // if audio is not found, return error
