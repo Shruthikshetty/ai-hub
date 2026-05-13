@@ -25,5 +25,6 @@ export const MUTATION_KEYS = {
   videoGenerate: 'video-generate',
   videoDelete: 'video-delete',
   deleteAllConversations: 'delete-all-conversations',
-  speechGenerate: 'speech-generate'
+  speechGenerate: 'speech-generate',
+  speechDelete: 'speech-delete'
 }

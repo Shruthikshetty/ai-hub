@@ -6,6 +6,7 @@ import { generateTailwindGradient } from '@renderer/lib/colors'
 import { Spinner } from './ui/spinner'
 import Waveform from './waveform'
 import AudioDetailsDialog from './audio-details-dialog'
+import { useDeleteGeneratedTTSAudio } from '@renderer/services/tts'
 
 /**
  * Card component to display a single generated audio item.
@@ -21,6 +22,9 @@ const GeneratedAudioDisplay = ({
 }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [playing, setPlaying] = useState(false)
+
+  // custom hook to delete the generated audio
+  const { mutate: deleteAudio } = useDeleteGeneratedTTSAudio()
 
   // generate random gradient for the image
   const gradientStyles = useMemo(() => generateTailwindGradient(), [])
@@ -58,8 +62,9 @@ const GeneratedAudioDisplay = ({
   }
 
   // delete audio file
-  const handleDelete = async (): Promise<void> => {
-    // @TODO: call delete mutation when available
+  const handleDelete = () => {
+    if (!media?.id) return
+    deleteAudio(media.id)
   }
 
   return (

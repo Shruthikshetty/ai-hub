@@ -126,6 +126,35 @@ app.whenReady().then(() => {
 
     try {
       const stat = fs.statSync(absolutePath)
+      //Add validation to ensure the path points to a file, not a directory.
+      if (!stat.isFile()) {
+        return new Response('Not a file', { status: 400 })
+      }
+
+      // Handle Range request for media seeking
+      const rangeHeader = request.headers.get('Range')
+
+      if (rangeHeader) {
+        const parts = rangeHeader.replace(/bytes=/, '').split('-')
+        const start = parseInt(parts[0], 10)
+        const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1
+        const chunkSize = end - start + 1
+
+        const stream = fs.createReadStream(absolutePath, { start, end })
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return new Response(stream as any, {
+          status: 206,
+          headers: {
+            'Content-Type': mime,
+            'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunkSize.toString(),
+            'Cache-Control': 'no-cache'
+          }
+        })
+      }
+
       return net
         .fetch(pathToFileURL(absolutePath).toString())
         .then((response) => {

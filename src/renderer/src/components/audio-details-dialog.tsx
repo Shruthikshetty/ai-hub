@@ -30,7 +30,7 @@ const AudioDetailsDialog = ({
   children: React.ReactNode
   audio?: MediaGetSchema
   onDownload: () => Promise<void>
-  onDelete: () => Promise<void>
+  onDelete: () => void
 }) => {
   // holds the model open close state
   const [open, setOpen] = useState(false)
@@ -63,7 +63,7 @@ const AudioDetailsDialog = ({
         {/* Audio player */}
         {audio?.mediaUrl && (
           <div className="px-5 py-3 w-full">
-            <AudioPlayer className="w-full [&_media-control-bar]:w-full **:[[role=group]]:w-full  [&_media-time-range]:flex-1">
+            <AudioPlayer className="w-full [&_media-control-bar]:w-full [&_[role=group]]:w-full [&_media-time-range]:flex-1">
               <AudioPlayerElement src={audio.mediaUrl} ref={audioRef} preload="auto" />
               <AudioPlayerControlBar>
                 <AudioPlayerSeekBackwardButton size="icon-lg" />
