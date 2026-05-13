@@ -10,6 +10,7 @@ import {
   buildGroqModel,
   buildHuggingFaceModel,
   buildMistralModel,
+  buildNvidiaModel,
   buildOpenAiModel,
   buildPoeModel,
   buildTogetherAiModel,
@@ -393,6 +394,13 @@ export async function getModelListFromProvider(
         })
         break
       }
+      case 'nvidia': {
+        response = await axios.get('https://integrate.api.nvidia.com/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        break
+      }
       case 'huggingface': {
         // Each request targets one pipeline_tag — HuggingFace only supports one at a time.
         // Fire them all in parallel and merge the results.
@@ -512,6 +520,11 @@ export async function getModelListFromProvider(
           inputs: ['text'],
           outputs: ['audio']
         }))
+      }
+      case 'nvidia': {
+        const data = (response.data as OpenAiResponse<OpenAiModel>).data
+        if (!data) return []
+        return data.map((model: OpenAiModel) => buildNvidiaModel(model.id, provider.provider))
       }
       case 'custom': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

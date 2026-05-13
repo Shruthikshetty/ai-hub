@@ -460,3 +460,33 @@ export function buildCustomModel(
     }
   }
 }
+
+/**
+ * function to extract the capabilities for Nvidia NIM models
+ */
+export function buildNvidiaModel(
+  model: string,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const outputs: ModelIOType[] = []
+
+  // output extraction
+  if (model.includes('embed')) {
+    outputs.push('embedding')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: model,
+    name: model,
+    provider,
+    inputs: ['text'],
+    outputs: outputs,
+    capabilities: {
+      realtime: false,
+      vision: false,
+      videoReasoning: false
+    }
+  }
+}

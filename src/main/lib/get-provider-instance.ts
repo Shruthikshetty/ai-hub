@@ -107,6 +107,17 @@ export async function getProviderInstanceModel({
       })
       return lmstudioInstance
     }
+    case 'nvidia': {
+      const baseURL = normalizeProviderUrl('https://integrate.api.nvidia.com/v1', '/v1')
+      const nvidiaInstance = createOpenAICompatible({
+        name: 'nvidia',
+        baseURL,
+        headers: {
+          Authorization: `Bearer ${apiKey}`
+        }
+      })
+      return nvidiaInstance
+    }
     case 'vercel': {
       const gatewayInstance = createGateway({
         apiKey
