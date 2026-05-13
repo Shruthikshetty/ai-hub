@@ -4,13 +4,14 @@
 
 import { experimental_generateSpeech as generateSpeech } from 'ai'
 import { AppRouteHandler } from '../../types'
-import { GenerateSpeechFromTextRoute } from './tts.routes'
+import { GenerateSpeechFromTextRoute, DeleteGeneratedTTSAudioRoute } from './tts.routes'
 import { saveFile, deleteMediaFile } from '../../lib/file-storage'
 import { FILE_STORAGE_CATEGORY } from '../../../common/constants/global.constants'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import db from '../../db'
 import { media } from '../../db/schema'
-import { getProviderInstanceModel } from '../../lib/get-provider-instance'
+import { getProviderInstanceTTS } from '../../lib/get-provider-instance'
+import { and, eq } from 'drizzle-orm'
 
 // handler to generate speech from text
 export const generateSpeechFromText: AppRouteHandler<GenerateSpeechFromTextRoute> = async (c) => {
@@ -18,8 +19,7 @@ export const generateSpeechFromText: AppRouteHandler<GenerateSpeechFromTextRoute
   const { text, chatId, messageId, model, voice } = c.req.valid('json')
 
   // get the provider as per user model
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const modelProvider: any = await getProviderInstanceModel({
+  const modelProvider = await getProviderInstanceTTS({
     provider: model.provider
   })
 
@@ -73,4 +73,37 @@ export const generateSpeechFromText: AppRouteHandler<GenerateSpeechFromTextRoute
 
   // send the response with the url
   return c.json({ success: true, data: { mediaUrl } }, HTTP_STATUS_CODES.OK)
+}
+
+// handler to delete the generated tts audio
+export const deleteGeneratedTTSAudio: AppRouteHandler<DeleteGeneratedTTSAudioRoute> = async (c) => {
+  // get the id from request params
+  const { id } = c.req.valid('param')
+
+  // get the audio from db
+  const ttsAudio = await db.query.media.findFirst({
+    where: and(eq(media.id, id), eq(media.type, 'tts'))
+  })
+
+  // if audio is not found, return error
+  if (!ttsAudio) {
+    return c.json(
+      {
+        message: 'TTS Audio not found',
+        success: false
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+
+  // delete the audio from db
+  await db.delete(media).where(eq(media.id, id))
+  // delete the audio from file storage
+  deleteMediaFile(ttsAudio.relativePath)
+
+  // return success response
+  return c.json(
+    { success: true, message: 'Successfully deleted the TTS audio' },
+    HTTP_STATUS_CODES.OK
+  )
 }

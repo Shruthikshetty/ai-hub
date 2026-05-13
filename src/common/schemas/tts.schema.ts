@@ -32,6 +32,12 @@ export const generateSpeechFromTextResponseSchema = z.object({
   })
 })
 
+// response schema for deleting tts audio
+export const deleteTTSAudioResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string()
+})
+
 // extract the type
 export type GenerateSpeechFromTextRequestSchemaType = z.infer<
   typeof generateSpeechFromTextRequestSchema
@@ -39,3 +45,4 @@ export type GenerateSpeechFromTextRequestSchemaType = z.infer<
 export type GenerateSpeechFromTextResponseSchemaType = z.infer<
   typeof generateSpeechFromTextResponseSchema
 >
+export type DeleteTTSAudioResponseSchemaType = z.infer<typeof deleteTTSAudioResponseSchema>

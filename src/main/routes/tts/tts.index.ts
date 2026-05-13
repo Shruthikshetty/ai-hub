@@ -4,10 +4,9 @@ import * as handlers from './tts.handlers'
 import * as routes from './tts.routes'
 
 // create the router
-const router = createRouter().openapi(
-  routes.generateSpeechFromText,
-  handlers.generateSpeechFromText
-)
+const router = createRouter()
+  .openapi(routes.generateSpeechFromText, handlers.generateSpeechFromText)
+  .openapi(routes.deleteGeneratedTTSAudio, handlers.deleteGeneratedTTSAudio)
 
 // export the router
 export default router

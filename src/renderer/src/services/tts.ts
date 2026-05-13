@@ -4,12 +4,14 @@
 
 import {
   GenerateSpeechFromTextRequestSchemaType,
-  GenerateSpeechFromTextResponseSchemaType
+  GenerateSpeechFromTextResponseSchemaType,
+  DeleteTTSAudioResponseSchemaType
 } from '@common/schemas/tts.schema'
 import { ApiError } from '@common/types'
-import { MUTATION_KEYS } from '@renderer/constants/service-keys.constants'
-import { errorToast } from '@renderer/lib/toast-wrapper'
-import { useMutation } from '@tanstack/react-query'
+import { MUTATION_KEYS, QUERY_KEYS } from '@renderer/constants/service-keys.constants'
+import { errorToast, successToast } from '@renderer/lib/toast-wrapper'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { MEDIA_TYPE } from '@common/constants/global.constants'
 
 /**
  * hook to generate speech from text
@@ -43,6 +45,31 @@ export const useGenerateSpeech = () => {
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to generate speech')
+    }
+  })
+}
+
+/**
+ * hook to delete generated tts audio
+ */
+export const useDeleteGeneratedTTSAudio = () => {
+  const queryClient = useQueryClient()
+  return useMutation<DeleteTTSAudioResponseSchemaType, ApiError, number>({
+    mutationKey: [MUTATION_KEYS.speechDelete],
+    mutationFn: async (id) => {
+      const response = await window.api.request(`/api/tts/${id}`, 'DELETE')
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    onSuccess: () => {
+      successToast('TTS Audio deleted successfully')
+      // invalidate media fetch
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.mediaFetch, MEDIA_TYPE[2]] })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to delete TTS audio')
     }
   })
 }

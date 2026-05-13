@@ -17,7 +17,7 @@ import { createMistral } from '@ai-sdk/mistral'
 import { createCerebras } from '@ai-sdk/cerebras'
 import { createElevenLabs } from '@ai-sdk/elevenlabs'
 
-// get the model based on the provider
+// get the provider instance based on the provider
 export async function getProviderInstanceModel({
   provider,
   toolAccess
@@ -145,11 +145,53 @@ export async function getProviderInstanceModel({
       })
       return cerebrasInstance
     }
+    case 'openai': // fall back as default
+    default: {
+      const openaiInstance = createOpenAI({
+        apiKey
+      })
+      return openaiInstance
+    }
+  }
+}
+
+// get provider instance for tts
+export async function getProviderInstanceTTS({
+  provider
+}: {
+  provider: ModelSchemaType['provider']
+}) {
+  // get the provider details
+  const providerDetails = await db.query.providers.findFirst({
+    where: (providers, { eq }) => eq(providers.provider, provider)
+  })
+  // extract api key
+  let apiKey: string | undefined
+  // if key exists decrypt it
+  if (providerDetails?.apiKey) {
+    apiKey = decryptText(providerDetails.apiKey)
+  }
+
+  // all the tts providers go here
+  switch (provider) {
     case 'elevenlabs': {
       const elevenlabsInstance = createElevenLabs({
         apiKey
       })
       return elevenlabsInstance
+    }
+    case 'custom': {
+      const baseURL = normalizeProviderUrl(
+        providerDetails?.serverUrl || 'http://localhost:8080',
+        '/v1'
+      )
+      const customInstance = createOpenAI({
+        name: 'custom',
+        baseURL,
+        apiKey: 'none' // @TODO: does not support auth
+      })
+
+      return customInstance
     }
     case 'openai': // fall back as default
     default: {

@@ -43,6 +43,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-success: var(--success);
+  --animate-waveform: waveform 0.8s ease-in-out infinite alternate;
 }
 
 :root {
@@ -130,4 +131,9 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes waveform {
+  0%   { transform: scaleY(0.4); opacity: 0.5; }
+  100% { transform: scaleY(1.2); opacity: 1; }
 }
