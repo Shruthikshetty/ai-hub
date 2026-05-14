@@ -1,6 +1,6 @@
 {
   "name": "ai-hub",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AI Hub - Your Personal AI aggregator",
   "main": "./out/main/index.js",
   "author": "shruthik shetty",
@@ -26,7 +26,9 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@ai-sdk/alibaba": "^1.0.23",
     "@ai-sdk/cerebras": "^2.0.45",
+    "@ai-sdk/cohere": "^3.0.35",
     "@ai-sdk/elevenlabs": "^2.0.33",
     "@ai-sdk/fireworks": "^2.0.42",
     "@ai-sdk/google": "^3.0.43",

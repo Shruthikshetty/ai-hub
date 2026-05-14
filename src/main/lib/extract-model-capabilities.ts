@@ -1,5 +1,6 @@
 import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
 import {
+  CohereModel,
   FireworksAiModel,
   GatewayModel,
   GoogleModel,
@@ -456,6 +457,109 @@ export function buildCustomModel(
     capabilities: {
       realtime: false,
       vision: false,
+      videoReasoning: false
+    }
+  }
+}
+
+/**
+ * function to extract the capabilities for Nvidia NIM models
+ */
+export function buildNvidiaModel(
+  model: string,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const outputs: ModelIOType[] = []
+
+  // output extraction
+  if (model.includes('embed')) {
+    outputs.push('embedding')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: model,
+    name: model,
+    provider,
+    inputs: ['text'],
+    outputs: outputs,
+    capabilities: {
+      realtime: false,
+      vision: false,
+      videoReasoning: false
+    }
+  }
+}
+
+/**
+ * function to build a model record for a Cohere model
+ */
+
+export function buildCohereModel(
+  model: CohereModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+
+  //outputs extraction
+  if (model.endpoints.includes('embed')) {
+    outputs.push('embedding')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: model.name,
+    name: model.name,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    capabilities: {
+      realtime: false,
+      vision: false,
+      videoReasoning: false
+    }
+  }
+}
+
+/**
+ * function to build a model record for an Alibaba DashScope model
+ * @TODO better extraction to be looked at
+ */
+export function buildAlibabaModel(
+  modelId: string,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = []
+  const lowerModeId = modelId.toLowerCase()
+
+  if (lowerModeId.includes('omni')) {
+    inputs.push('image')
+  }
+
+  // outputs extraction
+  if (lowerModeId.includes('embed')) {
+    outputs.push('embedding')
+  } else if (lowerModeId.includes('tts')) {
+    outputs.push('audio')
+  } else if (lowerModeId.includes('image')) {
+    outputs.push('image')
+  } else {
+    outputs.push('text')
+  }
+
+  return {
+    id: modelId,
+    name: modelId,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    capabilities: {
+      realtime: lowerModeId.includes('realtime'),
+      vision: inputs.includes('image'),
       videoReasoning: false
     }
   }

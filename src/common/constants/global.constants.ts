@@ -195,6 +195,36 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://elevenlabs.io/app/developers',
     description: 'ElevenLabs provider voice and tts models'
+  },
+  {
+    provider: 'nvidia',
+    name: 'Nvidia NIM',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/nvidia.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://build.nvidia.com/explore/discover',
+    description: 'Nvidia hosted models over 40+ different models'
+  },
+  {
+    provider: 'cohere',
+    name: 'Cohere',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/cohere.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://dashboard.cohere.com',
+    description: 'Cohere provider models'
+  },
+  {
+    provider: 'alibaba',
+    name: 'Alibaba',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@1.90.0/icons/alibaba.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://modelstudio.console.alibabacloud.com/',
+    description: 'Alibaba model studio provider models'
   }
 ]
 
@@ -214,7 +244,10 @@ export const AVAILABLE_PROVIDER_LIST = [
   'mistral',
   'cerebras',
   'custom',
-  'elevenlabs'
+  'elevenlabs',
+  'nvidia',
+  'cohere',
+  'alibaba'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
