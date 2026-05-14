@@ -18,7 +18,11 @@ import type { Readable } from 'stream'
 export function buildNinjaChatFetch(apiKey: string): typeof fetch {
   return async (url, init) => {
     // NinjaChat uses /chat not /chat/completions
-    const reqUrl = url.toString().replace('/chat/completions', '/chat')
+    // and /images not /images/generations
+    const reqUrl = url
+      .toString()
+      .replace('/chat/completions', '/chat')
+      .replace('/images/generations', '/images')
 
     // detect streaming from the JSON body
     let isStreaming = false
@@ -38,7 +42,7 @@ export function buildNinjaChatFetch(apiKey: string): typeof fetch {
         Authorization: `Bearer ${apiKey}`
       },
       data: init?.body,
-      responseType: isStreaming ? 'stream' : 'text',
+      responseType: isStreaming ? 'stream' : 'json', // Use json for better response manipulation
       validateStatus: () => true // let the SDK handle HTTP error status codes
     })
 
@@ -60,9 +64,29 @@ export function buildNinjaChatFetch(apiKey: string): typeof fetch {
       })
     }
 
-    return new Response(axiosResponse.data as string, {
+    let responseData = axiosResponse.data
+
+    // NinjaChat returns { images: [...] } but OpenAI SDK expects { data: [...] }
+    if (reqUrl.includes('/images') && responseData?.images) {
+      responseData = {
+        ...responseData,
+        data: responseData.images
+      }
+    }
+
+    // Filter headers to avoid issues with Response constructor
+    const safeHeaders: Record<string, string> = {}
+    const forbiddenHeaders = ['content-encoding', 'transfer-encoding', 'content-length']
+
+    Object.entries(axiosResponse.headers).forEach(([key, value]) => {
+      if (!forbiddenHeaders.includes(key.toLowerCase()) && typeof value === 'string') {
+        safeHeaders[key] = value
+      }
+    })
+
+    return new Response(JSON.stringify(responseData), {
       status: axiosResponse.status,
-      headers: axiosResponse.headers as HeadersInit
+      headers: safeHeaders
     })
   }
 }

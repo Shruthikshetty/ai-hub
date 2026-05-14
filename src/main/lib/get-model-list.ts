@@ -19,6 +19,7 @@ import {
   buildAlibabaModel,
   buildNinjaChatModel
 } from './extract-model-capabilities'
+import { NINJACHAT_STATIC_MODELS } from '../../common/custom-providers/ninjachat'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
 // types
@@ -498,7 +499,6 @@ export async function getModelListFromProvider(
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
         })
-        console.log('ninjachat response', response.data)
         break
       }
       case 'huggingface': {
@@ -638,8 +638,12 @@ export async function getModelListFromProvider(
       }
       case 'ninjachat': {
         const data = (response.data as NinjaChatResponse).models
-        if (!data) return []
-        return data.map((model: NinjaChatModel) => buildNinjaChatModel(model, provider.provider))
+        const fetchedModels = data
+          ? data.map((model: NinjaChatModel) => buildNinjaChatModel(model, provider.provider))
+          : []
+
+        // Manually append image models since they aren't returned by the /models endpoint
+        return [...fetchedModels, ...NINJACHAT_STATIC_MODELS]
       }
       case 'custom': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
