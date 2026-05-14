@@ -39,11 +39,20 @@ export function buildNinjaChatFetch(apiKey: string): typeof fetch {
       method: (init?.method ?? 'POST') as string,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
+        Authorization: `Bearer ${apiKey}`,
+        timeout: 30000 // 30 seconds
       },
       data: init?.body,
       responseType: isStreaming ? 'stream' : 'json', // Use json for better response manipulation
       validateStatus: () => true // let the SDK handle HTTP error status codes
+    })
+
+    // Convert axios headers to HeadersInit format
+    const headers = new Headers()
+    Object.entries(axiosResponse.headers).forEach(([key, value]) => {
+      if (value !== undefined) {
+        headers.set(key, String(value))
+      }
     })
 
     if (isStreaming) {
@@ -60,7 +69,7 @@ export function buildNinjaChatFetch(apiKey: string): typeof fetch {
       })
       return new Response(webStream, {
         status: axiosResponse.status,
-        headers: axiosResponse.headers as HeadersInit
+        headers: headers
       })
     }
 

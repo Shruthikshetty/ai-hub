@@ -10,6 +10,7 @@ import { NinjaChatImageModel } from './ninjachat-image-model'
 
 export type { NinjaChatProviderSettings }
 
+// base url
 const DEFAULT_BASE_URL = 'https://ninjachat.ai/api/v1'
 
 export interface NinjaChatProvider {
@@ -33,8 +34,14 @@ export interface NinjaChatProvider {
  * Create a NinjaChat provider instance.
  */
 export function createNinjaChat(options: NinjaChatProviderSettings = {}): NinjaChatProvider {
-  const resolvedApiKey = options.apiKey ?? process.env.NINJACHAT_API_KEY ?? ''
+  const resolvedApiKey = options.apiKey ?? ''
   const resolvedBaseURL = options.baseURL ?? DEFAULT_BASE_URL
+
+  // in case no api key is provided throw error
+  if (!resolvedApiKey) {
+    throw new Error('NinjaChat API key is required. Provide it via options.apiKey')
+  }
+
   const customFetch = buildNinjaChatFetch(resolvedApiKey)
 
   const openaiCompatible = createOpenAICompatible({

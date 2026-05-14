@@ -106,4 +106,69 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     capabilities: { vision: false, realtime: true, videoReasoning: false },
     provider: 'ninjachat'
   }
+  // locking till video gen is supported
+  // {
+  //   id: 'seedance-2',
+  //   name: 'Seedance 2',
+  //   inputs: ['text'],
+  //   outputs: ['video'],
+  //   capabilities: { vision: false, realtime: false, videoReasoning: true },
+  //   provider: 'ninjachat'
+  // },
+  // {
+  //   id: 'kling-video',
+  //   name: 'Kling Video',
+  //   inputs: ['text'],
+  //   outputs: ['video'],
+  //   capabilities: { vision: false, realtime: false, videoReasoning: true },
+  //   provider: 'ninjachat'
+  // },
+  // {
+  //   id: 'google-veo-2',
+  //   name: 'Google Veo 2',
+  //   inputs: ['text'],
+  //   outputs: ['video'],
+  //   capabilities: { vision: false, realtime: false, videoReasoning: true },
+  //   provider: 'ninjachat'
+  // },
+  // {
+  //   id: 'veo-3.1',
+  //   name: 'Veo 3.1',
+  //   inputs: ['text'],
+  //   outputs: ['video'],
+  //   capabilities: { vision: false, realtime: false, videoReasoning: true },
+  //   provider: 'ninjachat'
+  // },
+  // {
+  //   id: 'veo-3.1-fast',
+  //   name: 'Veo 3.1 Fast',
+  //   inputs: ['text'],
+  //   outputs: ['video'],
+  //   capabilities: { vision: false, realtime: false, videoReasoning: true },
+  //   provider: 'ninjachat'
+  // },
+  // {
+  //   id: 'google-veo-3-fast',
+  //   name: 'Veo 3 Fast',
+  //   inputs: ['text'],
+  //   outputs: ['video'],
+  //   capabilities: { vision: false, realtime: false, videoReasoning: true },
+  //   provider: 'ninjachat'
+  // },
+  // {
+  //   id: 'runway-gen4.5',
+  //   name: 'Runway Gen-4.5',
+  //   inputs: ['text'],
+  //   outputs: ['video'],
+  //   capabilities: { vision: false, realtime: false, videoReasoning: true },
+  //   provider: 'ninjachat'
+  // },
+  // {
+  //   id: 'runway-gen4-turbo',
+  //   name: 'Runway Gen-4 Turbo',
+  //   inputs: ['text'],
+  //   outputs: ['video'],
+  //   capabilities: { vision: false, realtime: false, videoReasoning: true },
+  //   provider: 'ninjachat'
+  // }
 ]
