@@ -31,7 +31,7 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     name: 'Recraft V3',
     inputs: ['text'],
     outputs: ['image'],
-    capabilities: { vision: false, realtime: true, videoReasoning: false },
+    capabilities: { vision: false, realtime: false, videoReasoning: false },
     provider: 'ninjachat'
   },
   {
@@ -47,7 +47,7 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     name: 'Nano Banana Pro',
     inputs: ['text'],
     outputs: ['image'],
-    capabilities: { vision: false, realtime: true, videoReasoning: false },
+    capabilities: { vision: false, realtime: false, videoReasoning: false },
     provider: 'ninjachat'
   },
   {
@@ -63,7 +63,7 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     name: 'FLUX.2 Pro',
     inputs: ['text'],
     outputs: ['image'],
-    capabilities: { vision: false, realtime: true, videoReasoning: false },
+    capabilities: { vision: false, realtime: false, videoReasoning: false },
     provider: 'ninjachat'
   },
   {
@@ -71,7 +71,7 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     name: 'FLUX Kontext Pro',
     inputs: ['text'],
     outputs: ['image'],
-    capabilities: { vision: false, realtime: true, videoReasoning: false },
+    capabilities: { vision: false, realtime: false, videoReasoning: false },
     provider: 'ninjachat'
   },
   {
@@ -79,7 +79,7 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     name: 'Nano Banana 2',
     inputs: ['text'],
     outputs: ['image'],
-    capabilities: { vision: false, realtime: true, videoReasoning: false },
+    capabilities: { vision: false, realtime: false, videoReasoning: false },
     provider: 'ninjachat'
   },
   {
@@ -87,7 +87,7 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     name: 'FLUX.1 Fill',
     inputs: ['text'],
     outputs: ['image'],
-    capabilities: { vision: false, realtime: true, videoReasoning: false },
+    capabilities: { vision: false, realtime: false, videoReasoning: false },
     provider: 'ninjachat'
   },
   {
@@ -95,7 +95,7 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     name: 'FLUX.2 Klein',
     inputs: ['text'],
     outputs: ['image'],
-    capabilities: { vision: false, realtime: true, videoReasoning: false },
+    capabilities: { vision: false, realtime: false, videoReasoning: false },
     provider: 'ninjachat'
   },
   {
@@ -103,7 +103,7 @@ export const NINJACHAT_STATIC_MODELS: ModelSchemaType[] = [
     name: 'Nano Banana',
     inputs: ['text'],
     outputs: ['image'],
-    capabilities: { vision: false, realtime: true, videoReasoning: false },
+    capabilities: { vision: false, realtime: false, videoReasoning: false },
     provider: 'ninjachat'
   }
   // locking till video gen is supported

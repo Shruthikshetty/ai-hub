@@ -14,6 +14,7 @@ import type { Readable } from 'stream'
 
 /**
  * Builds a fetch adapter for NinjaChat that uses axios instead of global fetch.
+ * @ todo fix this up we are not  using this for image so its not required to handle images
  */
 export function buildNinjaChatFetch(apiKey: string): typeof fetch {
   return async (url, init) => {
@@ -39,10 +40,10 @@ export function buildNinjaChatFetch(apiKey: string): typeof fetch {
       method: (init?.method ?? 'POST') as string,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-        timeout: 30000 // 30 seconds
+        Authorization: `Bearer ${apiKey}`
       },
       data: init?.body,
+      timeout: 180000, // 3 min
       responseType: isStreaming ? 'stream' : 'json', // Use json for better response manipulation
       validateStatus: () => true // let the SDK handle HTTP error status codes
     })

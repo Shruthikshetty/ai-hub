@@ -36,7 +36,8 @@ export class NinjaChatImageModel implements ImageModelV3 {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.apiKey}`
-      }
+      },
+      timeout: 600000 // 10 mins for image generation
     })
 
     const data = response.data
@@ -47,10 +48,23 @@ export class NinjaChatImageModel implements ImageModelV3 {
 
     // NinjaChat returns URLs — download and convert to base64 string
     const imageResponse = await axios.get(data.images[0].url, {
-      responseType: 'arraybuffer'
+      responseType: 'arraybuffer',
+      timeout: 30000 //   60 seconds for image download
     })
 
     const base64 = Buffer.from(imageResponse.data).toString('base64')
+
+    // Filter headers to avoid issues with Response constructor
+    const safeHeaders: Record<string, string> = {}
+    Object.entries(response.headers).forEach(([key, value]) => {
+      if (typeof value === 'string') {
+        safeHeaders[key] = value
+      } else if (Array.isArray(value)) {
+        safeHeaders[key] = value.join(', ')
+      } else if (value !== undefined) {
+        safeHeaders[key] = String(value)
+      }
+    })
 
     return {
       // ImageModelV3 expects Array<string> (base64) OR Array<Uint8Array>
@@ -59,7 +73,7 @@ export class NinjaChatImageModel implements ImageModelV3 {
       response: {
         timestamp: startTimestamp,
         modelId: this.modelId,
-        headers: response.headers as Record<string, string>
+        headers: safeHeaders
       }
     }
   }
