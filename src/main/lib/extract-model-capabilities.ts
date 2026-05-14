@@ -506,7 +506,7 @@ export function buildCohereModel(
   //outputs extraction
   if (model.endpoints.includes('embed')) {
     outputs.push('embedding')
-  } else if (model.endpoints.includes('chat')) {
+  } else {
     outputs.push('text')
   }
 
@@ -558,7 +558,7 @@ export function buildAlibabaModel(
     inputs: inputs,
     outputs: outputs,
     capabilities: {
-      realtime: modelId.includes('realtime'),
+      realtime: lowerModeId.includes('realtime'),
       vision: inputs.includes('image'),
       videoReasoning: false
     }
