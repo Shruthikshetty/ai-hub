@@ -18,6 +18,7 @@ import { createCerebras } from '@ai-sdk/cerebras'
 import { createElevenLabs } from '@ai-sdk/elevenlabs'
 import { createCohere } from '@ai-sdk/cohere'
 import { createAlibaba } from '@ai-sdk/alibaba'
+import { createNinjaChat } from '../../common/custom-providers/ninjachat'
 
 // get the provider instance based on the provider
 export async function getProviderInstanceModel({
@@ -169,6 +170,12 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return alibabaInstance
+    }
+    case 'ninjachat': {
+      const ninjaChatInstance = createNinjaChat({
+        apiKey
+      })
+      return ninjaChatInstance
     }
     case 'openai': // fall back as default
     default: {

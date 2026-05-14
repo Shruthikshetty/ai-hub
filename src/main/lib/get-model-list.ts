@@ -16,7 +16,8 @@ import {
   buildPoeModel,
   buildTogetherAiModel,
   buildXaiModel,
-  buildAlibabaModel
+  buildAlibabaModel,
+  buildNinjaChatModel
 } from './extract-model-capabilities'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
@@ -312,6 +313,40 @@ type CohereResponse = {
 }
 
 /**
+ * Ninja chat model type
+ * doc https://docs.ninjachat.ai/models#fetch-models-via-api
+ */
+export type NinjaChatModel = {
+  id: string
+  name: string
+  tier: string
+  cost_cents: number
+  capabilities: (
+    | 'text'
+    | 'code'
+    | 'fast'
+    | 'multilingual'
+    | 'reasoning'
+    | 'math'
+    | 'uncensored'
+    | 'creative'
+    | 'analysis'
+  )[]
+  context_window: number
+  max_output_tokens: number
+  speed: string
+  recommended_for: string[]
+  description: string
+}
+
+/**
+ * Ninja chat model response type
+ */
+type NinjaChatResponse = {
+  models: NinjaChatModel[]
+}
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -340,6 +375,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<OpenAiResponse<PoeModel>>
       | AxiosResponse<ElevenLabsResponse>
       | AxiosResponse<CohereResponse>
+      | AxiosResponse<NinjaChatResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -455,6 +491,14 @@ export async function getModelListFromProvider(
             timeout: 2000 //2 seconds
           }
         )
+        break
+      }
+      case 'ninjachat': {
+        response = await axios.get('https://ninjachat.ai/api/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 2000 //2 seconds
+        })
+        console.log('ninjachat response', response.data)
         break
       }
       case 'huggingface': {
@@ -591,6 +635,11 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
         if (!data) return []
         return data.map((model: OpenAiModel) => buildAlibabaModel(model.id, provider.provider))
+      }
+      case 'ninjachat': {
+        const data = (response.data as NinjaChatResponse).models
+        if (!data) return []
+        return data.map((model: NinjaChatModel) => buildNinjaChatModel(model, provider.provider))
       }
       case 'custom': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

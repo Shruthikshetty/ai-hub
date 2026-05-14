@@ -7,6 +7,7 @@ import {
   GroqModel,
   HuggingFaceModel,
   MistralModel,
+  NinjaChatModel,
   PoeModel,
   TogetherAiModel
 } from './get-model-list'
@@ -560,6 +561,30 @@ export function buildAlibabaModel(
     capabilities: {
       realtime: lowerModeId.includes('realtime'),
       vision: inputs.includes('image'),
+      videoReasoning: false
+    }
+  }
+}
+
+/**
+ * function to build a model record for a NinjaChat model
+ */
+export function buildNinjaChatModel(
+  model: NinjaChatModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs: ModelIOType[] = ['text']
+  const outputs: ModelIOType[] = ['text']
+
+  return {
+    id: model.id,
+    name: model?.name ?? model.id,
+    provider,
+    inputs: inputs,
+    outputs: outputs,
+    capabilities: {
+      realtime: false,
+      vision: false,
       videoReasoning: false
     }
   }
