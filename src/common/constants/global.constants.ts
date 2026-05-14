@@ -225,6 +225,16 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://modelstudio.console.alibabacloud.com/',
     description: 'Alibaba model studio provider models'
+  },
+  {
+    provider: 'ninjachat',
+    name: 'Ninja chat',
+    icon: 'https://models.dev/logos/custom.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://ninjachat.ai',
+    description: 'Ninja chat provider One API key for GPT-5, Claude, Gemini, and 30+ more models.'
   }
 ]
 
@@ -247,7 +257,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'elevenlabs',
   'nvidia',
   'cohere',
-  'alibaba'
+  'alibaba',
+  'ninjachat'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
