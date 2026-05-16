@@ -9,25 +9,25 @@ This document tracks the capabilities of various AI providers integrated into th
 - ! : partially supported
 - blank : not tested yet
 
-| Provider         | Chat | Tool Calling | Image | Video | TTS |
-| :--------------- | :--: | :----------: | :---: | :---: | :-: |
-| Open AI          |  ✓   |      ✓       |   ✓   |   ✓   |  ✓  |
-| Ollama           |  ✓   |      ✓       |   X   |   X   |  X  |
-| Open Router      |  ✓   |      ✓       |   X   |   X   |  X  |
-| Google AI Studio |      |              |       |       |     |
-| AI Gateway       |  ✓   |      ✓       |   ✓   |       |     |
-| Groq             |  ✓   |      ✓       |       |       |     |
-| Hugging Face     |  ✓   |              |       |       |     |
-| xAI              |  ✓   |      ✓       |   ✓   |   ✓   |  X  |
-| Together AI      |      |              |       |       |     |
-| Fireworks AI     |  ✓   |              |       |       |     |
-| LM Studio        |  ✓   |              |       |       |     |
-| Mistral          |  ✓   |              |       |       |     |
-| Cerebras         |  ✓   |              |       |       |     |
-| Custom           |  ✓   |              |       |       |     |
-| ElevenLabs       |  X   |      X       |   X   |   X   |  ✓  |
-| Nvidia NIM       |  ✓   |              |       |       |     |
-| Cohere           |  ✓   |              |       |       |     |
-| Alibaba          |  ✓   |              |       |       |     |
-| Poe              |  !   |              |   X   |   X   |  X  |
-| Ninja chat       |  ✓   |      ✓       |   X   |   X   |  X  |
+| Provider         | Chat | Tool Calling | Image | Video | TTS | Web Search |
+| :--------------- | :--: | :----------: | :---: | :---: | :-: | :--------: |
+| Open AI          |  ✓   |      ✓       |   ✓   |   ✓   |  ✓  |     ✓      |
+| Ollama           |  ✓   |      ✓       |   X   |   X   |  X  |            |
+| Open Router      |  ✓   |      ✓       |   X   |   X   |  X  |            |
+| Google AI Studio |  ✓   |              |       |       |     |            |
+| AI Gateway       |  ✓   |      ✓       |   ✓   |       |     |            |
+| Groq             |  ✓   |      ✓       |       |       |     |     !      |
+| Hugging Face     |  ✓   |              |       |       |     |            |
+| xAI              |  ✓   |      ✓       |   ✓   |   ✓   |  X  |     ✓      |
+| Together AI      |      |              |       |       |     |            |
+| Fireworks AI     |  ✓   |              |       |       |     |            |
+| LM Studio        |  ✓   |              |       |       |     |            |
+| Mistral          |  ✓   |              |       |       |     |            |
+| Cerebras         |  ✓   |              |       |       |     |            |
+| Custom           |  ✓   |              |       |       |     |            |
+| ElevenLabs       |  X   |      X       |   X   |   X   |  ✓  |            |
+| Nvidia NIM       |  ✓   |              |       |       |     |            |
+| Cohere           |  ✓   |              |       |       |     |            |
+| Alibaba          |  ✓   |              |       |       |     |            |
+| Poe              |  !   |              |   X   |   X   |  X  |     X      |
+| Ninja chat       |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
