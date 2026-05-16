@@ -4,7 +4,7 @@
 
 import { LanguageModelV3 } from '@ai-sdk/provider'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { buildNinjaChatFetch } from './ninjachat-fetch-adapter'
+import { buildNinjaChatFetch } from './ninjachat-chat-fetch-adapter'
 import { NinjaChatProviderSettings } from './ninjachat-settings'
 import { NinjaChatImageModel } from './ninjachat-image-model'
 

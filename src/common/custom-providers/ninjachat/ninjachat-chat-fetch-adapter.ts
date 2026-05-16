@@ -14,16 +14,11 @@ import type { Readable } from 'stream'
 
 /**
  * Builds a fetch adapter for NinjaChat that uses axios instead of global fetch.
- * @ todo fix this up we are not  using this for image so its not required to handle images
  */
 export function buildNinjaChatFetch(apiKey: string): typeof fetch {
   return async (url, init) => {
     // NinjaChat uses /chat not /chat/completions
-    // and /images not /images/generations
-    const reqUrl = url
-      .toString()
-      .replace('/chat/completions', '/chat')
-      .replace('/images/generations', '/images')
+    const reqUrl = url.toString().replace('/chat/completions', '/chat')
 
     // detect streaming from the JSON body
     let isStreaming = false
@@ -35,6 +30,7 @@ export function buildNinjaChatFetch(apiKey: string): typeof fetch {
       }
     }
 
+    // axios fetch
     const axiosResponse = await axios({
       url: reqUrl,
       method: (init?.method ?? 'POST') as string,
@@ -74,15 +70,7 @@ export function buildNinjaChatFetch(apiKey: string): typeof fetch {
       })
     }
 
-    let responseData = axiosResponse.data
-
-    // NinjaChat returns { images: [...] } but OpenAI SDK expects { data: [...] }
-    if (reqUrl.includes('/images') && responseData?.images) {
-      responseData = {
-        ...responseData,
-        data: responseData.images
-      }
-    }
+    const responseData = axiosResponse.data
 
     // Filter headers to avoid issues with Response constructor
     const safeHeaders: Record<string, string> = {}
@@ -94,6 +82,7 @@ export function buildNinjaChatFetch(apiKey: string): typeof fetch {
       }
     })
 
+    // return response data in JSON format
     return new Response(JSON.stringify(responseData), {
       status: axiosResponse.status,
       headers: safeHeaders
