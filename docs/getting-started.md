@@ -2,6 +2,9 @@
 
 Welcome to **AI Hub**, your personal AI aggregator. AI Hub brings together the world's most powerful AI models—from OpenAI and Google to specialized providers like ElevenLabs—all into one unified, locally-stored interface.
 
+> [!IMPORTANT]
+> **Privacy First:** Your chats and keys are stored locally. Read our [Security & Privacy Guide](./security.md) to understand how your data is handled.
+
 ## 🚀 Quick Start Guide
 
 Getting up and running takes just a few minutes:
