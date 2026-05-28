@@ -12,8 +12,8 @@ This document tracks the capabilities of various AI providers integrated into th
 | Provider         | Chat | Tool Calling | Image | Video | TTS | Web Search |
 | :--------------- | :--: | :----------: | :---: | :---: | :-: | :--------: |
 | Open AI          |  ✓   |      ✓       |   ✓   |   ✓   |  ✓  |     ✓      |
-| Ollama           |  ✓   |      ✓       |   X   |   X   |  X  |            |
-| Open Router      |  ✓   |      ✓       |   X   |   X   |  X  |            |
+| Ollama           |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
+| Open Router      |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
 | Google AI Studio |  ✓   |              |       |       |     |            |
 | AI Gateway       |  ✓   |      ✓       |   ✓   |       |     |            |
 | Groq             |  ✓   |      ✓       |       |       |     |     !      |
