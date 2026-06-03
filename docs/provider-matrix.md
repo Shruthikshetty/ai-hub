@@ -28,6 +28,6 @@ This document tracks the capabilities of various AI providers integrated into th
 | ElevenLabs       |  X   |      X       |   X   |   X   |  ✓  |            |
 | Nvidia NIM       |  ✓   |              |       |       |     |            |
 | Cohere           |  ✓   |              |       |       |     |            |
-| Alibaba          |  ✓   |              |       |       |     |            |
+| Alibaba          |  ✓   |              |   ✓   |       |     |            |
 | Poe              |  !   |              |   X   |   X   |  X  |     X      |
 | Ninja chat       |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
