@@ -53,7 +53,10 @@ export function createAlibaba(
 
   /** Download an image URL and return base64-encoded string */
   async function downloadAsBase64(url: string): Promise<string> {
-    const res = await axios.get<ArrayBuffer>(url, { responseType: 'arraybuffer' })
+    const res = await axios.get<ArrayBuffer>(url, {
+      responseType: 'arraybuffer',
+      timeout: 30000
+    })
     return Buffer.from(res.data).toString('base64')
   }
 
@@ -90,7 +93,11 @@ export function createAlibaba(
           ...(!isQwenImage ? { 'X-DashScope-Async': 'enable' } : {})
         }
 
-        const submitRes = await axios.post(endpoint, body, { headers, validateStatus: null })
+        const submitRes = await axios.post(endpoint, body, {
+          headers,
+          validateStatus: null,
+          timeout: 30000
+        })
 
         if (submitRes.status !== 200) {
           throw new Error(
@@ -134,8 +141,15 @@ export function createAlibaba(
 
           const pollRes = await axios.get(pollEndpoint, {
             headers: { Authorization: `Bearer ${resolvedApiKey}` },
-            validateStatus: null
+            validateStatus: null,
+            timeout: 10000
           })
+
+          if (pollRes.status !== 200) {
+            throw new Error(
+              `Alibaba image task polling failed: ${pollRes.status} — ${JSON.stringify(pollRes.data)}`
+            )
+          }
 
           const taskStatus: string | undefined = pollRes.data?.output?.task_status
 
