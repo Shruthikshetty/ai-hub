@@ -17,7 +17,7 @@ import { createMistral } from '@ai-sdk/mistral'
 import { createCerebras } from '@ai-sdk/cerebras'
 import { createElevenLabs } from '@ai-sdk/elevenlabs'
 import { createCohere } from '@ai-sdk/cohere'
-import { createAlibaba } from '@ai-sdk/alibaba'
+import { createAlibaba } from '../../common/custom-providers/alibaba'
 import { createNinjaChat } from '../../common/custom-providers/ninjachat'
 
 // get the provider instance based on the provider

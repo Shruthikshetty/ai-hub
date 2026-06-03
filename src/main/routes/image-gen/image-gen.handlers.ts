@@ -33,10 +33,13 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
     )
   }
 
+  // note : diff providers support different sizes
   // generate image
   const { image } = await aiGenerateImage({
     model: modelProvider.image(model.id),
-    prompt
+    prompt,
+    size: '1024x1024',
+    n: 1 // @TODO fix 1 for now
   })
 
   // store the image in file and get the url
