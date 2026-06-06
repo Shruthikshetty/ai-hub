@@ -21,8 +21,7 @@ const VideoPage = () => {
   // state to store prompt
   const [prompt, setPrompt] = useState('')
   // get selected model from global store
-  const getModel = useSelectedModel((state) => state.getModel)
-  const model = getModel('video')
+  const model = useSelectedModel((state) => state.models['video'] ?? null)
 
   // fetch all the list of generated media
   const { data: mediaList, refetch } = useFetchMedia({ type: 'video' })

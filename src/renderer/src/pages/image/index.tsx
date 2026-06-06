@@ -20,15 +20,18 @@ import {
 import ImageOptionsPanel from './image-options-panal'
 import PanelTrigger from '@renderer/components/panel-trigger'
 import ImageGenStarter from './image-gen-starter'
+import { useImagOptions } from '@renderer/state-management/image-options.store'
 
 const ImagePage = () => {
   // state to store prompt
   const [prompt, setPrompt] = useState('')
   // this is the options panel state to show the options panel
   const [optionsPanelOpen, setOptionsPanelOpen] = useState(false)
+  // get quality and size from the sore
+  const size = useImagOptions((s) => s.size)
+  const quality = useImagOptions((s) => s.quality) //@TODO yet to be used
   // get selected model from global store
-  const getModel = useSelectedModel((state) => state.getModel)
-  const model = getModel('image')
+  const model = useSelectedModel((state) => state.models['image'] ?? null)
   // fetch all the list of generated media
   const { data: mediaList, refetch } = useFetchMedia({ type: 'image' })
 
@@ -39,7 +42,7 @@ const ImagePage = () => {
   const handleSubmit = () => {
     if (!model) return
     generateImage(
-      { prompt, model },
+      { prompt, model, size: size as `${number}x${number}` | undefined },
       {
         onSuccess: () => {
           // refetch the media list
@@ -110,7 +113,7 @@ const ImagePage = () => {
       </ResizablePanel>
       {/* right side options panel */}
       <ResizableHandle withHandle />
-      <ImageOptionsPanel isOpen={optionsPanelOpen} setIsOpen={setOptionsPanelOpen} />
+      <ImageOptionsPanel model={model} isOpen={optionsPanelOpen} setIsOpen={setOptionsPanelOpen} />
     </ResizablePanelGroup>
   )
 }

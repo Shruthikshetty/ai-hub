@@ -7,22 +7,27 @@ export type ProviderImageOptions = {
   quality?: readonly ImageOptionItem[]
 }
 
+// default auto value
+export const DEFAULT_IMAGE_SIZE_OPTION = 'auto'
+
 export const IMAGE_GEN_OPTIONS: Record<string, ProviderImageOptions> = {
   // https://developers.openai.com/api/docs/guides/image-generation
   openai: {
     size: [
-      { id: 'auto', label: 'Auto' },
-      { id: 'square', label: 'Square (1024x1024)' },
-      { id: 'portrait', label: 'Portrait (1024x1536)' },
-      { id: 'landscape', label: 'Landscape (1536x1024)' },
-      { id: '2k', label: '2K (2560x1440)' },
-      { id: '4k', label: '4K (3840x2160)' }
+      { id: DEFAULT_IMAGE_SIZE_OPTION, label: 'Auto' },
+      { id: '1024x1024', label: 'Square (1024x1024)' },
+      { id: '1024x1536', label: 'Portrait (1024x1536)' },
+      { id: '1536x1024', label: 'Landscape (1536x1024)' },
+      { id: '2048x2048', label: '2K square (2048x2048)' },
+      { id: '2048x1152', label: '2K landscape (2048x1152)' },
+      { id: '3840x2160', label: '4K landscape (3840x2160)' },
+      { id: '2160x3840', label: '4K portrait (2160x3840)' }
     ],
     quality: [
       { id: 'auto', label: 'Auto' },
-      { id: 'high', label: 'High' },
+      { id: 'low', label: 'Low' },
       { id: 'medium', label: 'Medium' },
-      { id: 'low', label: 'Low' }
+      { id: 'high', label: 'High' }
     ]
   }
 } as const

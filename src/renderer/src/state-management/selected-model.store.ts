@@ -12,6 +12,9 @@ const initialState = {
 
 type UseSelectedModel = {
   models: Record<string, ModelSchemaType | null>
+  /**
+   * get the selected model dose not cause re-render when model changes.
+   */
   getModel: (feature: string) => ModelSchemaType | null
   setModel: (feature: string, model: ModelSchemaType) => void
 }
