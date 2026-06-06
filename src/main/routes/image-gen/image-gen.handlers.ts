@@ -14,7 +14,7 @@ import { eq } from 'drizzle-orm'
 // handler for image generation
 export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
   // get the prompt from request body
-  const { prompt, model } = c.req.valid('json')
+  const { prompt, model, size } = c.req.valid('json')
 
   // get the provider as per user model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,7 +38,7 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
   const { image } = await aiGenerateImage({
     model: modelProvider.image(model.id),
     prompt,
-    size: '1024x1024',
+    size: size,
     n: 1 // @TODO fix 1 for now
   })
 

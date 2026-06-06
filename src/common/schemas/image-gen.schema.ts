@@ -4,7 +4,12 @@ import { modelSchema } from './model.schema'
 // generate image request schema
 export const generateImageRequestSchema = z.object({
   prompt: z.string().trim().min(1, 'Prompt is required'),
-  model: modelSchema
+  model: modelSchema,
+  size: z
+    .string()
+    .regex(/^\d+x\d+$/)
+    .transform((val) => val as `${number}x${number}`)
+    .optional()
 })
 
 // generate image response schema

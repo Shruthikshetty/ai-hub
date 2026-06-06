@@ -24,10 +24,9 @@ This document tracks the capabilities of various AI providers integrated into th
 | LM Studio        |  ✓   |              |       |       |     |            |
 | Mistral          |  ✓   |              |       |       |     |            |
 | Cerebras         |  ✓   |              |       |       |     |            |
-| Custom           |  ✓   |              |       |       |     |            |
 | ElevenLabs       |  X   |      X       |   X   |   X   |  ✓  |            |
 | Nvidia NIM       |  ✓   |              |       |       |     |            |
 | Cohere           |  ✓   |              |       |       |     |            |
-| Alibaba          |  ✓   |              |   ✓   |       |     |            |
+| Alibaba          |  ✓   |      ✓       |   ✓   |   X   |  X  |     X      |
 | Poe              |  !   |              |   X   |   X   |  X  |     X      |
 | Ninja chat       |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
