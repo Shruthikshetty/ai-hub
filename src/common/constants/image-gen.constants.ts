@@ -61,5 +61,21 @@ export const IMAGE_GEN_OPTIONS: Record<string, ProviderImageOptions> = {
       { id: 'high', label: 'High' }
     ],
     seed: true
+  },
+  vercel: {
+    size: [
+      { id: DEFAULT_IMAGE_SIZE_OPTION, label: 'Auto' },
+      { id: '1024x1024', label: 'Square (1024x1024)' },
+      { id: '1024x1536', label: 'Portrait (1024x1536)' },
+      { id: '1536x1024', label: 'Landscape (1536x1024)' }
+    ],
+    aspectRatio: [
+      { id: DEFAULT_IMAGE_ASPECT_RATIO, label: 'Auto' },
+      { id: '1:1', label: 'Square (1:1)' },
+      { id: '16:9 ', label: 'Landscape (16:9)' },
+      { id: '9:16', label: 'Portrait (9:16)' },
+      { id: '4:3', label: '4:3' }
+    ],
+    seed: true
   }
 } as const

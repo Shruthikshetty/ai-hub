@@ -20,7 +20,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui
 import { handlePositiveIntNoDecimal } from '@renderer/lib/form.utils'
 import { getRandomSeed } from '@renderer/lib/generation.utild'
 import { useImagOptions } from '@renderer/state-management/image-options.store'
-import { Shuffle } from 'lucide-react'
+import { CircleAlert, Shuffle } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
 /**
@@ -129,6 +129,15 @@ const ImageOptionsPanel = ({
                   </Select>
                 </div>
               )}
+
+              {/*  show error if both size and aspect ratio are set */}
+              {size && aspectRatio ? (
+                <p className="text-sm font-normal text-destructive ">
+                  size and aspect ratio cannot be selected together. Note if both options are
+                  visible then please select either size or aspect ratio which ever works as per the
+                  provider .
+                </p>
+              ) : null}
 
               {/* Quality Select */}
               {options?.quality && options.quality.length > 0 && (
