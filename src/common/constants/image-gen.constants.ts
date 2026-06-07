@@ -72,7 +72,7 @@ export const IMAGE_GEN_OPTIONS: Record<string, ProviderImageOptions> = {
     aspectRatio: [
       { id: DEFAULT_IMAGE_ASPECT_RATIO, label: 'Auto' },
       { id: '1:1', label: 'Square (1:1)' },
-      { id: '16:9 ', label: 'Landscape (16:9)' },
+      { id: '16:9', label: 'Landscape (16:9)' },
       { id: '9:16', label: 'Portrait (9:16)' },
       { id: '4:3', label: '4:3' }
     ],
