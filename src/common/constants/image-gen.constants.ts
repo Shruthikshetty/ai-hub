@@ -5,10 +5,13 @@ export type ImageOptionItem = { id: string; label: string }
 export type ProviderImageOptions = {
   size: readonly ImageOptionItem[]
   quality?: readonly ImageOptionItem[]
+  seed: boolean
 }
 
 // default auto value
 export const DEFAULT_IMAGE_SIZE_OPTION = 'auto'
+
+export const IMAGE_GEN_SEED_LIMITS = { min: 0, max: 4294967295 } as const
 
 export const IMAGE_GEN_OPTIONS: Record<string, ProviderImageOptions> = {
   // https://developers.openai.com/api/docs/guides/image-generation
@@ -28,6 +31,7 @@ export const IMAGE_GEN_OPTIONS: Record<string, ProviderImageOptions> = {
       { id: 'low', label: 'Low' },
       { id: 'medium', label: 'Medium' },
       { id: 'high', label: 'High' }
-    ]
+    ],
+    seed: true
   }
 } as const

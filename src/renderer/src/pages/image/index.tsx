@@ -27,9 +27,11 @@ const ImagePage = () => {
   const [prompt, setPrompt] = useState('')
   // this is the options panel state to show the options panel
   const [optionsPanelOpen, setOptionsPanelOpen] = useState(false)
-  // get quality and size from the sore
+  // get quality , size , seed from the store
   const size = useImagOptions((s) => s.size)
-  const quality = useImagOptions((s) => s.quality) //@TODO yet to be used
+  const quality = useImagOptions((s) => s.quality)
+  const seed = useImagOptions((s) => s.seed)
+
   // get selected model from global store
   const model = useSelectedModel((state) => state.models['image'] ?? null)
   // fetch all the list of generated media
@@ -42,7 +44,7 @@ const ImagePage = () => {
   const handleSubmit = () => {
     if (!model) return
     generateImage(
-      { prompt, model, size: size as `${number}x${number}` | undefined, quality },
+      { prompt, model, size: size as `${number}x${number}` | undefined, quality, seed },
       {
         onSuccess: () => {
           // refetch the media list

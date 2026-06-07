@@ -10,18 +10,22 @@ interface ImageOptionsState {
   quality: string | undefined
   setSize: (size: string | undefined) => void
   setQuality: (quality: string | undefined) => void
+  seed: number | undefined
+  setSeed: (seed: number | undefined) => void
   reset: () => void
 }
 
 // initial state
-const initialState: Pick<ImageOptionsState, 'size' | 'quality'> = {
+const initialState: Pick<ImageOptionsState, 'size' | 'quality' | 'seed'> = {
   size: undefined,
-  quality: undefined
+  quality: undefined,
+  seed: undefined
 }
 
 export const useImagOptions = create<ImageOptionsState>((set) => ({
   ...initialState,
   setSize: (size) => set({ size }),
   setQuality: (quality) => set({ quality }),
-  reset: () => set({ quality: undefined, size: undefined })
+  setSeed: (seed) => set({ seed }),
+  reset: () => set({ quality: undefined, size: undefined, seed: undefined })
 }))

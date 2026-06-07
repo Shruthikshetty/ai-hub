@@ -1,6 +1,11 @@
-import { DEFAULT_IMAGE_SIZE_OPTION, IMAGE_GEN_OPTIONS } from '@common/constants/image-gen.constants'
+import {
+  DEFAULT_IMAGE_SIZE_OPTION,
+  IMAGE_GEN_OPTIONS,
+  IMAGE_GEN_SEED_LIMITS
+} from '@common/constants/image-gen.constants'
 import { ModelSchemaType } from '@common/schemas/model.schema'
 import ResizableSidePanel from '@renderer/components/resizable-side-panel'
+import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
 import {
   Select,
@@ -10,7 +15,10 @@ import {
   SelectValue
 } from '@renderer/components/ui/select'
 import { Separator } from '@renderer/components/ui/separator'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
+import { getRandomSeed } from '@renderer/lib/generation.utild'
 import { useImagOptions } from '@renderer/state-management/image-options.store'
+import { Shuffle } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
 /**
@@ -25,8 +33,7 @@ const ImageOptionsPanel = ({
   model: ModelSchemaType | null
 }) => {
   // get the state from the store for image options
-  const { setSize, setQuality, size, quality } = useImagOptions()
-  console.log(size, quality)
+  const { setSize, setQuality, size, quality, setSeed, seed } = useImagOptions()
   // Get active options based on the selected model's provider
   const provider = model?.provider
   const options = provider ? IMAGE_GEN_OPTIONS?.[provider] : undefined
@@ -110,6 +117,44 @@ const ImageOptionsPanel = ({
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              )}
+
+              {/* Seed */}
+              {options?.seed && (
+                <div className="space-y-2">
+                  <div className="flex flex-row gap-2 items-center justify-between pr-3">
+                    <Label
+                      htmlFor="seed-input"
+                      className="text-muted-foreground text-sm font-semibold"
+                    >
+                      Seed
+                    </Label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => {
+                            setSeed(getRandomSeed(6))
+                          }}
+                          className="px-2"
+                        >
+                          <Shuffle className="text-muted-foreground size-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Generate random seed</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <Input
+                    id="seed-input"
+                    type="number"
+                    min={IMAGE_GEN_SEED_LIMITS.min}
+                    max={IMAGE_GEN_SEED_LIMITS.max}
+                    value={seed ?? ''}
+                    onChange={(e) => setSeed(e.target.value ? Number(e.target.value) : undefined)}
+                    placeholder="Random seed"
+                  />
                 </div>
               )}
             </>
