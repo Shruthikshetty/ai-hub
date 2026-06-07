@@ -16,6 +16,7 @@ import {
 } from '@renderer/components/ui/select'
 import { Separator } from '@renderer/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip'
+import { handlePositiveIntNoDecimal } from '@renderer/lib/form.utils'
 import { getRandomSeed } from '@renderer/lib/generation.utild'
 import { useImagOptions } from '@renderer/state-management/image-options.store'
 import { Shuffle } from 'lucide-react'
@@ -46,9 +47,10 @@ const ImageOptionsPanel = ({
     if (provider && provider !== lastProviderRef.current) {
       setSize(undefined)
       setQuality(undefined)
+      setSeed(undefined)
     }
     lastProviderRef.current = provider
-  }, [provider, setSize, setQuality])
+  }, [provider, setSize, setQuality, setSeed])
 
   return (
     <ResizableSidePanel {...rest}>
@@ -61,7 +63,7 @@ const ImageOptionsPanel = ({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
-          {!provider ? (
+          {!provider || !options ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               Model is not selected or the selected model doesn&apos;t have any options.
             </p>
@@ -152,7 +154,7 @@ const ImageOptionsPanel = ({
                     min={IMAGE_GEN_SEED_LIMITS.min}
                     max={IMAGE_GEN_SEED_LIMITS.max}
                     value={seed ?? ''}
-                    onChange={(e) => setSeed(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={(e) => handlePositiveIntNoDecimal(e, setSeed)}
                     placeholder="Random seed"
                   />
                 </div>
