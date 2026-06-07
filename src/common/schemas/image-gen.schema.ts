@@ -9,7 +9,8 @@ export const generateImageRequestSchema = z.object({
     .string()
     .regex(/^\d+x\d+$/)
     .transform((val) => val as `${number}x${number}`)
-    .optional()
+    .optional(),
+  quality: z.string().optional()
 })
 
 // generate image response schema

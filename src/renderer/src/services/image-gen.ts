@@ -18,8 +18,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 export const useGenerateImage = () => {
   return useMutation<GenerateImageResponseSchemaType, ApiError, GenerateImageRequestSchemaType>({
     mutationKey: [MUTATION_KEYS.imageGenerate],
-    mutationFn: async ({ model, prompt, size }) => {
-      const response = await window.api.request('/api/image-gen', 'POST', { prompt, model, size })
+    mutationFn: async ({ model, prompt, size, quality }) => {
+      const response = await window.api.request('/api/image-gen', 'POST', {
+        prompt,
+        model,
+        size,
+        quality
+      })
       if (!response.success) {
         throw response
       }

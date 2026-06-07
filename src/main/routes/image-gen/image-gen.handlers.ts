@@ -10,11 +10,12 @@ import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import db from '../../db'
 import { media } from '../../db/schema'
 import { eq } from 'drizzle-orm'
+import { generateImageProviderBasedOption } from '../../lib/image-gen-options-per-provider'
 
 // handler for image generation
 export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
   // get the prompt from request body
-  const { prompt, model, size } = c.req.valid('json')
+  const { prompt, model, size, quality } = c.req.valid('json')
 
   // get the provider as per user model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,13 +34,24 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
     )
   }
 
+  console.log({
+    model: modelProvider.image(model.id),
+    prompt,
+    size: size,
+    n: 1, // @TODO fix 1 for now
+    // generate the model based options
+    providerOptions: generateImageProviderBasedOption({ provider: model.provider, quality })
+  })
+
   // note : diff providers support different sizes
   // generate image
   const { image } = await aiGenerateImage({
     model: modelProvider.image(model.id),
     prompt,
     size: size,
-    n: 1 // @TODO fix 1 for now
+    n: 1, // @TODO fix 1 for now
+    // generate the model based options
+    providerOptions: generateImageProviderBasedOption({ provider: model.provider, quality })
   })
 
   // store the image in file and get the url

@@ -42,7 +42,7 @@ const ImagePage = () => {
   const handleSubmit = () => {
     if (!model) return
     generateImage(
-      { prompt, model, size: size as `${number}x${number}` | undefined },
+      { prompt, model, size: size as `${number}x${number}` | undefined, quality },
       {
         onSuccess: () => {
           // refetch the media list
