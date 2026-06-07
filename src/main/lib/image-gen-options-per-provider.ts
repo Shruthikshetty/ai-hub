@@ -1,4 +1,5 @@
 import { type XaiImageModelOptions } from '@ai-sdk/xai'
+import { DEFAULT_IMAGE_ASPECT_RATIO } from '../../common/constants/image-gen.constants'
 
 /**
  * types
@@ -30,7 +31,7 @@ export const generateImageProviderBasedOption = ({
     case 'xai':
       return {
         xai: {
-          quality: quality
+          quality: quality === DEFAULT_IMAGE_ASPECT_RATIO ? undefined : quality
         } as XaiImageModelOptions
       }
     default:
