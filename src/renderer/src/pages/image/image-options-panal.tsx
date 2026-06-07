@@ -159,12 +159,14 @@ const ImageOptionsPanel = ({
                   />
                 </div>
               )}
+
+              {/* Note */}
+              <p className="text-xs text-muted-foreground">
+                ❗Note : if some options doesn&apos;t seem to work then set it back to auto or try
+                another model
+              </p>
             </>
           )}
-          <p className="text-xs text-muted-foreground">
-            ❗Note : if some options doesn&apos;t seem to work then set it back to auto or try
-            another model
-          </p>
         </div>
       </div>
     </ResizableSidePanel>
