@@ -20,7 +20,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui
 import { handlePositiveIntNoDecimal } from '@renderer/lib/form.utils'
 import { getRandomSeed } from '@renderer/lib/generation.utild'
 import { useImagOptions } from '@renderer/state-management/image-options.store'
-import { CircleAlert, Shuffle } from 'lucide-react'
+import { Shuffle } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
 /**
