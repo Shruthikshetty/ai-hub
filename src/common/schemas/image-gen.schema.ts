@@ -1,10 +1,18 @@
 import { z } from 'zod'
 import { modelSchema } from './model.schema'
+import { IMAGE_GEN_SEED_LIMITS } from '../constants/image-gen.constants'
 
 // generate image request schema
 export const generateImageRequestSchema = z.object({
   prompt: z.string().trim().min(1, 'Prompt is required'),
-  model: modelSchema
+  model: modelSchema,
+  size: z
+    .string()
+    .regex(/^\d+x\d+$/)
+    .transform((val) => val as `${number}x${number}`)
+    .optional(),
+  quality: z.string().optional(),
+  seed: z.number().int().nonnegative().max(IMAGE_GEN_SEED_LIMITS.max).optional()
 })
 
 // generate image response schema

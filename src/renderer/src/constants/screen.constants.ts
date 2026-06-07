@@ -143,3 +143,13 @@ export const THEME_OPTIONS: { value: Theme; label: string; icon?: LucideIcon }[]
     icon: Monitor
   }
 ]
+
+// starter screen quick prompts for image gen
+export const QUICK_IMAGE_PROMPTS = [
+  'A wise old wizard conjuring glowing runes in an ancient forest, cinematic lighting, digital painting, highly detailed',
+  'Sleek autonomous robot tending to a vertical garden on a Mars colony balcony, photorealistic, soft golden hour light, Unreal Engine 5 style',
+  'Mist-covered pine forest with a winding river at dawn, atmospheric perspective, nature photography, ultra-detailed',
+  'Close-up portrait of an elderly fisherman with weathered skin and kind eyes, wearing a traditional straw hat, studio lighting, oil painting style',
+  'Abandoned Art Deco theater overgrown with lush tropical vines, dramatic shafts of sunlight, concept art, moody atmosphere',
+  'Giant glass jellyfish floating above a neon-lit Tokyo street at night, reflection pools, dreamlike ambiance, hyperrealistic'
+]

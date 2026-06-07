@@ -1,0 +1,30 @@
+/**
+ * types
+ */
+type OpenAiImageModelGenerationOptions = {
+  quality: string
+}
+
+/**
+ * Generate model specific options
+ * for image generation based on the provider type
+ */
+export const generateImageProviderBasedOption = ({
+  provider,
+  quality
+}: {
+  provider: string | undefined
+  quality: string | undefined
+}) => {
+  if (!provider || !quality) return undefined
+  switch (provider) {
+    case 'openai':
+      return {
+        openai: {
+          quality: quality
+        } as OpenAiImageModelGenerationOptions
+      }
+    default:
+      return undefined
+  }
+}
