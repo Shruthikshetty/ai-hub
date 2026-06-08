@@ -53,7 +53,7 @@ const VideoPage = () => {
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
           {isPending ? <GeneratedVideoDisplay loading={true} /> : null}
           {/* Video player will go here */}
-          {mediaList?.data?.map(
+          {mediaList?.data?.media?.map(
             (video) =>
               video?.mediaUrl && (
                 <GeneratedVideoDisplay key={video?.id} video={video} loading={false} />

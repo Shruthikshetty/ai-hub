@@ -35,7 +35,13 @@ export const mediaUploadResponseSchema = z.object({
 // schema to get all media by type
 export const getMediaResponseSchema = z.object({
   success: z.boolean(),
-  data: z.array(mediaGetSchema)
+  data: z.object({
+    media: z.array(mediaGetSchema),
+    pagination: z.object({
+      nextCursor: z.number().nullable(),
+      hasMore: z.boolean()
+    })
+  })
 })
 
 // schema to get a single media record by messageId

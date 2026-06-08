@@ -83,14 +83,14 @@ const ImagePage = () => {
         </div>
         <div className="flex flex-col items-center justify-between h-full p-4 overflow-hidden w-full mx-auto">
           {/* in case of no images  */}
-          {!isPending && mediaList?.data?.length === 0 ? (
+          {!isPending && mediaList?.data?.media?.length === 0 ? (
             <ImageGenStarter onSelect={(p) => setPrompt(p)} />
           ) : (
             /* images grid */
             <div className="grow overflow-auto min-h-0 w-full">
               <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
                 {isPending && <GeneratedImageDisplay image={undefined} loading={true} />}
-                {mediaList?.data?.map((image) => (
+                {mediaList?.data?.media?.map((image) => (
                   <GeneratedImageDisplay key={image?.id} image={image} loading={false} />
                 ))}
               </div>

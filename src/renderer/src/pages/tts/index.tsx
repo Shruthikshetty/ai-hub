@@ -67,7 +67,7 @@ const TTSPage = () => {
       <div className="grow overflow-auto min-h-0 w-full">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-2">
           {isPending && <GeneratedAudioDisplay media={undefined} loading={true} />}
-          {mediaList?.data?.map((media) => (
+          {mediaList?.data?.media?.map((media) => (
             <GeneratedAudioDisplay key={media.id} media={media} loading={false} />
           ))}
         </div>
