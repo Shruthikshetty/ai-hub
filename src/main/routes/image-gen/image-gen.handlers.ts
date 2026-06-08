@@ -15,7 +15,7 @@ import { generateImageProviderBasedOption } from '../../lib/image-gen-options-pe
 // handler for image generation
 export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
   // get the prompt from request body
-  const { prompt, model, size, quality, seed } = c.req.valid('json')
+  const { prompt, model, size, quality, seed, aspectRatio } = c.req.valid('json')
 
   // get the provider as per user model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +41,7 @@ export const generateImage: AppRouteHandler<GenerateImageRoute> = async (c) => {
     prompt,
     size: size,
     seed: seed,
+    aspectRatio: aspectRatio,
     n: 1, // @TODO fix 1 for now
     // generate the model based options
     providerOptions: generateImageProviderBasedOption({ provider: model.provider, quality })

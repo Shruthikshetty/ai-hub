@@ -27,10 +27,11 @@ const ImagePage = () => {
   const [prompt, setPrompt] = useState('')
   // this is the options panel state to show the options panel
   const [optionsPanelOpen, setOptionsPanelOpen] = useState(false)
-  // get quality , size , seed from the store
+  // get quality , size , aspect ratio , seed from the store
   const size = useImagOptions((s) => s.size)
   const quality = useImagOptions((s) => s.quality)
   const seed = useImagOptions((s) => s.seed)
+  const aspectRatio = useImagOptions((s) => s.aspectRatio)
 
   // get selected model from global store
   const model = useSelectedModel((state) => state.models['image'] ?? null)
@@ -44,7 +45,14 @@ const ImagePage = () => {
   const handleSubmit = () => {
     if (!model) return
     generateImage(
-      { prompt, model, size: size as `${number}x${number}` | undefined, quality, seed },
+      {
+        prompt,
+        model,
+        size: size as `${number}x${number}` | undefined,
+        quality,
+        seed,
+        aspectRatio: aspectRatio as `${number}:${number}` | undefined
+      },
       {
         onSuccess: () => {
           // refetch the media list

@@ -29,4 +29,4 @@ This document tracks the capabilities of various AI providers integrated into th
 | Cohere           |  ✓   |              |       |       |     |            |
 | Alibaba          |  ✓   |      ✓       |   ✓   |   X   |  X  |     X      |
 | Poe              |  !   |              |   X   |   X   |  X  |     X      |
-| Ninja chat       |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
+| Ninja chat       |  ✓   |      ✓       |   ✓   |   X   |  X  |     X      |

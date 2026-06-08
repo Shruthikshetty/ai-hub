@@ -12,20 +12,24 @@ interface ImageOptionsState {
   setQuality: (quality: string | undefined) => void
   seed: number | undefined
   setSeed: (seed: number | undefined) => void
+  aspectRatio: string | undefined
+  setAspectRatio: (aspectRatio: string | undefined) => void
   reset: () => void
 }
 
 // initial state
-const initialState: Pick<ImageOptionsState, 'size' | 'quality' | 'seed'> = {
+const initialState: Pick<ImageOptionsState, 'size' | 'quality' | 'seed' | 'aspectRatio'> = {
   size: undefined,
   quality: undefined,
-  seed: undefined
+  seed: undefined,
+  aspectRatio: undefined
 }
 
 export const useImagOptions = create<ImageOptionsState>((set) => ({
   ...initialState,
   setSize: (size) => set({ size }),
   setQuality: (quality) => set({ quality }),
+  setAspectRatio: (aspectRatio) => set({ aspectRatio }),
   setSeed: (seed) => set({ seed }),
-  reset: () => set({ quality: undefined, size: undefined, seed: undefined })
+  reset: () => set({ quality: undefined, size: undefined, seed: undefined, aspectRatio: undefined })
 }))

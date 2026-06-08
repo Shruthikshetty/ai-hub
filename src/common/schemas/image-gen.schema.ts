@@ -8,8 +8,13 @@ export const generateImageRequestSchema = z.object({
   model: modelSchema,
   size: z
     .string()
-    .regex(/^\d+x\d+$/)
+    .regex(/^\d+x\d+$/, 'Size must be in the format of numberxnumber')
     .transform((val) => val as `${number}x${number}`)
+    .optional(),
+  aspectRatio: z
+    .string()
+    .regex(/^\d+(\.\d+)?:\d+(\.\d+)?$/, 'Aspect ratio must be in the format of number:number')
+    .transform((val) => val as `${number}:${number}`)
     .optional(),
   quality: z.string().optional(),
   seed: z.number().int().nonnegative().max(IMAGE_GEN_SEED_LIMITS.max).optional()

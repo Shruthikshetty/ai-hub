@@ -14,7 +14,7 @@ const configureOpenApi = (app: AppOpenApi) => {
     openapi: '3.0.0',
     info: {
       version: packageJson.version,
-      title: 'Electron Hono React Template'
+      title: 'AI Hub Backend'
     }
   })
 

@@ -1,4 +1,5 @@
 import {
+  DEFAULT_IMAGE_ASPECT_RATIO,
   DEFAULT_IMAGE_SIZE_OPTION,
   IMAGE_GEN_OPTIONS,
   IMAGE_GEN_SEED_LIMITS
@@ -34,7 +35,8 @@ const ImageOptionsPanel = ({
   model: ModelSchemaType | null
 }) => {
   // get the state from the store for image options
-  const { setSize, setQuality, size, quality, setSeed, seed } = useImagOptions()
+  const { setSize, setQuality, size, quality, setSeed, seed, setAspectRatio, aspectRatio } =
+    useImagOptions()
   // Get active options based on the selected model's provider
   const provider = model?.provider
   const options = provider ? IMAGE_GEN_OPTIONS?.[provider] : undefined
@@ -48,9 +50,10 @@ const ImageOptionsPanel = ({
       setSize(undefined)
       setQuality(undefined)
       setSeed(undefined)
+      setAspectRatio(undefined)
     }
     lastProviderRef.current = provider
-  }, [provider, setSize, setQuality, setSeed])
+  }, [provider, setSize, setQuality, setSeed, setAspectRatio])
 
   return (
     <ResizableSidePanel {...rest}>
@@ -97,6 +100,44 @@ const ImageOptionsPanel = ({
                   </Select>
                 </div>
               )}
+
+              {/* aspect ratio */}
+              {options?.aspectRatio && options.aspectRatio.length > 0 && (
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="aspect-ratio-select"
+                    className="text-muted-foreground text-sm font-semibold"
+                  >
+                    Aspect Ratio
+                  </Label>
+                  <Select
+                    value={aspectRatio || DEFAULT_IMAGE_ASPECT_RATIO}
+                    onValueChange={(value) =>
+                      setAspectRatio(value === DEFAULT_IMAGE_ASPECT_RATIO ? undefined : value)
+                    }
+                  >
+                    <SelectTrigger id="aspect-ratio-select" className="w-full">
+                      <SelectValue placeholder="Select aspect ratio" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {options.aspectRatio.map((opt) => (
+                        <SelectItem key={opt.id} value={opt.id}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/*  show error if both size and aspect ratio are set */}
+              {size && aspectRatio ? (
+                <p className="text-sm font-normal text-destructive ">
+                  size and aspect ratio cannot be selected together. Note if both options are
+                  visible then please select either size or aspect ratio which ever works as per the
+                  provider .
+                </p>
+              ) : null}
 
               {/* Quality Select */}
               {options?.quality && options.quality.length > 0 && (
@@ -159,12 +200,14 @@ const ImageOptionsPanel = ({
                   />
                 </div>
               )}
+
+              {/* Note */}
+              <p className="text-xs text-muted-foreground">
+                ❗Note : if some options doesn&apos;t seem to work then set it back to auto or try
+                another model
+              </p>
             </>
           )}
-          <p className="text-xs text-muted-foreground">
-            ❗Note : if some options doesn&apos;t seem to work then set it back to auto or try
-            another model
-          </p>
         </div>
       </div>
     </ResizableSidePanel>
