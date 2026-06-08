@@ -24,7 +24,7 @@ const VideoPage = () => {
   const model = useSelectedModel((state) => state.models['video'] ?? null)
 
   // fetch all the list of generated media
-  const { data: mediaList, refetch } = useFetchMedia({ type: 'video' })
+  const { data: mediaList, refetch } = useFetchMedia({ type: 'video', limit: 10000 }) //@TODO temp limit till infinite scroll is implemented
 
   // hook to generate video
   const { mutate: generateVideo, isPending } = useGenerateVideo()

@@ -36,7 +36,7 @@ const TTSPage = () => {
   const voiceOptions = VOICE_OPTIONS?.[model?.provider as keyof typeof VOICE_OPTIONS] ?? []
 
   // fetch all the list of generated media
-  const { data: mediaList, refetch } = useFetchMedia({ type: 'tts' })
+  const { data: mediaList, refetch } = useFetchMedia({ type: 'tts', limit: 10000 }) //@TODO temp limit till infinite scroll is implemented
 
   // hook to generate speech
   const { mutateAsync: generateSpeech, isPending } = useGenerateSpeech()

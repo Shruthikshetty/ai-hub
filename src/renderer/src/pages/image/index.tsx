@@ -8,7 +8,7 @@ import {
 } from '@renderer/components/ai-elements/prompt-input'
 import AppModelSelector from '@renderer/components/model-selector'
 import { useGenerateImage } from '@renderer/services/image-gen'
-import { Ref, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import GeneratedImageDisplay from '@renderer/components/generated-image-display'
 import { useFetchInfiniteMedia } from '@renderer/services/media'
