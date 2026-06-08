@@ -9,6 +9,7 @@ export const QUERY_KEYS = {
   conversationMessagesFetch: 'conversation-messages-fetch',
   messageFetch: 'message-fetch',
   mediaFetch: 'media-fetch',
+  mediaFetchInfinite: 'media-fetch-infinite',
   mediaTtsFetch: 'media-tts-fetch'
 }
 

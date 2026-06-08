@@ -14,7 +14,7 @@ import { MUTATION_KEYS, QUERY_KEYS } from '@renderer/constants/service-keys.cons
 import { buildQueryString } from '@renderer/lib/generation.utild'
 import { uploadMediaFile } from '@renderer/lib/media-upload'
 import { errorToast } from '@renderer/lib/toast-wrapper'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query'
 
 // types
 export interface UploadMediaInput {
@@ -38,6 +38,7 @@ export function useUploadMedia() {
 
 /**
  *get all the media items by type
+ *@deprecated use the useFetchInfiniteMedia instead
  */
 export function useFetchMedia({
   type = 'all',
@@ -57,6 +58,36 @@ export function useFetchMedia({
         throw response
       }
       return response
+    }
+  })
+}
+
+/**
+ * get all the media items by type with infinity scrolling
+ */
+export function useFetchInfiniteMedia({
+  type = 'all',
+  limit = 50
+}: {
+  type?: (typeof MEDIA_REQUEST_TYPES)[number]
+  limit?: number
+}) {
+  return useInfiniteQuery<GetMediaResponseType, ApiError>({
+    queryKey: [QUERY_KEYS.mediaFetchInfinite, type, limit],
+    initialPageParam: undefined as number | undefined,
+    queryFn: async ({ pageParam }) => {
+      const queryString = buildQueryString({ cursor: pageParam, limit })
+      const response = await window.api.request(`/api/media/${type}${queryString}`, 'GET')
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage?.data?.pagination.hasMore) {
+        return undefined // no more pages
+      }
+      return lastPage.data.pagination.nextCursor // cursor for the next page
     }
   })
 }

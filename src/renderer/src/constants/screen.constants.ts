@@ -153,3 +153,17 @@ export const QUICK_IMAGE_PROMPTS = [
   'Abandoned Art Deco theater overgrown with lush tropical vines, dramatic shafts of sunlight, concept art, moody atmosphere',
   'Giant glass jellyfish floating above a neon-lit Tokyo street at night, reflection pools, dreamlike ambiance, hyperrealistic'
 ]
+
+// loading placeholder image media item
+export const LOADING_IMAGE_MEDIA_ITEM = {
+  id: -1,
+  mediaUrl: '',
+  type: 'image' as const,
+  prompt: '',
+  relativePath: '',
+  modelId: '',
+  provider: '',
+  chatId: null,
+  messageId: null,
+  createdAt: null
+}

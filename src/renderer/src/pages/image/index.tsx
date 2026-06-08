@@ -8,10 +8,10 @@ import {
 } from '@renderer/components/ai-elements/prompt-input'
 import AppModelSelector from '@renderer/components/model-selector'
 import { useGenerateImage } from '@renderer/services/image-gen'
-import { useState } from 'react'
+import { Ref, useRef, useState } from 'react'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
 import GeneratedImageDisplay from '@renderer/components/generated-image-display'
-import { useFetchMedia } from '@renderer/services/media'
+import { useFetchInfiniteMedia } from '@renderer/services/media'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -21,6 +21,10 @@ import ImageOptionsPanel from './image-options-panal'
 import PanelTrigger from '@renderer/components/panel-trigger'
 import ImageGenStarter from './image-gen-starter'
 import { useImagOptions } from '@renderer/state-management/image-options.store'
+import { VirtuosoGrid, VirtuosoGridHandle } from 'react-virtuoso'
+import { LOADING_IMAGE_MEDIA_ITEM } from '@renderer/constants/screen.constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
 
 const ImagePage = () => {
   // state to store prompt
@@ -33,17 +37,29 @@ const ImagePage = () => {
   const seed = useImagOptions((s) => s.seed)
   const aspectRatio = useImagOptions((s) => s.aspectRatio)
 
+  // query client
+  const queryClient = useQueryClient()
+  // hold out virtual list ref
+  const virtuosoRef = useRef<VirtuosoGridHandle>(null)
   // get selected model from global store
   const model = useSelectedModel((state) => state.models['image'] ?? null)
   // fetch all the list of generated media
-  const { data: mediaList, refetch } = useFetchMedia({ type: 'image' })
-
+  const {
+    data: mediaList,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useFetchInfiniteMedia({ type: 'image' })
+  // flatten the array
+  const mediaItems = mediaList?.pages.flatMap((page) => page.data.media) ?? []
   // hook to generate image
   const { mutate: generateImage, isPending } = useGenerateImage()
 
   // handler to handle submit
   const handleSubmit = () => {
     if (!model) return
+    // scroll to top
+    virtuosoRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
     generateImage(
       {
         prompt,
@@ -55,12 +71,19 @@ const ImagePage = () => {
       },
       {
         onSuccess: () => {
-          // refetch the media list
-          refetch()
+          // reset the query
+          queryClient.resetQueries({ queryKey: [QUERY_KEYS.mediaFetchInfinite, 'image'] })
           setPrompt('')
         }
       }
     )
+  }
+
+  // fetch more images if they exist
+  const fetchMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
   }
 
   return (
@@ -83,17 +106,29 @@ const ImagePage = () => {
         </div>
         <div className="flex flex-col items-center justify-between h-full p-4 overflow-hidden w-full mx-auto">
           {/* in case of no images  */}
-          {!isPending && mediaList?.data?.media?.length === 0 ? (
+          {!isPending && mediaItems?.length === 0 ? (
             <ImageGenStarter onSelect={(p) => setPrompt(p)} />
           ) : (
             /* images grid */
             <div className="grow overflow-auto min-h-0 w-full">
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-                {isPending && <GeneratedImageDisplay image={undefined} loading={true} />}
-                {mediaList?.data?.media?.map((image) => (
-                  <GeneratedImageDisplay key={image?.id} image={image} loading={false} />
-                ))}
-              </div>
+              <VirtuosoGrid
+                ref={virtuosoRef}
+                className="h-full w-full"
+                overscan={1200}
+                listClassName="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4"
+                endReached={fetchMore}
+                data={isPending ? [LOADING_IMAGE_MEDIA_ITEM, ...mediaItems] : mediaItems}
+                itemContent={(_index, image) => {
+                  const isLoading = image.id === -1
+                  return (
+                    <GeneratedImageDisplay
+                      image={isLoading ? undefined : image}
+                      loading={isLoading}
+                      key={image.id}
+                    />
+                  )
+                }}
+              />
             </div>
           )}
           {/* input area */}
