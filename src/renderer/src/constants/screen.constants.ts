@@ -167,3 +167,18 @@ export const LOADING_IMAGE_MEDIA_ITEM = {
   messageId: null,
   createdAt: null
 }
+
+// loading placeholder tts media item
+export const LOADING_TTS_MEDIA_ITEM = {
+  id: -1,
+  mediaUrl: '',
+  type: 'tts' as const,
+  prompt: '',
+  relativePath: '',
+  modelId: '',
+  provider: '',
+  chatId: null,
+  messageId: null,
+  createdAt: null
+}
+

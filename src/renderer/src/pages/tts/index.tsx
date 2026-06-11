@@ -14,13 +14,18 @@ import {
   SelectTrigger,
   SelectValue
 } from '@renderer/components/ui/select'
-import { useFetchMedia } from '@renderer/services/media'
+import { useFetchInfiniteMedia } from '@renderer/services/media'
 import { useGenerateSpeech } from '@renderer/services/tts'
 import useSelectedModel from '@renderer/state-management/selected-model.store'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { VOICE_OPTIONS } from '@common/constants/voices.constants'
 import GeneratedAudioDisplay from '@renderer/components/generated-audio-display'
 import { Volume2 } from 'lucide-react'
+import { VirtuosoGrid, VirtuosoGridHandle } from 'react-virtuoso'
+import { LOADING_TTS_MEDIA_ITEM } from '@renderer/constants/screen.constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
+import { MEDIA_FETCH_PAGE_LIMIT_BY_TYPE } from '@renderer/constants/config.constants'
 
 // landing page for tts - text to speech conversion tab
 const TTSPage = () => {
@@ -28,6 +33,10 @@ const TTSPage = () => {
   const [prompt, setPrompt] = useState('')
   // state to manage voice
   const [voice, setVoice] = useState('')
+  // query client
+  const queryClient = useQueryClient()
+  // hold our virtual list ref
+  const virtuosoRef = useRef<VirtuosoGridHandle>(null)
 
   // get selected model from global store
   const model = useSelectedModel((state) => state.models['audio'])
@@ -36,7 +45,14 @@ const TTSPage = () => {
   const voiceOptions = VOICE_OPTIONS?.[model?.provider as keyof typeof VOICE_OPTIONS] ?? []
 
   // fetch all the list of generated media
-  const { data: mediaList, refetch } = useFetchMedia({ type: 'tts', limit: 10000 }) //@TODO temp limit till infinite scroll is implemented
+  const {
+    data: mediaList,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useFetchInfiniteMedia({ type: 'tts', limit: MEDIA_FETCH_PAGE_LIMIT_BY_TYPE.tts })
+  // flatten the array
+  const mediaItems = mediaList?.pages.flatMap((page) => page.data.media) ?? []
 
   // hook to generate speech
   const { mutateAsync: generateSpeech, isPending } = useGenerateSpeech()
@@ -44,6 +60,8 @@ const TTSPage = () => {
   // handle submit function
   const handleSubmit = () => {
     if (!model || !voice) return
+    // scroll to top
+    virtuosoRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
     generateSpeech(
       {
         model: model,
@@ -52,12 +70,19 @@ const TTSPage = () => {
       },
       {
         onSuccess: () => {
-          // refetch the media list
-          refetch()
+          // reset the query
+          queryClient.resetQueries({ queryKey: [QUERY_KEYS.mediaFetchInfinite, 'tts'] })
           setPrompt('')
         }
       }
     )
+  }
+
+  // fetch more audio if they exist
+  const fetchMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
   }
 
   return (
@@ -65,12 +90,24 @@ const TTSPage = () => {
       <h2 className="text-md md:text-lg font-medium text-center w-full">TTS - (Text To Speech)</h2>
       {/* audio grid */}
       <div className="grow overflow-auto min-h-0 w-full">
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-2">
-          {isPending && <GeneratedAudioDisplay media={undefined} loading={true} />}
-          {mediaList?.data?.media?.map((media) => (
-            <GeneratedAudioDisplay key={media.id} media={media} loading={false} />
-          ))}
-        </div>
+        <VirtuosoGrid
+          ref={virtuosoRef}
+          className="h-full w-full"
+          overscan={900}
+          listClassName="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-2"
+          endReached={fetchMore}
+          data={isPending ? [LOADING_TTS_MEDIA_ITEM, ...mediaItems] : mediaItems}
+          itemContent={(_index, media) => {
+            const isLoading = media.id === -1
+            return (
+              <GeneratedAudioDisplay
+                media={isLoading ? undefined : media}
+                loading={isLoading}
+                key={media.id}
+              />
+            )
+          }}
+        />
       </div>
 
       {/* input area */}

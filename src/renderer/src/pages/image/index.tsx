@@ -25,6 +25,7 @@ import { VirtuosoGrid, VirtuosoGridHandle } from 'react-virtuoso'
 import { LOADING_IMAGE_MEDIA_ITEM } from '@renderer/constants/screen.constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@renderer/constants/service-keys.constants'
+import { MEDIA_FETCH_PAGE_LIMIT_BY_TYPE } from '@renderer/constants/config.constants'
 
 const ImagePage = () => {
   // state to store prompt
@@ -49,7 +50,7 @@ const ImagePage = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useFetchInfiniteMedia({ type: 'image' })
+  } = useFetchInfiniteMedia({ type: 'image', limit: MEDIA_FETCH_PAGE_LIMIT_BY_TYPE.image })
   // flatten the array
   const mediaItems = mediaList?.pages.flatMap((page) => page.data.media) ?? []
   // hook to generate image

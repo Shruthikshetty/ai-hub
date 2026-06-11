@@ -49,5 +49,13 @@ export const VOICE_OPTIONS: Record<string, readonly VoiceOption[]> = {
     { id: 'leo', label: 'leo' },
     { id: 'rex', label: 'rex' },
     { id: 'sal', label: 'sal' }
+  ],
+  custom: [
+    { id: 'af_heart', label: 'Heart' },
+    { id: 'af_bella', label: 'Bella' },
+    { id: 'af_nicole', label: 'Nicole' },
+    { id: 'af_sarah', label: 'Sarah' },
+    { id: 'af_sky', label: 'Sky' },
+    { id: 'am_adam', label: 'Adam' }
   ]
 } as const

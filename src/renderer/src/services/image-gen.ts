@@ -48,7 +48,7 @@ export const useDeleteGeneratedImage = () => {
     onSuccess: () => {
       successToast('Image deleted successfully')
       // invalidate media fetch
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.mediaFetch, MEDIA_TYPE[0]] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.mediaFetchInfinite, MEDIA_TYPE[0]] })
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to delete image')
