@@ -70,6 +70,10 @@ export const getMedia = createRoute({
           },
           example: 'all'
         })
+    }),
+    query: z.object({
+      limit: z.coerce.number().positive().default(20),
+      cursor: z.coerce.number().optional()
     })
   },
   responses: {

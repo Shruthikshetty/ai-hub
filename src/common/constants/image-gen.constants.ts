@@ -62,6 +62,7 @@ export const IMAGE_GEN_OPTIONS: Record<string, ProviderImageOptions> = {
     ],
     seed: true
   },
+  //https://ai-sdk.dev/docs/ai-sdk-core/image-generation
   vercel: {
     size: [
       { id: DEFAULT_IMAGE_SIZE_OPTION, label: 'Auto' },

@@ -15,7 +15,8 @@ import { deleteMediaFile, saveFile } from '../../lib/file-storage'
 import { MEDIA_TYPE } from '../../../common/constants/global.constants'
 import db from '../../db'
 import { media, MediaGetSchema } from '../../db/schema'
-import { and, desc, eq, isNull, ne, or } from 'drizzle-orm'
+import { and, desc, eq, isNull, lt, ne, or } from 'drizzle-orm'
+import { getCursorPagination } from '../../lib/pagination'
 
 // handler for uploading media files (local non db)
 export const uploadMedia: AppRouteHandler<UploadMediaRoute> = async (c) => {
@@ -40,6 +41,7 @@ export const uploadMedia: AppRouteHandler<UploadMediaRoute> = async (c) => {
 // handler for getting all the stored media by type image/video  from db
 export const getMedia: AppRouteHandler<GetMediaRoute> = async (c) => {
   const { type } = c.req.valid('param')
+  const { limit, cursor } = c.req.valid('query')
 
   // default fetch all
   let getType = 'all'
@@ -66,14 +68,35 @@ export const getMedia: AppRouteHandler<GetMediaRoute> = async (c) => {
       where = eq(media.type, getType as MediaGetSchema['type'])
   }
 
+  // apply cursor if found
+  if (cursor) {
+    where = and(where, lt(media.id, cursor))
+  }
+
   // get all the media files from db based on the where condition
   const result = await db.query.media.findMany({
     where,
-    orderBy: [desc(media.createdAt)]
+    limit: limit + 1, // add one to limit to catch if there are more results
+    orderBy: [desc(media.id)]
   })
 
+  // paginate the results using helper
+  const { items, hasMore, nextCursor } = getCursorPagination(result, limit)
+
   // send response with the media files
-  return c.json({ success: true, data: result }, HTTP_STATUS_CODES.OK)
+  return c.json(
+    {
+      success: true,
+      data: {
+        media: items,
+        pagination: {
+          nextCursor,
+          hasMore
+        }
+      }
+    },
+    HTTP_STATUS_CODES.OK
+  )
 }
 
 // handler for deleting a media file (local non db )
