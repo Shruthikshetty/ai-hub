@@ -195,4 +195,3 @@ export const LOADING_VIDEO_MEDIA_ITEM = {
   messageId: null,
   createdAt: null
 }
-

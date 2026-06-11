@@ -77,7 +77,7 @@ export const getMedia: AppRouteHandler<GetMediaRoute> = async (c) => {
   const result = await db.query.media.findMany({
     where,
     limit: limit + 1, // add one to limit to catch if there are more results
-    orderBy: [desc(media.createdAt)]
+    orderBy: [desc(media.id)]
   })
 
   // paginate the results using helper
