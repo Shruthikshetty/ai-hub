@@ -181,4 +181,3 @@ export const LOADING_TTS_MEDIA_ITEM = {
   messageId: null,
   createdAt: null
 }
-
