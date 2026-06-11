@@ -181,3 +181,18 @@ export const LOADING_TTS_MEDIA_ITEM = {
   messageId: null,
   createdAt: null
 }
+
+// loading placeholder video media item
+export const LOADING_VIDEO_MEDIA_ITEM = {
+  id: -1,
+  mediaUrl: '',
+  type: 'video' as const,
+  prompt: '',
+  relativePath: '',
+  modelId: '',
+  provider: '',
+  chatId: null,
+  messageId: null,
+  createdAt: null
+}
+

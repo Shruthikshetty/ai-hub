@@ -50,7 +50,7 @@ export const useDeleteVideo = () => {
     onSuccess: () => {
       successToast('Video deleted successfully')
       // invalidate media fetch
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.mediaFetch, MEDIA_TYPE[1]] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.mediaFetchInfinite, MEDIA_TYPE[1]] })
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to delete video')

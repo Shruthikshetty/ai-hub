@@ -6,5 +6,6 @@ export const FETCH_MEDIA_BY_MESSAGE_ID_STALE_TIME = Infinity // url doesn't chan
 
 export const MEDIA_FETCH_PAGE_LIMIT_BY_TYPE = {
   tts: 50,
-  image: 20
+  image: 20,
+  video: 20
 }
