@@ -16,7 +16,7 @@ This document tracks the capabilities of various AI providers integrated into th
 | Open Router      |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
 | Google AI Studio |  ✓   |              |       |       |     |            |
 | AI Gateway       |  ✓   |      ✓       |   ✓   |       |     |            |
-| Groq             |  ✓   |      ✓       |       |       |     |     !      |
+| Groq             |  ✓   |      ✓       |   X   |   X   |     |     !      |
 | Hugging Face     |  ✓   |              |       |       |     |            |
 | xAI              |  ✓   |      ✓       |   ✓   |   ✓   |  X  |     ✓      |
 | Together AI      |      |              |       |       |     |            |
@@ -29,4 +29,5 @@ This document tracks the capabilities of various AI providers integrated into th
 | Cohere           |  ✓   |              |       |       |     |            |
 | Alibaba          |  ✓   |      ✓       |   ✓   |   X   |  X  |     X      |
 | Poe              |  !   |              |   X   |   X   |  X  |     X      |
-| Ninja chat       |  ✓   |      ✓       |   ✓   |   X   |  X  |     X      |
+| Ninja Chat       |  ✓   |      ✓       |   ✓   |   X   |  X  |     X      |
+| Open Code        |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
