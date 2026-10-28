@@ -147,6 +147,13 @@ export async function getProviderInstanceModel({
       })
       return poeInstance
     }
+    case 'open-code': {
+      const openCodeInstance = createOpenAI({
+        baseURL: 'https://opencode.ai/inference/v1',
+        apiKey
+      })
+      return openCodeInstance
+    }
     case 'mistral': {
       const mistralInstance = createMistral({
         apiKey
