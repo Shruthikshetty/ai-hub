@@ -149,7 +149,7 @@ export async function getProviderInstanceModel({
     }
     case 'open-code': {
       const openCodeInstance = createOpenAI({
-        baseURL: 'https://opencode.ai/inference/v1',
+        baseURL: 'https://opencode.ai/inference/openai/v1',
         apiKey
       })
       return openCodeInstance
