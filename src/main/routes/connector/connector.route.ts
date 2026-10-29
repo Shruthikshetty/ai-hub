@@ -4,12 +4,21 @@
 
 import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { internalServerErrorDocObject, zodNotFoundDocObject } from '../../constants/doc-constants'
+import {
+  internalServerErrorDocObject,
+  zodNotFoundDocObject,
+  zodValidationErrorDocObject
+} from '../../constants/doc-constants'
 import {
   fetchAllConnectorResponseSchema,
-  updateConnectorResponseSchema
+  updateConnectorResponseSchema,
+  createConnectorResponseSchema,
+  deleteConnectorResponseSchema
 } from '../../../common/schemas/connector.schema'
-import { connectorUpdateSchema } from '../../../common/db-schemas/connector.schema'
+import {
+  connectorInsertSchema,
+  connectorUpdateSchema
+} from '../../../common/db-schemas/connector.schema'
 
 // route to get all connectors
 export const getConnectors = createRoute({
@@ -26,6 +35,36 @@ export const getConnectors = createRoute({
       },
       description: 'success response for getting all connectors'
     },
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
+// route to create a connector
+export const createConnector = createRoute({
+  tags: ['Connector'],
+  method: 'post',
+  path: '/connector',
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: connectorInsertSchema
+        }
+      },
+      description: 'request body for creating a connector'
+    }
+  },
+  responses: {
+    [HTTP_STATUS_CODES.CREATED]: {
+      content: {
+        'application/json': {
+          schema: createConnectorResponseSchema
+        }
+      },
+      description: 'Connector created successfully'
+    },
+    [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
     [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }
 })
@@ -71,6 +110,40 @@ export const patchConnectorByName = createRoute({
   }
 })
 
+// route to delete a connector by primary key (name)
+export const deleteConnectorByName = createRoute({
+  tags: ['Connector'],
+  method: 'delete',
+  path: '/connector/{name}',
+  request: {
+    params: z.object({
+      name: z.string().openapi({
+        param: {
+          name: 'name',
+          in: 'path',
+          required: true,
+          description: 'connector name (e.g. telegram)'
+        },
+        example: 'telegram'
+      })
+    })
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: deleteConnectorResponseSchema
+        }
+      },
+      description: 'Connector deleted successfully'
+    },
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export types
 export type GetConnectorsRoute = typeof getConnectors
+export type CreateConnectorRoute = typeof createConnector
 export type PatchConnectorByNameRoute = typeof patchConnectorByName
+export type DeleteConnectorByNameRoute = typeof deleteConnectorByName

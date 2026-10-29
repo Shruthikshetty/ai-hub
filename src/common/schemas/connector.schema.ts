@@ -12,3 +12,17 @@ export const updateConnectorResponseSchema = z.object({
   success: z.boolean(),
   data: connectorSelectSchema
 })
+
+// response schema for creating a connector
+export const createConnectorResponseSchema = z.object({
+  success: z.boolean(),
+  data: connectorSelectSchema,
+  message: z.string().optional()
+})
+
+// response schema for deleting a connector
+export const deleteConnectorResponseSchema = z.object({
+  success: z.boolean(),
+  data: connectorSelectSchema.optional(),
+  message: z.string().optional()
+})
