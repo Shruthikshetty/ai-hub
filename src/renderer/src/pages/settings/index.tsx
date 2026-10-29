@@ -7,6 +7,7 @@ import { ProviderSettingsTab } from './provider-settings'
 import AppearanceTab from './appearance-setting'
 import SecurityTab from './security-settings'
 import { useLocation } from 'react-router'
+import ConnectorTab from './connectors-setting'
 
 /**
  * Settings page
@@ -28,6 +29,8 @@ function Settings(): React.JSX.Element {
         return <AppearanceTab />
       case 'Security':
         return <SecurityTab />
+      case 'Connectors':
+        return <ConnectorTab />
       default:
         return <div className="text-2xl h-full w-full">In Progress</div>
     }

@@ -10,7 +10,8 @@ export const QUERY_KEYS = {
   messageFetch: 'message-fetch',
   mediaFetch: 'media-fetch',
   mediaFetchInfinite: 'media-fetch-infinite',
-  mediaTtsFetch: 'media-tts-fetch'
+  mediaTtsFetch: 'media-tts-fetch',
+  connectorsFetch: 'connectors-fetch'
 }
 
 export const MUTATION_KEYS = {

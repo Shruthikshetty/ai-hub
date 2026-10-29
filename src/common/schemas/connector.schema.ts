@@ -26,3 +26,9 @@ export const deleteConnectorResponseSchema = z.object({
   data: connectorSelectSchema.optional(),
   message: z.string().optional()
 })
+
+// export all the types
+export type FetchAllConnectorResponseSchemaType = z.infer<typeof fetchAllConnectorResponseSchema>
+export type UpdateConnectorResponseSchemaType = z.infer<typeof updateConnectorResponseSchema>
+export type CreateConnectorResponseSchemaType = z.infer<typeof createConnectorResponseSchema>
+export type DeleteConnectorResponseSchemaType = z.infer<typeof deleteConnectorResponseSchema>
