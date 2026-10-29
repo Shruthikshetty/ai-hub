@@ -6,3 +6,9 @@ export const fetchAllConnectorResponseSchema = z.object({
   success: z.boolean(),
   data: connectorSelectSchema.array()
 })
+
+// response schema for updating a connector
+export const updateConnectorResponseSchema = z.object({
+  success: z.boolean(),
+  data: connectorSelectSchema
+})

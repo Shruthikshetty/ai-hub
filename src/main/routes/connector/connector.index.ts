@@ -5,7 +5,9 @@ import * as routes from './connector.route'
 import * as handlers from './connector.handler'
 
 // create the route
-const router = createRouter().openapi(routes.getConnectors, handlers.fetchConnectors)
+const router = createRouter()
+  .openapi(routes.getConnectors, handlers.fetchConnectors)
+  .openapi(routes.patchConnectorByName, handlers.updateConnector)
 
 // add all the routes
 export default router
