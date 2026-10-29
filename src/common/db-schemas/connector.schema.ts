@@ -4,11 +4,15 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
+import { conversations } from './conversation.schema'
 
 export const connectors = sqliteTable('connectors', {
   name: text('name').primaryKey(), // name of the connection  telegram , discord etc ...
   botToken: text('bot_token').notNull(),
   allowedUsers: text('allowed_users', { mode: 'json' }).$type<string[]>().default([]), // userid's that are allowed to access the bot
+  activeConversationId: integer('active_conversation_id').references(() => conversations.id, {
+    onDelete: 'set null'
+  }),
   modelProvider: text('default_provider'),
   modelId: text('model-id').notNull(), // can not be pre configured , due to multi provider set but is mandatory before turn on
   provider: text('provider').notNull(),
@@ -25,7 +29,8 @@ export const connectors = sqliteTable('connectors', {
 
 // Validation schemas
 export const connectorSelectSchema = createSelectSchema(connectors, {
-  name: (field) => field.max(150)
+  name: (field) => field.max(150),
+  activeConversationId: (field) => field.nullish().default(null)
 }).omit({
   createdAt: true,
   updatedAt: true
