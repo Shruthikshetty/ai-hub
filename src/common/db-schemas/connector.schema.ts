@@ -8,6 +8,8 @@ import { conversations } from './conversation.schema'
 
 export const connectors = sqliteTable('connectors', {
   name: text('name').primaryKey(), // name of the connection  telegram , discord etc ...
+  displayName: text('display_name').default(''),
+  description: text('description').default(''),
   botToken: text('bot_token').notNull(),
   allowedUsers: text('allowed_users', { mode: 'json' }).$type<string[]>().default([]), // userid's that are allowed to access the bot
   activeConversationId: integer('active_conversation_id').references(() => conversations.id, {
@@ -43,6 +45,6 @@ export const connectorUpdateSchema = connectorSelectSchema.partial().omit({
 })
 
 //export types
-export type connectorGetSchema = z.infer<typeof connectorSelectSchema>
-export type connectorCreateSchema = z.infer<typeof connectorInsertSchema>
-export type connectorUpdateSchema = z.infer<typeof connectorUpdateSchema>
+export type ConnectorGetSchema = z.infer<typeof connectorSelectSchema>
+export type ConnectorCreateSchema = z.infer<typeof connectorInsertSchema>
+export type ConnectorUpdateSchema = z.infer<typeof connectorUpdateSchema>

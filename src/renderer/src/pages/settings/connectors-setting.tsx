@@ -1,4 +1,5 @@
 import { AVAILABLE_CONNECTORS } from '@common/constants/global.constants'
+import ConnectorCard from '@renderer/components/connector-card'
 import { useFetchConnectors } from '@renderer/services/connectors'
 import { useMemo } from 'react'
 /**
@@ -12,7 +13,7 @@ function ConnectorSettings() {
   // connectors that can be added
   const availableToAdd = useMemo(() => {
     const addedNames = new Set(connectorsData?.data?.map((c) => c.name) ?? [])
-    return AVAILABLE_CONNECTORS.filter((name) => addedNames.has(name)) ?? []
+    return AVAILABLE_CONNECTORS.filter((item) => !addedNames.has(item.name)) ?? []
   }, [connectorsData])
 
   return (
@@ -24,11 +25,11 @@ function ConnectorSettings() {
       </div>
       {/* list of configured providers */}
       {connectorsData?.data.map((item) => (
-        <div key={item.name}>{item.name}</div>
+        <ConnectorCard key={item.name} connector={item} />
       ))}
       {/* list of connectors available to add */}
       {availableToAdd.map((item) => (
-        <div key={item}>{item}</div>
+        <ConnectorCard key={item.name} connector={item} />
       ))}
     </div>
   )

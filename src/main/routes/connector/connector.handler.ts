@@ -105,7 +105,7 @@ export const deleteConnector: AppRouteHandler<DeleteConnectorByNameRoute> = asyn
       HTTP_STATUS_CODES.NOT_FOUND
     )
   }
-
+  // return success response
   return c.json(
     {
       success: true,
