@@ -15,7 +15,6 @@ export const connectors = sqliteTable('connectors', {
   activeConversationId: integer('active_conversation_id').references(() => conversations.id, {
     onDelete: 'set null'
   }),
-  modelProvider: text('default_provider'),
   modelId: text('model-id').notNull(), // can not be pre configured , due to multi provider set but is mandatory before turn on
   provider: text('provider').notNull(),
   systemPrompt: text('system-prompt').default(

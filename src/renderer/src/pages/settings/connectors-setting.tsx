@@ -25,11 +25,11 @@ function ConnectorSettings() {
       </div>
       {/* list of configured providers */}
       {connectorsData?.data.map((item) => (
-        <ConnectorCard key={item.name} connector={item} />
+        <ConnectorCard key={item.name} connector={item} type="UPDATE" />
       ))}
       {/* list of connectors available to add */}
       {availableToAdd.map((item) => (
-        <ConnectorCard key={item.name} connector={item} />
+        <ConnectorCard key={item.name} connector={item} type="ADD" />
       ))}
     </div>
   )
