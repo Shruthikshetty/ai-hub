@@ -1,6 +1,6 @@
 import { ConnectorGetSchema } from '@common/db-schemas/connector.schema'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
-import { ChartBarIcon } from 'lucide-react'
+import { MessageSquare } from 'lucide-react'
 import { Button } from './ui/button'
 
 /**
@@ -12,23 +12,31 @@ const ConnectorCard = ({
   connector: Partial<Omit<ConnectorGetSchema, 'name'>> & { name: string }
 }) => {
   return (
-    <Card>
-      <CardHeader>
-        {/* icon  */}
-        <ChartBarIcon />
-        <div>
-          <CardTitle>{connector.displayName}</CardTitle>
-          <CardDescription>{connector.description}</CardDescription>
+    <Card className="pt-0">
+      <CardHeader className="bg-muted/50 mt-0 py-3">
+        <div className="flex flex-row items-center gap-2">
+          {/* icon  */}
+          <div className="p-2 bg-muted-foreground/20 rounded-md">
+            <MessageSquare className="size-5" />
+          </div>
+          <div className="gap-1 flex flex-col">
+            <CardTitle>{connector.displayName}</CardTitle>
+            <CardDescription>{connector.description}</CardDescription>
+          </div>
         </div>
       </CardHeader>
       <CardContent>{/* form will go here */}</CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-row justify-between">
         {/*  text*/}
-        <p>Fill in the required fields to continue</p>
+        <p className="text-muted-foreground">Fill in the required fields to continue</p>
         {/* button for connect and apply */}
-        <div>
-          <Button>Apply</Button>
-          <Button>connect</Button>
+        <div className="gap-2 flex flex-row">
+          {/*@TODO will have apply and delete */}
+          <Button variant={'default'} className="active:scale-95">
+            Apply
+          </Button>
+          {/*@TODO will change color when connected */}
+          <Button variant={'outline'}>connect</Button>
         </div>
       </CardFooter>
     </Card>
