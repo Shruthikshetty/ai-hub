@@ -4,13 +4,14 @@
 
 import { ConnectorCreateSchema, ConnectorUpdateSchema } from '@common/db-schemas/connector.schema'
 import {
+  DeleteConnectorResponseSchemaType,
   FetchAllConnectorResponseSchemaType,
   UpdateConnectorResponseSchemaType
 } from '@common/schemas/connector.schema'
 import { ApiError } from '@common/types'
 import { FETCH_CONNECTORS_STALE_TIME } from '@renderer/constants/config.constants'
 import { MUTATION_KEYS, QUERY_KEYS } from '@renderer/constants/service-keys.constants'
-import { successToast } from '@renderer/lib/toast-wrapper'
+import { errorToast, successToast } from '@renderer/lib/toast-wrapper'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**
@@ -74,6 +75,34 @@ export const useUpdateConnector = () => {
     onSuccess: (data) => {
       successToast(`${data?.data?.displayName ?? ''} connector updated successfully`)
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.connectorsFetch] })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to update connector')
+    }
+  })
+}
+
+/**
+ * hook to delete a connector
+ */
+export const useDeleteConnector = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<DeleteConnectorResponseSchemaType, ApiError, string>({
+    mutationKey: [MUTATION_KEYS.deleteConnectorByName],
+    mutationFn: async (name) => {
+      const response = await window.api.request(`/api/connector/${name}`, 'DELETE')
+      if (!response.success) {
+        throw response
+      }
+      return response.data
+    },
+    onSuccess: () => {
+      successToast('Connector deleted successfully')
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.connectorsFetch] })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to delete connector')
     }
   })
 }

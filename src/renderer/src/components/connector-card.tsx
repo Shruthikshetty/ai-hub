@@ -1,6 +1,6 @@
 import { ConnectorGetSchema } from '@common/db-schemas/connector.schema'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, Trash2 } from 'lucide-react'
 import { Button } from './ui/button'
 import { useForm } from '@tanstack/react-form'
 import {
@@ -20,7 +20,11 @@ import AppModelSelector from './model-selector'
 import { Textarea } from './ui/textarea'
 import { Switch } from './ui/switch'
 import { Separator } from './ui/separator'
-import { useAddConnector, useUpdateConnector } from '@renderer/services/connectors'
+import {
+  useAddConnector,
+  useDeleteConnector,
+  useUpdateConnector
+} from '@renderer/services/connectors'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -35,6 +39,7 @@ const ConnectorCard = ({
   // hook to add a connector
   const { mutate: addConnectorMutation } = useAddConnector()
   const { mutate: updateConnectorMutation } = useUpdateConnector()
+  const { mutate: deleteConnectorMutation } = useDeleteConnector()
   // for used to take in the connector details
   const form = useForm({
     defaultValues: {
@@ -68,15 +73,30 @@ const ConnectorCard = ({
   return (
     <Card className="pt-0 shrink-0">
       <CardHeader className="bg-muted/50 mt-0 py-3 border-b">
-        <div className="flex flex-row items-center gap-2">
-          {/* icon  */}
-          <div className="p-2 bg-muted-foreground/20 rounded-md">
-            <MessageSquare className="size-5" />
+        <div className="flex-row flex justify-between items-center">
+          <div className="flex flex-row items-center gap-2">
+            {/* icon  */}
+            <div className="p-2 bg-muted-foreground/20 rounded-md">
+              <MessageSquare className="size-5" />
+            </div>
+            <div className="gap-1 flex flex-col">
+              <CardTitle>{connector.displayName}</CardTitle>
+              <CardDescription>{connector.description}</CardDescription>
+            </div>
           </div>
-          <div className="gap-1 flex flex-col">
-            <CardTitle>{connector.displayName}</CardTitle>
-            <CardDescription>{connector.description}</CardDescription>
-          </div>
+          {/* trash icon */}
+          {type === 'UPDATE' ? (
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              className="text-destructive p-5 hover:text-destructive active:scale-95 hover:border hover:bg-accent-foreground/10!"
+              onClick={() => {
+                deleteConnectorMutation(connector.name)
+              }}
+            >
+              <Trash2 className="size-5" />
+            </Button>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent>
