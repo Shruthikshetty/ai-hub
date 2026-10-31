@@ -13,6 +13,7 @@ import { connectors } from '../../db/schema'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { encryptText } from '../../../common/utils/encryption.util'
 import { telegramBotService } from '../../services/telegram-bot.service'
+import { CONNECTOR_SERVICES } from '../../constants/config.constanst'
 
 // handler to fetch all the connectors
 export const fetchConnectors: AppRouteHandler<GetConnectorsRoute> = async (c) => {
@@ -21,11 +22,17 @@ export const fetchConnectors: AppRouteHandler<GetConnectorsRoute> = async (c) =>
     orderBy: [asc(connectors.createdAt)]
   })
 
+  // map with the connector services to check if the connector is running
+  const data = allConnectors.map((item) => ({
+    ...item,
+    isRunning: CONNECTOR_SERVICES[item.name]?.isRunning() ?? false
+  }))
+
   // return the data
   return c.json(
     {
       success: true,
-      data: allConnectors
+      data: data
     },
     HTTP_STATUS_CODES.OK
   )

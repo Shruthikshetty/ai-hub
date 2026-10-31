@@ -52,7 +52,7 @@ export async function getConnectorChatContext({
   if (!connector) {
     throw new Error(`Connector ${connectorName} not found`)
   }
-
+  // @TODO what with the conversation itself is deleted but the ref is there in connector db
   let conversationId = connector.activeConversationId
   // in case no conversation id
   if (!conversationId) {
@@ -135,12 +135,13 @@ export async function getAiResponseForBotNonStream({
   })
 
   // generate title if more than 4 messages not waiting for this
-  if (messages.length == 4) {
+  if (messages.length == 3) {
     generateTitleFromModelMessages({
       modelId,
       provider,
       messages,
-      conversationId
+      conversationId,
+      messageLimit: 3
     })
   }
 

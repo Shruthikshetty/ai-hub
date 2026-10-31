@@ -113,6 +113,7 @@ export const useDeleteConnector = () => {
  * hook to start a connector by name
  */
 export const useStartConnector = () => {
+  const queryClient = useQueryClient()
   return useMutation<StartConnectorResponseSchemaType, ApiError, string>({
     mutationKey: [MUTATION_KEYS.startConnectorByName],
     mutationFn: async (name) => {
@@ -128,6 +129,7 @@ export const useStartConnector = () => {
           ? `Connected to @${data.data.botUsername}`
           : 'Connector started successfully'
       )
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.connectorsFetch] })
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to start connector')

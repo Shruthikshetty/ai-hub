@@ -1,4 +1,4 @@
-import { ConnectorGetSchema, ConnectorUpdateSchema } from '@common/db-schemas/connector.schema'
+import { ConnectorUpdateSchema } from '@common/db-schemas/connector.schema'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { MessageSquare, Trash2 } from 'lucide-react'
 import { Button } from './ui/button'
@@ -31,6 +31,7 @@ import {
 import { maskedText } from '@renderer/lib/format.utils'
 import { cn } from '@renderer/lib/utils'
 import { Spinner } from './ui/spinner'
+import { FetchAllConnectorResponseSchemaType } from '@common/schemas/connector.schema'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -39,12 +40,13 @@ const ConnectorCard = ({
   connector,
   type = 'ADD'
 }: {
-  connector: Partial<Omit<ConnectorGetSchema, 'name'>> & { name: string }
+  connector: Partial<Omit<FetchAllConnectorResponseSchemaType['data'][0], 'name'>> & {
+    name: string
+  }
   type: 'ADD' | 'UPDATE'
 }) => {
   // When updating, token starts masked/locked, on ADD, it is editable
   const [isTokenEditing, setIsTokenEditing] = useState(type === 'ADD')
-  const [isConnected, setConnected] = useState(false)
 
   // connector hooks
   const { mutate: addConnectorMutation } = useAddConnector()
@@ -60,18 +62,10 @@ const ConnectorCard = ({
   // function to handle connection
   const handleConnection = () => {
     // stop or start the connector
-    if (isConnected) {
-      stopConnectionMutation(connector.name, {
-        onSuccess: () => {
-          setConnected(false)
-        }
-      })
+    if (connector.isRunning) {
+      stopConnectionMutation(connector.name)
     } else {
-      startConnectionMutation(connector.name, {
-        onSuccess: () => {
-          setConnected(true)
-        }
-      })
+      startConnectionMutation(connector.name)
     }
   }
 
@@ -316,14 +310,14 @@ const ConnectorCard = ({
             disabled={isStartConnectorPending || isStopConnectorPending}
             variant={'outline'}
             className={cn(
-              isConnected
+              connector.isRunning
                 ? 'bg-success/70! hover:bg-destructive/80! hover:text-destructive-foreground!'
                 : '',
               'active:scale-95'
             )}
             onClick={handleConnection}
           >
-            {isConnected ? 'Connected' : 'Disconnected'}
+            {connector.isRunning ? 'Connected' : 'Disconnected'}
             {isStartConnectorPending || isStopConnectorPending ? <Spinner /> : null}
           </Button>
         </div>
