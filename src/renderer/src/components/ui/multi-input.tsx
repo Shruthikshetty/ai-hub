@@ -32,6 +32,9 @@ export function MultiInput({
   const [internalItems, setInternalItems] = React.useState<string[]>(defaultValue)
   const [inputValue, setInputValue] = React.useState('')
 
+  // is button enabled derived from disabled and sanitized value
+  const isButtonDisabled = disabled || !inputValue.trim()
+
   const isControlled = controlledValue !== undefined
   const items = isControlled ? controlledValue : internalItems
 
@@ -45,11 +48,8 @@ export function MultiInput({
 
   // add an item at the end run a optional filter function
   const handleAdd = () => {
-    let text = inputValue.trim()
-    if (filterFn) {
-      text = filterFn(text)
-    }
-
+    const text = inputValue.trim()
+    // don't add duplicates
     if (text && !items.includes(text)) {
       updateItems([...items, text])
       setInputValue('')
@@ -67,6 +67,18 @@ export function MultiInput({
       e.preventDefault()
       handleAdd()
     }
+  }
+
+  // handle onchange of input
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let text = e.target.value
+
+    // sanitize any invalid entries
+    if (filterFn) {
+      text = filterFn(text)
+    }
+    // set the value
+    setInputValue(text)
   }
 
   return (
@@ -94,13 +106,17 @@ export function MultiInput({
           value={inputValue}
           disabled={disabled}
           placeholder={placeholder}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
         />
         <Button
           type="button"
           variant="outline"
-          disabled={disabled || !inputValue.trim()}
+          className={cn(
+            isButtonDisabled ? 'disabled:pointer-events-auto disabled:cursor-not-allowed!' : '',
+            'active:scale-95'
+          )}
+          disabled={isButtonDisabled}
           onClick={handleAdd}
         >
           Add

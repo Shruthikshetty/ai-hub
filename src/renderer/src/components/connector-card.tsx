@@ -16,6 +16,9 @@ import {
 } from '@renderer/components/ui/field'
 import { Input } from './ui/input'
 import { MultiInput } from './ui/multi-input'
+import AppModelSelector from './model-selector'
+import { Textarea } from './ui/textarea'
+import { Switch } from './ui/switch'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -50,8 +53,8 @@ const ConnectorCard = ({
   })
 
   return (
-    <Card className="pt-0">
-      <CardHeader className="bg-muted/50 mt-0 py-3">
+    <Card className="pt-0 shrink-0">
+      <CardHeader className="bg-muted/50 mt-0 py-3 border-b">
         <div className="flex flex-row items-center gap-2">
           {/* icon  */}
           <div className="p-2 bg-muted-foreground/20 rounded-md">
@@ -104,6 +107,88 @@ const ConnectorCard = ({
                     Numeric user IDs allowed to chat with the bot. Leave empty to allow all.
                   </FieldDescription>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              )
+            }}
+          </form.Field>
+
+          {/* Model selection for chat */}
+          <form.Field name="provider">
+            {(providerField) => (
+              <form.Field name="modelId">
+                {(modelField) => {
+                  const isProviderInvalid =
+                    providerField.state.meta.isTouched && !providerField.state.meta.isValid
+                  const isModelInvalid =
+                    modelField.state.meta.isTouched && !modelField.state.meta.isValid
+                  return (
+                    <Field
+                      data-invalid={isProviderInvalid || isModelInvalid}
+                      className="flex flex-col gap-1"
+                    >
+                      <FieldLabel>Chat Model</FieldLabel>
+                      <AppModelSelector
+                        modelType="chat"
+                        output="text"
+                        className="border border-input bg-input/30"
+                        disableDefaultSelection
+                        onSelect={(selected) => {
+                          providerField.handleChange(selected.provider)
+                          modelField.handleChange(selected.id)
+                        }}
+                      />
+                      <FieldDescription className="truncate">
+                        The AI model that answers queries from this connector.
+                      </FieldDescription>
+                      {(isModelInvalid || isProviderInvalid) && (
+                        <p className="text-sm font-normal text-destructive">
+                          Please select a model
+                        </p>
+                      )}
+                    </Field>
+                  )
+                }}
+              </form.Field>
+            )}
+          </form.Field>
+
+          {/* optional sys prompt */}
+          <form.Field name="systemPrompt">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>System prompt</FieldLabel>
+                  <Textarea
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value ?? ''}
+                    onBlur={field.handleBlur}
+                    placeholder="Enter system instructions for the AI..."
+                    className="dark:bg-background/90 max-h-60"
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              )
+            }}
+          </form.Field>
+          {/* auto start field */}
+          <form.Field name="autoStart">
+            {(field) => {
+              return (
+                <Field data-invalid={false}>
+                  <div className="flex flex-row gap-5 items-center">
+                    <FieldLabel htmlFor={field.name}>Auto start</FieldLabel>
+                    <Switch
+                      className="shrink-0"
+                      checked={field.state.value}
+                      onCheckedChange={field.handleChange}
+                    />
+                  </div>
+                  <p className="text-muted-foreground">
+                    Connect this bot automatically when the app opens.
+                  </p>
                 </Field>
               )
             }}

@@ -17,7 +17,7 @@ function ConnectorSettings() {
   }, [connectorsData])
 
   return (
-    <div className="h-full w-full px-[5%] py-5 flex flex-col gap-5">
+    <div className="h-full w-full px-[5%] py-5 flex flex-col gap-5 overflow-y-auto">
       {/* title description  */}
       <div>
         <h1 className="text-2xl font-semibold">Connectors</h1>
