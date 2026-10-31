@@ -24,9 +24,12 @@ import { Separator } from './ui/separator'
 import {
   useAddConnector,
   useDeleteConnector,
+  useStartConnector,
   useUpdateConnector
 } from '@renderer/services/connectors'
 import { maskedText } from '@renderer/lib/format.utils'
+import { cn } from '@renderer/lib/utils'
+import { Spinner } from './ui/spinner'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -40,11 +43,26 @@ const ConnectorCard = ({
 }) => {
   // When updating, token starts masked/locked, on ADD, it is editable
   const [isTokenEditing, setIsTokenEditing] = useState(type === 'ADD')
+  const [isConnected, setConnected] = useState(false)
 
-  // hook to add a connector
+  // connector hooks
   const { mutate: addConnectorMutation } = useAddConnector()
   const { mutate: updateConnectorMutation } = useUpdateConnector()
   const { mutate: deleteConnectorMutation } = useDeleteConnector()
+
+  // hooks for connection
+  const { mutate: startConnectionMutation, isPending: isStartConnectorPending } =
+    useStartConnector()
+
+  // function to handle connection
+  const handleConnection = () => {
+    startConnectionMutation(connector.name, {
+      onSuccess: () => {
+        setConnected(true)
+      }
+    })
+  }
+
   // for used to take in the connector details
   const form = useForm({
     defaultValues: {
@@ -136,7 +154,7 @@ const ConnectorCard = ({
                       <Button
                         type="button"
                         variant="outline"
-                        className="active:scale-95"
+                        className="active:scale-95 sm:min-w-20"
                         onClick={() => {
                           if (isTokenEditing) {
                             setIsTokenEditing(false)
@@ -270,7 +288,6 @@ const ConnectorCard = ({
         <p className="text-muted-foreground">Fill in the required fields to continue</p>
         {/* button for connect and apply */}
         <div className="gap-2 flex flex-row">
-          {/*@TODO will have apply and delete */}
           <Button
             variant={'default'}
             className="active:scale-95"
@@ -279,8 +296,15 @@ const ConnectorCard = ({
           >
             Apply
           </Button>
-          {/*@TODO will change color when connected */}
-          <Button variant={'outline'}>connect</Button>
+          <Button
+            disabled={isStartConnectorPending}
+            variant={'outline'}
+            className={cn(isConnected ? 'bg-success/70!' : '', 'active:scale-95')}
+            onClick={handleConnection}
+          >
+            {isConnected ? 'Connected' : 'Connect'}
+            {isStartConnectorPending ? <Spinner /> : null}
+          </Button>
         </div>
       </CardFooter>
     </Card>

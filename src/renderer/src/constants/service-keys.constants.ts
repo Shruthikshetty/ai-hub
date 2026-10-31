@@ -31,5 +31,6 @@ export const MUTATION_KEYS = {
   speechDelete: 'speech-delete',
   updateConnectorByName: 'update-connector-by-name',
   addConnector: 'add-connector',
-  deleteConnectorByName: 'delete-connector-by-name'
+  deleteConnectorByName: 'delete-connector-by-name',
+  startConnectorByName: 'start-connector-by-name'
 }

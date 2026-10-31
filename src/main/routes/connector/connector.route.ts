@@ -13,7 +13,8 @@ import {
   fetchAllConnectorResponseSchema,
   updateConnectorResponseSchema,
   createConnectorResponseSchema,
-  deleteConnectorResponseSchema
+  deleteConnectorResponseSchema,
+  startConnectorResponseSchema
 } from '../../../common/schemas/connector.schema'
 import {
   connectorInsertSchema,
@@ -142,8 +143,41 @@ export const deleteConnectorByName = createRoute({
   }
 })
 
+// route to start a connector (starts long polling for the connector)
+export const startConnectorByName = createRoute({
+  tags: ['Connector'],
+  method: 'post',
+  path: '/connector/{name}/start',
+  request: {
+    params: z.object({
+      name: z.string().openapi({
+        param: {
+          name: 'name',
+          in: 'path',
+          required: true,
+          description: 'connector name (e.g. telegram)'
+        },
+        example: 'telegram'
+      })
+    })
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: startConnectorResponseSchema
+        }
+      },
+      description: 'Connector started successfully'
+    },
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export types
 export type GetConnectorsRoute = typeof getConnectors
 export type CreateConnectorRoute = typeof createConnector
 export type PatchConnectorByNameRoute = typeof patchConnectorByName
 export type DeleteConnectorByNameRoute = typeof deleteConnectorByName
+export type StartConnectorByNameRoute = typeof startConnectorByName

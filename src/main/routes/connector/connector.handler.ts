@@ -5,11 +5,13 @@ import {
   GetConnectorsRoute,
   CreateConnectorRoute,
   PatchConnectorByNameRoute,
-  DeleteConnectorByNameRoute
+  DeleteConnectorByNameRoute,
+  StartConnectorByNameRoute
 } from './connector.route'
 import { connectors } from '../../db/schema'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { encryptText } from '../../../common/utils/encryption.util'
+import { telegramBotService } from '../../services/telegram-bot.service'
 
 // handler to fetch all the connectors
 export const fetchConnectors: AppRouteHandler<GetConnectorsRoute> = async (c) => {
@@ -111,6 +113,28 @@ export const deleteConnector: AppRouteHandler<DeleteConnectorByNameRoute> = asyn
       success: true,
       data: deleted,
       message: `Connector '${name}' deleted successfully`
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+//@NOTE this is only handling telegram because app only supports that if adding additional connector we need to modify this handler
+// start connector long polling
+export const startConnector: AppRouteHandler<StartConnectorByNameRoute> = async (c) => {
+  const { name } = c.req.valid('param') // name of the connector will be used later to conditionally call the service when more connectors are added
+
+  // start the bot service
+  const { botUsername } = await telegramBotService.start()
+  // send the response  back to user
+  return c.json(
+    {
+      success: true,
+      message: `Connected to Telegram bot @${botUsername}`,
+      data: {
+        name,
+        botUsername: botUsername,
+        isRunning: true
+      }
     },
     HTTP_STATUS_CODES.OK
   )

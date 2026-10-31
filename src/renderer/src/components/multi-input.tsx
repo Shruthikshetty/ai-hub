@@ -114,7 +114,7 @@ export function MultiInput({
           variant="outline"
           className={cn(
             isButtonDisabled ? 'disabled:pointer-events-auto disabled:cursor-not-allowed!' : '',
-            'active:scale-95'
+            'active:scale-95 sm:min-w-20'
           )}
           disabled={isButtonDisabled}
           onClick={handleAdd}

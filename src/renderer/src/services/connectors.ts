@@ -6,6 +6,7 @@ import { ConnectorCreateSchema, ConnectorUpdateSchema } from '@common/db-schemas
 import {
   DeleteConnectorResponseSchemaType,
   FetchAllConnectorResponseSchemaType,
+  StartConnectorResponseSchemaType,
   UpdateConnectorResponseSchemaType
 } from '@common/schemas/connector.schema'
 import { ApiError } from '@common/types'
@@ -103,6 +104,32 @@ export const useDeleteConnector = () => {
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to delete connector')
+    }
+  })
+}
+
+/**
+ * hook to start a connector by name
+ */
+export const useStartConnector = () => {
+  return useMutation<StartConnectorResponseSchemaType, ApiError, string>({
+    mutationKey: [MUTATION_KEYS.startConnectorByName],
+    mutationFn: async (name) => {
+      const response = await window.api.request(`/api/connector/${name}/start`, 'POST')
+      if (!response.success) {
+        throw response
+      }
+      return response.data
+    },
+    onSuccess: (data) => {
+      successToast(
+        data?.data?.botUsername
+          ? `Connected to @${data.data.botUsername}`
+          : 'Connector started successfully'
+      )
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to start connector')
     }
   })
 }

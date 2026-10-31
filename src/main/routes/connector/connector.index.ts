@@ -10,6 +10,7 @@ const router = createRouter()
   .openapi(routes.createConnector, handlers.createConnector)
   .openapi(routes.patchConnectorByName, handlers.updateConnector)
   .openapi(routes.deleteConnectorByName, handlers.deleteConnector)
+  .openapi(routes.startConnectorByName, handlers.startConnector)
 
 // add all the routes
 export default router
