@@ -1,3 +1,6 @@
+import { generateText } from 'ai'
+import { getProviderInstanceModel } from './get-provider-instance'
+
 export function splitMessage(text: string, maxLength: number = 4000): string[] {
   if (text.length <= maxLength) return [text]
   const chunks: string[] = []
@@ -22,4 +25,23 @@ export function splitMessage(text: string, maxLength: number = 4000): string[] {
   }
 
   return chunks
+}
+
+/**
+ *this is used for generating text response from ai
+ * used by connector chant bots
+ */
+export async function getAiResponseForBotNonStream({ prompt, provider, modelId }): Promise<string> {
+  // const get the provider as per user model
+  const modelProvider = await getProviderInstanceModel({
+    provider
+  })
+
+  // generate response
+  const { text } = await generateText({
+    model: modelProvider(modelId),
+    prompt: prompt
+  })
+
+  return text
 }

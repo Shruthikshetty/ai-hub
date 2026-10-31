@@ -49,7 +49,8 @@ const ConnectorCard = ({
   // connector hooks
   const { mutate: addConnectorMutation } = useAddConnector()
   const { mutate: updateConnectorMutation } = useUpdateConnector()
-  const { mutate: deleteConnectorMutation } = useDeleteConnector()
+  const { mutate: deleteConnectorMutation, isPending: isDeleteConnectorPending } =
+    useDeleteConnector()
 
   // hooks for connection
   const { mutate: startConnectionMutation, isPending: isStartConnectorPending } =
@@ -131,6 +132,9 @@ const ConnectorCard = ({
               size="icon-sm"
               variant="ghost"
               className="text-destructive p-5 hover:text-destructive active:scale-95 hover:border hover:bg-accent-foreground/10!"
+              disabled={
+                isStartConnectorPending || isStopConnectorPending || isDeleteConnectorPending
+              }
               onClick={() => {
                 deleteConnectorMutation(connector.name)
               }}

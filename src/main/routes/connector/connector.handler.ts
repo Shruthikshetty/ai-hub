@@ -95,6 +95,11 @@ export const updateConnector: AppRouteHandler<PatchConnectorByNameRoute> = async
 export const deleteConnector: AppRouteHandler<DeleteConnectorByNameRoute> = async (c) => {
   const { name } = c.req.valid('param')
 
+  //if a connection is active stop the bot before deleting from DB
+  if (name === 'telegram') {
+    await telegramBotService.stop()
+  }
+
   // delete the connector from db
   const [deleted] = await db.delete(connectors).where(eq(connectors.name, name)).returning()
 

@@ -3,6 +3,7 @@ import db from '../db'
 import { connectors } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import { decryptText } from '../../common/utils/encryption.util'
+import { getAiResponseForBotNonStream } from '../lib/connector-utils'
 
 /**
  * This is the main telegram service that handles the connection and chat with telegram bot
@@ -57,13 +58,23 @@ class TelegramBotService {
 
     // attach listeners
     newBot.command('start', (ctx) => ctx.reply('Hello from AI Hub!'))
-    newBot.on('message:text', (ctx) => {
+    newBot.on('message:text', async (ctx) => {
+      // only allow authorized users
       if (allowedUsers.length > 0 && !allowedUsers.includes(String(ctx.from?.id))) {
         ctx.reply('⛔ Unauthorized please request access from the admin to use this bot')
         return
       }
-      // send response to allowed users only
-      ctx.reply(`Echo: ${ctx.message.text}`)
+      // show typing in ui
+      ctx.replyWithChatAction('typing').catch(() => {})
+      // generate response based on the query provided
+      const response = await getAiResponseForBotNonStream({
+        modelId: connector.modelId,
+        prompt: ctx.message?.text || 'reply to user that u did not receive any valid request',
+        provider: connector.provider
+      })
+
+      // send response to user
+      ctx.reply(response)
     })
 
     // Start long-polling
