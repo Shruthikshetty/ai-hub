@@ -1,8 +1,9 @@
-import { ConnectorGetSchema } from '@common/db-schemas/connector.schema'
+import { ConnectorGetSchema, ConnectorUpdateSchema } from '@common/db-schemas/connector.schema'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { MessageSquare, Trash2 } from 'lucide-react'
 import { Button } from './ui/button'
 import { useForm } from '@tanstack/react-form'
+import { useState } from 'react'
 import {
   connectorFormValidationSchema,
   ConnectorFormValidationSchemaType
@@ -15,7 +16,7 @@ import {
   FieldLabel
 } from '@renderer/components/ui/field'
 import { Input } from './ui/input'
-import { MultiInput } from './ui/multi-input'
+import { MultiInput } from './multi-input'
 import AppModelSelector from './model-selector'
 import { Textarea } from './ui/textarea'
 import { Switch } from './ui/switch'
@@ -25,6 +26,7 @@ import {
   useDeleteConnector,
   useUpdateConnector
 } from '@renderer/services/connectors'
+import { maskedText } from '@renderer/lib/format.utils'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -36,6 +38,9 @@ const ConnectorCard = ({
   connector: Partial<Omit<ConnectorGetSchema, 'name'>> & { name: string }
   type: 'ADD' | 'UPDATE'
 }) => {
+  // When updating, token starts masked/locked, on ADD, it is editable
+  const [isTokenEditing, setIsTokenEditing] = useState(type === 'ADD')
+
   // hook to add a connector
   const { mutate: addConnectorMutation } = useAddConnector()
   const { mutate: updateConnectorMutation } = useUpdateConnector()
@@ -61,11 +66,18 @@ const ConnectorCard = ({
             displayName: connector.displayName
           })
           break
-        case 'UPDATE':
+        case 'UPDATE': {
+          const { botToken, ...rest } = value
+          const updatePayload: ConnectorUpdateSchema = {
+            ...rest,
+            ...(isTokenEditing && botToken ? { botToken } : {})
+          }
           updateConnectorMutation({
-            connector: value,
+            connector: updatePayload,
             name: connector.name
           })
+          break
+        }
       }
     }
   })
@@ -108,16 +120,41 @@ const ConnectorCard = ({
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Bot Token</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value ?? ''}
-                    onBlur={field.handleBlur}
-                    placeholder="token"
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={
+                        !isTokenEditing ? maskedText(field.state.value) : (field.state.value ?? '')
+                      }
+                      onBlur={field.handleBlur}
+                      disabled={!isTokenEditing}
+                      placeholder={'token'}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    {type === 'UPDATE' && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="active:scale-95"
+                        onClick={() => {
+                          if (isTokenEditing) {
+                            setIsTokenEditing(false)
+                            field.handleChange(connector.botToken ?? '')
+                          } else {
+                            setIsTokenEditing(true)
+                            field.handleChange('')
+                          }
+                        }}
+                      >
+                        {isTokenEditing ? 'Reset' : 'Clear'}
+                      </Button>
+                    )}
+                  </div>
                   <FieldDescription>
-                    Enter the bot authentication token (e.g. from @BotFather on Telegram).
+                    {isTokenEditing
+                      ? 'Enter the bot authentication token (e.g. from @BotFather on Telegram).'
+                      : 'Token is encrypted and saved. Click "Clear" to change it.'}
                   </FieldDescription>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>

@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Badge } from './badge'
-import { Button } from './button'
-import { Input } from './input'
+import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
 import { X } from 'lucide-react'
 import { cn } from '@renderer/lib/utils'
 
