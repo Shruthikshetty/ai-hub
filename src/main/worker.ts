@@ -17,6 +17,7 @@ import message from './routes/message/message.index'
 import image from './routes/image-gen/image-gen.index'
 import video from './routes/video-gen/video-gen.index'
 import tts from './routes/tts/tts.index'
+import connector from './routes/connector/connector.index'
 
 import { runMigrations } from './db/migrate'
 import { seed } from './db/seed'
@@ -50,7 +51,8 @@ const routes = [
   message,
   image,
   video,
-  tts
+  tts,
+  connector
 ]
 
 routes.forEach((route) => {

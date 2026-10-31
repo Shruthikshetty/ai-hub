@@ -7,6 +7,7 @@ import { ProviderSettingsTab } from './provider-settings'
 import AppearanceTab from './appearance-setting'
 import SecurityTab from './security-settings'
 import { useLocation } from 'react-router'
+import ConnectorTab from './connectors-setting'
 
 /**
  * Settings page
@@ -28,6 +29,8 @@ function Settings(): React.JSX.Element {
         return <AppearanceTab />
       case 'Security':
         return <SecurityTab />
+      case 'Connectors':
+        return <ConnectorTab />
       default:
         return <div className="text-2xl h-full w-full">In Progress</div>
     }
@@ -42,7 +45,7 @@ function Settings(): React.JSX.Element {
           Manage your account, AI providers, and application settings
         </p>
       </div>
-      <div className="flex flex-1 flex-row overflow-hidden">
+      <div className="flex flex-1 flex-row overflow-hidden min-h-0">
         {/* tabs */}
         <div className="w-35 bg-sidebar-accent h-full pt-10 md:w-40 lg:w-48 lg:pt-12">
           {/* tab buttons */}
