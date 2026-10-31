@@ -6,7 +6,7 @@ import { useForm } from '@tanstack/react-form'
 import {
   connectorFormValidationSchema,
   ConnectorFormValidationSchemaType
-} from '@renderer/schemas/connectors-validatoin.schema'
+} from '@renderer/schemas/connectors-validation.schema'
 import {
   Field,
   FieldDescription,
@@ -19,6 +19,8 @@ import { MultiInput } from './ui/multi-input'
 import AppModelSelector from './model-selector'
 import { Textarea } from './ui/textarea'
 import { Switch } from './ui/switch'
+import { Separator } from './ui/separator'
+import { useAddConnector, useUpdateConnector } from '@renderer/services/connectors'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -30,6 +32,9 @@ const ConnectorCard = ({
   connector: Partial<Omit<ConnectorGetSchema, 'name'>> & { name: string }
   type: 'ADD' | 'UPDATE'
 }) => {
+  // hook to add a connector
+  const { mutate: addConnectorMutation } = useAddConnector()
+  const { mutate: updateConnectorMutation } = useUpdateConnector()
   // for used to take in the connector details
   const form = useForm({
     defaultValues: {
@@ -41,13 +46,21 @@ const ConnectorCard = ({
       autoStart: connector.autoStart ?? false
     } as ConnectorFormValidationSchemaType,
     validators: { onSubmit: connectorFormValidationSchema },
-    onSubmit: async () => {
+    onSubmit: async ({ value }) => {
       switch (type) {
         case 'ADD':
-          //@TOD
+          addConnectorMutation({
+            ...value,
+            name: connector.name,
+            description: connector.description,
+            displayName: connector.displayName
+          })
           break
         case 'UPDATE':
-        //@TODO
+          updateConnectorMutation({
+            connector: value,
+            name: connector.name
+          })
       }
     }
   })
@@ -111,7 +124,7 @@ const ConnectorCard = ({
               )
             }}
           </form.Field>
-
+          <h2 className="text-muted-foreground text-base font-bold">OPTIONS</h2>
           {/* Model selection for chat */}
           <form.Field name="provider">
             {(providerField) => (
@@ -151,7 +164,6 @@ const ConnectorCard = ({
               </form.Field>
             )}
           </form.Field>
-
           {/* optional sys prompt */}
           <form.Field name="systemPrompt">
             {(field) => {
@@ -173,6 +185,7 @@ const ConnectorCard = ({
               )
             }}
           </form.Field>
+          <Separator />
           {/* auto start field */}
           <form.Field name="autoStart">
             {(field) => {
@@ -201,7 +214,12 @@ const ConnectorCard = ({
         {/* button for connect and apply */}
         <div className="gap-2 flex flex-row">
           {/*@TODO will have apply and delete */}
-          <Button variant={'default'} className="active:scale-95">
+          <Button
+            variant={'default'}
+            className="active:scale-95"
+            type="submit"
+            onClick={() => form.handleSubmit()}
+          >
             Apply
           </Button>
           {/*@TODO will change color when connected */}
