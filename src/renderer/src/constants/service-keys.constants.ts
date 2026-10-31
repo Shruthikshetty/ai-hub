@@ -32,5 +32,6 @@ export const MUTATION_KEYS = {
   updateConnectorByName: 'update-connector-by-name',
   addConnector: 'add-connector',
   deleteConnectorByName: 'delete-connector-by-name',
-  startConnectorByName: 'start-connector-by-name'
+  startConnectorByName: 'start-connector-by-name',
+  stopConnectorByName: 'stop-connector-by-name'
 }

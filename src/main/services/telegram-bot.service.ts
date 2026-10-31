@@ -45,6 +45,8 @@ class TelegramBotService {
     if (!connector || !connector.botToken) {
       throw new Error('Telegram bot token not found')
     }
+    // get the list of allowed users
+    const allowedUsers = connector.allowedUsers ?? []
 
     // decrypt the connector data
     const token = decryptText(connector.botToken)
@@ -56,6 +58,11 @@ class TelegramBotService {
     // attach listeners
     newBot.command('start', (ctx) => ctx.reply('Hello from AI Hub!'))
     newBot.on('message:text', (ctx) => {
+      if (allowedUsers.length > 0 && !allowedUsers.includes(String(ctx.from?.id))) {
+        ctx.reply('⛔ Unauthorized please request access from the admin to use this bot')
+        return
+      }
+      // send response to allowed users only
       ctx.reply(`Echo: ${ctx.message.text}`)
     })
 

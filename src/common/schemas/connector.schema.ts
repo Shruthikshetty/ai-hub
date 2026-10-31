@@ -37,9 +37,20 @@ export const startConnectorResponseSchema = z.object({
   })
 })
 
+// response from stop a connector
+export const stopConnectorResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    name: z.string(),
+    isRunning: z.boolean()
+  }),
+  message: z.string().optional()
+})
+
 // export all the types
 export type FetchAllConnectorResponseSchemaType = z.infer<typeof fetchAllConnectorResponseSchema>
 export type UpdateConnectorResponseSchemaType = z.infer<typeof updateConnectorResponseSchema>
 export type CreateConnectorResponseSchemaType = z.infer<typeof createConnectorResponseSchema>
 export type DeleteConnectorResponseSchemaType = z.infer<typeof deleteConnectorResponseSchema>
 export type StartConnectorResponseSchemaType = z.infer<typeof startConnectorResponseSchema>
+export type StopConnectorResponseSchemaType = z.infer<typeof stopConnectorResponseSchema>

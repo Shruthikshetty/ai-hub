@@ -6,7 +6,8 @@ import {
   CreateConnectorRoute,
   PatchConnectorByNameRoute,
   DeleteConnectorByNameRoute,
-  StartConnectorByNameRoute
+  StartConnectorByNameRoute,
+  StopConnectorByNameRoute
 } from './connector.route'
 import { connectors } from '../../db/schema'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
@@ -134,6 +135,27 @@ export const startConnector: AppRouteHandler<StartConnectorByNameRoute> = async 
         name,
         botUsername: botUsername,
         isRunning: true
+      }
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+//@NOTE this is only handling telegram because app only supports that if adding additional connector we need to modify this handler
+// stop connector long polling
+export const stopConnector: AppRouteHandler<StopConnectorByNameRoute> = async (c) => {
+  const { name } = c.req.valid('param')
+
+  // telegram service stop
+  await telegramBotService.stop()
+
+  return c.json(
+    {
+      success: true,
+      message: `Connector '${name}' stopped successfully`,
+      data: {
+        name,
+        isRunning: false
       }
     },
     HTTP_STATUS_CODES.OK

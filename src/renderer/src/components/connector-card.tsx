@@ -25,6 +25,7 @@ import {
   useAddConnector,
   useDeleteConnector,
   useStartConnector,
+  useStopConnector,
   useUpdateConnector
 } from '@renderer/services/connectors'
 import { maskedText } from '@renderer/lib/format.utils'
@@ -53,14 +54,24 @@ const ConnectorCard = ({
   // hooks for connection
   const { mutate: startConnectionMutation, isPending: isStartConnectorPending } =
     useStartConnector()
+  const { mutate: stopConnectionMutation, isPending: isStopConnectorPending } = useStopConnector()
 
   // function to handle connection
   const handleConnection = () => {
-    startConnectionMutation(connector.name, {
-      onSuccess: () => {
-        setConnected(true)
-      }
-    })
+    // stop or start the connector
+    if (isConnected) {
+      stopConnectionMutation(connector.name, {
+        onSuccess: () => {
+          setConnected(false)
+        }
+      })
+    } else {
+      startConnectionMutation(connector.name, {
+        onSuccess: () => {
+          setConnected(true)
+        }
+      })
+    }
   }
 
   // for used to take in the connector details
@@ -288,6 +299,7 @@ const ConnectorCard = ({
         <p className="text-muted-foreground">Fill in the required fields to continue</p>
         {/* button for connect and apply */}
         <div className="gap-2 flex flex-row">
+          {/*@TODO restart the connector on change of configs create a new endpoint and a new method in the service */}
           <Button
             variant={'default'}
             className="active:scale-95"
@@ -297,13 +309,18 @@ const ConnectorCard = ({
             Apply
           </Button>
           <Button
-            disabled={isStartConnectorPending}
+            disabled={isStartConnectorPending || isStopConnectorPending}
             variant={'outline'}
-            className={cn(isConnected ? 'bg-success/70!' : '', 'active:scale-95')}
+            className={cn(
+              isConnected
+                ? 'bg-success/70! hover:bg-destructive/80! hover:text-destructive-foreground!'
+                : '',
+              'active:scale-95'
+            )}
             onClick={handleConnection}
           >
-            {isConnected ? 'Connected' : 'Connect'}
-            {isStartConnectorPending ? <Spinner /> : null}
+            {isConnected ? 'Connected' : 'Disconnected'}
+            {isStartConnectorPending || isStopConnectorPending ? <Spinner /> : null}
           </Button>
         </div>
       </CardFooter>

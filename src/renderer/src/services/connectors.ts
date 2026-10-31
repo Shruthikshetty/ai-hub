@@ -7,6 +7,7 @@ import {
   DeleteConnectorResponseSchemaType,
   FetchAllConnectorResponseSchemaType,
   StartConnectorResponseSchemaType,
+  StopConnectorResponseSchemaType,
   UpdateConnectorResponseSchemaType
 } from '@common/schemas/connector.schema'
 import { ApiError } from '@common/types'
@@ -130,6 +131,31 @@ export const useStartConnector = () => {
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to start connector')
+    }
+  })
+}
+
+/**
+ * hook to stop a connector
+ */
+export const useStopConnector = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<StopConnectorResponseSchemaType, ApiError, string>({
+    mutationKey: [MUTATION_KEYS.stopConnectorByName],
+    mutationFn: async (name) => {
+      const response = await window.api.request(`/api/connector/${name}/stop`, 'POST')
+      if (!response.success) {
+        throw response
+      }
+      return response.data
+    },
+    onSuccess: (data) => {
+      successToast(data?.message ?? 'Connector stopped successfully')
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.connectorsFetch] })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to stop connector')
     }
   })
 }
