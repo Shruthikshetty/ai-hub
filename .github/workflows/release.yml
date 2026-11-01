@@ -3,18 +3,7 @@ name: Release
 on:
   release:
     types: [published, prereleased]
-  workflow_dispatch:
-    inputs:
-      target_os:
-        description: 'Target OS to build'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - linux
-          - windows
-          - macos
+  workflow_dispatch: # Allows manual trigger from the Actions tab
 
 jobs:
   build:
@@ -23,12 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
-    if: |
-      github.event_name == 'release' ||
-      inputs.target_os == 'all' ||
-      (inputs.target_os == 'windows' && matrix.os == 'windows-latest') ||
-      (inputs.target_os == 'macos' && matrix.os == 'macos-latest') ||
-      (inputs.target_os == 'linux' && matrix.os == 'ubuntu-latest')
 
     permissions:
       contents: write
