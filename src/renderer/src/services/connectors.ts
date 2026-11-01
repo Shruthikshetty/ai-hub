@@ -52,6 +52,9 @@ export const useAddConnector = () => {
     onSuccess: () => {
       successToast('connector added successfully')
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.connectorsFetch] })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to add connector')
     }
   })
 }
