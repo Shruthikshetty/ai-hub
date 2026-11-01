@@ -102,7 +102,8 @@ class TelegramBotService {
             provider,
             systemPrompt,
             messages: modelMessages,
-            conversationId
+            conversationId,
+            connectorName: 'telegram'
           })
 
           // send response to user

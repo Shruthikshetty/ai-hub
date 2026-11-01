@@ -18,6 +18,7 @@ import { pathToFileURL } from 'node:url'
 import contextMenu from 'electron-context-menu'
 
 // Prevent Node/Undici web stream cancellation race conditions from popping main process error dialogs
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 process.on('uncaughtException', (err: any) => {
   if (
     err?.code === 'ERR_INVALID_STATE' &&

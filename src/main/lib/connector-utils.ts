@@ -114,13 +114,15 @@ export async function getAiResponseForBotNonStream({
   modelId,
   systemPrompt,
   messages,
-  conversationId
+  conversationId,
+  connectorName
 }: {
   modelId: string
   provider: string
   systemPrompt?: string
   messages: ModelMessage[]
   conversationId: number
+  connectorName?: string
 }): Promise<string> {
   // const get the provider as per user model
   const modelProvider = await getProviderInstanceModel({
@@ -164,7 +166,8 @@ export async function getAiResponseForBotNonStream({
             modelId,
             provider,
             messages,
-            conversationId
+            conversationId,
+            optionalSuffix: connectorName ? `(${connectorName})` : ''
           })
         }
       })
