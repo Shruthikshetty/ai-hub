@@ -46,7 +46,7 @@ jobs:
 
       - name: Build Linux (x64 and arm64)
         if: matrix.os == 'ubuntu-latest'
-        run: bun run build:linux
+        run: bun run build:linux:all
 
       - name: Save Workflow Artifacts
         uses: actions/upload-artifact@v4

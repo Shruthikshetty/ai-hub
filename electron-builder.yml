@@ -30,14 +30,8 @@ dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
   target:
-    - target: AppImage
-      arch:
-        - x64
-        - arm64
-    - target: deb
-      arch:
-        - x64
-        - arm64
+    - AppImage
+    - deb
   maintainer: shruthik shetty <shrutikshetty14@gmail.com>
   category: Utility
 appImage:
