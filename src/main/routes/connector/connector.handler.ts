@@ -12,7 +12,6 @@ import {
 import { connectors } from '../../db/schema'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { encryptText } from '../../../common/utils/encryption.util'
-import { telegramBotService } from '../../services/telegram-bot.service'
 import { CONNECTOR_SERVICES } from '../../constants/config.constanst'
 
 // handler to fetch all the connectors
@@ -122,8 +121,9 @@ export const deleteConnector: AppRouteHandler<DeleteConnectorByNameRoute> = asyn
   const { name } = c.req.valid('param')
 
   //if a connection is active stop the bot before deleting from DB
-  if (name === 'telegram') {
-    await telegramBotService.stop()
+  const service = CONNECTOR_SERVICES[name]
+  if (service?.isRunning() && service?.stop) {
+    await service.stop()
   }
 
   // delete the connector from db

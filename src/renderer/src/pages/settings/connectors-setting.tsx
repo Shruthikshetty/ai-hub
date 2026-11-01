@@ -24,7 +24,7 @@ function ConnectorSettings() {
         <p className="text-lg">Link external platforms so people can talk to your assistant.</p>
       </div>
       {/* list of configured providers */}
-      {connectorsData?.data.map((item) => (
+      {connectorsData?.data?.map((item) => (
         <ConnectorCard key={item.name} connector={item} type="UPDATE" />
       ))}
       {/* list of connectors available to add */}

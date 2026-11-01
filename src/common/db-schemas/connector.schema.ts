@@ -31,13 +31,16 @@ export const connectors = sqliteTable('connectors', {
 // Validation schemas
 export const connectorSelectSchema = createSelectSchema(connectors, {
   name: (field) => field.max(150),
-  activeConversationId: (field) => field.nullish().default(null)
+  activeConversationId: (field) => field.nullish().default(null),
+  allowedUsers: () => z.array(z.string())
 }).omit({
   createdAt: true,
   updatedAt: true
 })
 
-export const connectorInsertSchema = createInsertSchema(connectors)
+export const connectorInsertSchema = createInsertSchema(connectors, {
+  allowedUsers: () => z.array(z.string())
+})
 
 export const connectorUpdateSchema = connectorSelectSchema.partial().omit({
   name: true

@@ -4,6 +4,7 @@
 
 import { ConnectorCreateSchema, ConnectorUpdateSchema } from '@common/db-schemas/connector.schema'
 import {
+  CreateConnectorResponseSchemaType,
   DeleteConnectorResponseSchemaType,
   FetchAllConnectorResponseSchemaType,
   StartConnectorResponseSchemaType,
@@ -39,14 +40,14 @@ export const useFetchConnectors = () => {
 export const useAddConnector = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateConnectorResponseSchemaType, ApiError, ConnectorCreateSchema>({
+  return useMutation<CreateConnectorResponseSchemaType, ApiError, ConnectorCreateSchema>({
     mutationKey: [MUTATION_KEYS.addConnector],
     mutationFn: async (connector) => {
       const response = await window.api.request(`/api/connector`, 'POST', connector)
       if (!response.success) {
         throw response
       }
-      return response.data
+      return response
     },
     onSuccess: () => {
       successToast('connector added successfully')
@@ -72,7 +73,7 @@ export const useUpdateConnector = () => {
       if (!response.success) {
         throw response
       }
-      return response.data
+      return response
     },
     onSuccess: (data) => {
       successToast(`${data?.data?.displayName ?? ''} connector updated successfully`)
@@ -97,7 +98,7 @@ export const useDeleteConnector = () => {
       if (!response.success) {
         throw response
       }
-      return response.data
+      return response
     },
     onSuccess: () => {
       successToast('Connector deleted successfully')
@@ -121,7 +122,7 @@ export const useStartConnector = () => {
       if (!response.success) {
         throw response
       }
-      return response.data
+      return response
     },
     onSuccess: (data) => {
       successToast(
@@ -150,7 +151,7 @@ export const useStopConnector = () => {
       if (!response.success) {
         throw response
       }
-      return response.data
+      return response
     },
     onSuccess: (data) => {
       successToast(data?.message ?? 'Connector stopped successfully')

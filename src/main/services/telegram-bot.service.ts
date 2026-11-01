@@ -55,11 +55,11 @@ class TelegramBotService {
           throw new Error('Telegram bot token not found')
         }
         // get the list of allowed users
-        const allowedUsers = connector.allowedUsers ?? []
+        const allowedUsers = Array.isArray(connector.allowedUsers) ? connector.allowedUsers : []
 
         // in case allowed users not found
-        if (allowedUsers.length == 0) {
-          throw new Error('No allowed users found for Telegram bot')
+        if (allowedUsers.length === 0) {
+          throw new Error('Telegram connector requires at least one allowed user id')
         }
 
         // decrypt the connector data
