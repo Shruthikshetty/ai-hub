@@ -26,13 +26,35 @@ jobs:
       - name: Build Linux (x64 and arm64)
         run: bun run build:linux:all
 
-      - name: Upload Linux Artifacts
+      - name: Upload Pi (ARM64) DEB
         uses: actions/upload-artifact@v4
         with:
-          name: linux-builds
-          path: |
-            dist/*.AppImage
-            dist/*.deb
+          name: linux-arm64-deb
+          path: dist/*arm64.deb
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload Pi (ARM64) AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-AppImage
+          path: dist/*arm64.AppImage
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload PC (x64) DEB
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64-deb
+          path: dist/*x64.deb
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload PC (x64) AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64-AppImage
+          path: dist/*x64.AppImage
           if-no-files-found: error
           retention-days: 7
 
