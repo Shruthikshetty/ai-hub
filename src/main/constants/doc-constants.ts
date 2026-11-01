@@ -1,5 +1,6 @@
 import {
   AppBadRequestErrorSchema,
+  AppConflictErrorSchema,
   AppInternalServerErrorSchema,
   AppNotFoundErrorSchema,
   AppValidationErrorSchema
@@ -48,4 +49,19 @@ export const badRequestDocObject = {
     }
   },
   description: 'Bad request error response'
+}
+
+// conflict error doc object (409)
+export const conflictDocObject = {
+  content: {
+    'application/json': {
+      schema: AppConflictErrorSchema.openapi({
+        example: {
+          message: 'Conflict error (resource already exists)',
+          success: false
+        }
+      })
+    }
+  },
+  description: 'Conflict error response'
 }

@@ -17,7 +17,8 @@ import {
   Monitor,
   LucideIcon,
   Video,
-  Volume2
+  Volume2,
+  Unplug
 } from 'lucide-react'
 
 // side tray items (do not change order add new items at the end)
@@ -108,6 +109,10 @@ export const SETTINGS_TABS = [
   {
     name: 'Security',
     icon: Shield
+  },
+  {
+    name: 'Connectors',
+    icon: Unplug
   }
 ] as const
 

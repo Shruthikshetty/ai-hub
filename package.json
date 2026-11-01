@@ -64,6 +64,7 @@
     "drizzle-zod": "^0.8.3",
     "electron-context-menu": "^4.1.2",
     "electron-updater": "^6.3.9",
+    "grammy": "^1.46.0",
     "hono": "^4.11.9",
     "hono-pino": "^0.10.3",
     "lucide-react": "^1.0.1",

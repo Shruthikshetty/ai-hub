@@ -17,3 +17,11 @@ export const hiddenText = (
 
   return `${start}••••••••${end}`
 }
+
+/**
+ * completely mask the string
+ */
+export const maskedText = (strOrLength: string | number = 16, char: string = '•') => {
+  const len = typeof strOrLength === 'number' ? strOrLength : strOrLength?.length || 16
+  return char.repeat(len)
+}

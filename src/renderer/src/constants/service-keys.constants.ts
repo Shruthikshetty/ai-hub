@@ -10,7 +10,8 @@ export const QUERY_KEYS = {
   messageFetch: 'message-fetch',
   mediaFetch: 'media-fetch',
   mediaFetchInfinite: 'media-fetch-infinite',
-  mediaTtsFetch: 'media-tts-fetch'
+  mediaTtsFetch: 'media-tts-fetch',
+  connectorsFetch: 'connectors-fetch'
 }
 
 export const MUTATION_KEYS = {
@@ -27,5 +28,10 @@ export const MUTATION_KEYS = {
   videoDelete: 'video-delete',
   deleteAllConversations: 'delete-all-conversations',
   speechGenerate: 'speech-generate',
-  speechDelete: 'speech-delete'
+  speechDelete: 'speech-delete',
+  updateConnectorByName: 'update-connector-by-name',
+  addConnector: 'add-connector',
+  deleteConnectorByName: 'delete-connector-by-name',
+  startConnectorByName: 'start-connector-by-name',
+  stopConnectorByName: 'stop-connector-by-name'
 }

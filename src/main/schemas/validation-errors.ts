@@ -35,3 +35,11 @@ export const AppBadRequestErrorSchema = z.object({
   message: z.string(),
   success: z.boolean()
 })
+
+/**
+ * defines conflict error schema (409)
+ */
+export const AppConflictErrorSchema = z.object({
+  message: z.string(),
+  success: z.boolean()
+})

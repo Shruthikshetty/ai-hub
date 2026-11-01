@@ -1,0 +1,1 @@
+ALTER TABLE `connectors` ADD `active_conversation_id` integer REFERENCES conversations(id);

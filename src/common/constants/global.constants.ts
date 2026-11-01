@@ -285,3 +285,12 @@ export const MEDIA_REQUEST_TYPES = [...MEDIA_TYPE, 'all'] as const
  * https://github.com/vercel/ai/issues/12178
  */
 export const PROVIDERS_WITH_SEARCH_TOOL = new Set(['openai', 'xai', 'google', 'groq'])
+
+// available connectors
+export const AVAILABLE_CONNECTORS = [
+  {
+    name: 'telegram',
+    displayName: 'Telegram',
+    description: 'Let allowed Telegram users chat with your assistant through a bot.'
+  }
+]
