@@ -27,7 +27,10 @@ function AppModelSelector({
   modelType = 'chat',
   onSelect,
   disabled,
-  className
+  className,
+  controlled = false,
+  selectedModelId,
+  selectedProvider
 }: {
   output?: ModelIOType
   disableDefaultSelection?: boolean
@@ -35,6 +38,9 @@ function AppModelSelector({
   onSelect?: (model: ModelSchemaType) => void
   disabled?: boolean
   className?: string
+  controlled?: boolean
+  selectedModelId?: string
+  selectedProvider?: string
 }) {
   // fetch all the model list
   const {
@@ -65,20 +71,35 @@ function AppModelSelector({
   }, [modelsData])
 
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false)
-  // selected model
-  const { getModel, setModel } = useSelectedModel()
-  const model = getModel(modelType)
+
+  // selected model from store (only if not controlled)
+  const storeModel = useSelectedModel((state) =>
+    controlled ? null : (state.models[modelType] ?? null)
+  )
+  const setStoreModel = useSelectedModel((state) => state.setModel)
+
+  const model = useMemo(() => {
+    if (controlled) {
+      if (!selectedModelId) return null
+      return (
+        modelsData?.data?.find(
+          (m) => m.id === selectedModelId && (!selectedProvider || m.provider === selectedProvider)
+        ) ?? null
+      )
+    }
+    return storeModel
+  }, [controlled, selectedModelId, selectedProvider, modelsData, storeModel])
 
   // set the model to the first model of the first provider
   useEffect(() => {
-    // in case default selection is disabled
-    if (disableDefaultSelection) return
+    // in case default selection is disabled or component is controlled
+    if (disableDefaultSelection || controlled) return
     // set the model to the first model of the first provider
     if (modelsData?.data?.length && !model) {
-      setModel(modelType, modelsData?.data?.[0])
+      setStoreModel(modelType, modelsData?.data?.[0])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modelsData, disableDefaultSelection, modelType])
+  }, [modelsData, disableDefaultSelection, controlled, modelType])
 
   // handle no models
   useEffect(() => {
@@ -120,7 +141,9 @@ function AppModelSelector({
                   key={`${m.provider}-${m.id}`}
                   model={m}
                   onSelect={(selected) => {
-                    setModel(modelType, selected)
+                    if (!controlled) {
+                      setStoreModel(modelType, selected)
+                    }
                     onSelect?.(selected)
                   }}
                   selectedModel={model}

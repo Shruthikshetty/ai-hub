@@ -225,7 +225,9 @@ const ConnectorCard = ({
                     >
                       <FieldLabel>Chat Model</FieldLabel>
                       <AppModelSelector
-                        modelType="chat"
+                        controlled
+                        selectedModelId={modelField.state.value}
+                        selectedProvider={providerField.state.value}
                         output="text"
                         className="border border-input bg-input/30"
                         disableDefaultSelection
