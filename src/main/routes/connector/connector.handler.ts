@@ -150,18 +150,30 @@ export const deleteConnector: AppRouteHandler<DeleteConnectorByNameRoute> = asyn
   )
 }
 
-//@NOTE this is only handling telegram because app only supports that if adding additional connector we need to modify this handler
-// start connector long polling
+// start connector by the getting the service using the name
 export const startConnector: AppRouteHandler<StartConnectorByNameRoute> = async (c) => {
   const { name } = c.req.valid('param') // name of the connector will be used later to conditionally call the service when more connectors are added
 
+  // get then service for the connector
+  const service = CONNECTOR_SERVICES[name]
+
+  if (!service || !service.start) {
+    return c.json(
+      {
+        success: false,
+        message: `Connector '${name}' not found or not supported`
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+
   // start the bot service
-  const { botUsername } = await telegramBotService.start()
+  const { botUsername } = await service.start()
   // send the response  back to user
   return c.json(
     {
       success: true,
-      message: `Connected to Telegram bot @${botUsername}`,
+      message: `Connected to ${name} bot @${botUsername}`,
       data: {
         name,
         botUsername: botUsername,
@@ -172,13 +184,24 @@ export const startConnector: AppRouteHandler<StartConnectorByNameRoute> = async 
   )
 }
 
-//@NOTE this is only handling telegram because app only supports that if adding additional connector we need to modify this handler
 // stop connector long polling
 export const stopConnector: AppRouteHandler<StopConnectorByNameRoute> = async (c) => {
   const { name } = c.req.valid('param')
 
-  // telegram service stop
-  await telegramBotService.stop()
+  // get then service for the connector
+  const service = CONNECTOR_SERVICES[name]
+
+  if (!service || !service.stop) {
+    return c.json(
+      {
+        success: false,
+        message: `Connector '${name}' not found or not supported`
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+  //  service stop
+  await service.stop()
 
   return c.json(
     {

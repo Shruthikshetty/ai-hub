@@ -15,6 +15,6 @@ export type AppRouteHandler<T extends RouteConfig> = RouteHandler<T, AppBindings
 export interface ConnectorService {
   isRunning: () => boolean
   restart: () => Promise<unknown>
-  start?: () => Promise<unknown>
-  stop?: () => Promise<void>
+  start: () => Promise<{ botUsername: string }>
+  stop: () => Promise<void>
 }
