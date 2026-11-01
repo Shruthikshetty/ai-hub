@@ -57,6 +57,11 @@ class TelegramBotService {
         // get the list of allowed users
         const allowedUsers = connector.allowedUsers ?? []
 
+        // in case allowed users not found
+        if (allowedUsers.length == 0) {
+          throw new Error('No allowed users found for Telegram bot')
+        }
+
         // decrypt the connector data
         const token = decryptText(connector.botToken)
 
@@ -72,7 +77,7 @@ class TelegramBotService {
         )
         newBot.on('message:text', async (ctx) => {
           // only allow authorized users
-          if (allowedUsers.length > 0 && !allowedUsers.includes(String(ctx.from?.id))) {
+          if (!allowedUsers.includes(String(ctx.from?.id))) {
             ctx.reply('⛔ Unauthorized please request access from the admin to use this bot')
             return
           }
@@ -116,7 +121,12 @@ class TelegramBotService {
         })
 
         // Start long-polling
-        newBot.start()
+        newBot.start().catch((error) => {
+          console.error('[TelegramBot] Polling stopped with error:', error)
+          if (this.bot === newBot) {
+            this.bot = null // reset is running state
+          }
+        })
 
         // store the created bot
         this.bot = newBot
