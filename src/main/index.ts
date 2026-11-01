@@ -13,10 +13,21 @@ import { join } from 'path'
 import path from 'node:path'
 import fs from 'node:fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { EXT_TO_MIME } from '../common/constants/global.constants'
 import icon from '../../resources/icon.png?asset'
 import { pathToFileURL } from 'node:url'
 import contextMenu from 'electron-context-menu'
+
+// Prevent Node/Undici web stream cancellation race conditions from popping main process error dialogs
+process.on('uncaughtException', (err: any) => {
+  if (
+    err?.code === 'ERR_INVALID_STATE' &&
+    err?.message?.includes('ReadableStream is already closed')
+  ) {
+    console.warn('[Main Process] Suppressed stream close race condition:', err.message)
+    return
+  }
+  console.error('[Main Process] Uncaught Exception:', err)
+})
 
 // Custom media:// protocol
 // Must be registered before app.ready
@@ -28,7 +39,8 @@ protocol.registerSchemesAsPrivileged([
       secure: true, //Tells the browser that resources loaded from this protocol are "secure"
       supportFetchAPI: true, //Enables to use fetch('media://...') and XMLHttpRequest on these URLs in React code
       stream: true, //Allows the protocol handler to return a Node.js Stream (which we do internally using net.fetch). Crucial for efficiently loading large videos or images without loading them entirely into memory first.
-      bypassCSP: true //Bypasses the Content Security Policy (CSP).
+      bypassCSP: true, //Bypasses the Content Security Policy (CSP).
+      corsEnabled: true //Enables proper CORS handling for audio/video range requests
     }
   }
 ])
@@ -120,53 +132,20 @@ app.whenReady().then(() => {
       return new Response('Not found', { status: 404 })
     }
 
-    // Serve the file using net.fetch for efficient streaming
-    const ext = path.extname(absolutePath).replace('.', '').toLowerCase()
-    const mime = EXT_TO_MIME[ext] ?? 'application/octet-stream'
-
     try {
       const stat = fs.statSync(absolutePath)
-      //Add validation to ensure the path points to a file, not a directory.
+      // Add validation to ensure the path points to a file, not a directory.
       if (!stat.isFile()) {
         return new Response('Not a file', { status: 400 })
       }
 
-      // Handle Range request for media seeking
+      // Delegate file serving directly to Chromium's native net.fetch.
+      // net.fetch handles file:// URLs natively (Range requests, partial content, seeking, streaming)
+      // without wrapping in Node.js streams or Undici Response, preventing stream-cancellation race conditions.
       const rangeHeader = request.headers.get('Range')
-
-      if (rangeHeader) {
-        const parts = rangeHeader.replace(/bytes=/, '').split('-')
-        const start = parseInt(parts[0], 10)
-        const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1
-        const chunkSize = end - start + 1
-
-        const stream = fs.createReadStream(absolutePath, { start, end })
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return new Response(stream as any, {
-          status: 206,
-          headers: {
-            'Content-Type': mime,
-            'Content-Range': `bytes ${start}-${end}/${stat.size}`,
-            'Accept-Ranges': 'bytes',
-            'Content-Length': chunkSize.toString(),
-            'Cache-Control': 'no-cache'
-          }
-        })
-      }
-
       return net
-        .fetch(pathToFileURL(absolutePath).toString())
-        .then((response) => {
-          return new Response(response.body, {
-            status: 200,
-            headers: {
-              'Content-Type': mime,
-              'Cache-Control': 'no-cache',
-              'Content-Length': stat.size.toString(),
-              'Accept-Ranges': 'bytes'
-            }
-          })
+        .fetch(pathToFileURL(absolutePath).toString(), {
+          headers: rangeHeader ? { Range: rangeHeader } : undefined
         })
         .catch(() => {
           return new Response('Failed to read file', { status: 500 })
