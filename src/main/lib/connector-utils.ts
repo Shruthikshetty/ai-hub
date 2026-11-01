@@ -114,13 +114,15 @@ export async function getAiResponseForBotNonStream({
   modelId,
   systemPrompt,
   messages,
-  conversationId
+  conversationId,
+  connectorName
 }: {
   modelId: string
   provider: string
   systemPrompt?: string
   messages: ModelMessage[]
   conversationId: number
+  connectorName?: string
 }): Promise<string> {
   // const get the provider as per user model
   const modelProvider = await getProviderInstanceModel({
@@ -134,14 +136,15 @@ export async function getAiResponseForBotNonStream({
     messages: messages
   })
 
-  // generate title if more than 4 messages not waiting for this
-  if (messages.length == 3) {
+  // generate title after 2nd user prompt
+  if (messages.length === 3) {
     generateTitleFromModelMessages({
       modelId,
       provider,
       messages,
       conversationId,
-      messageLimit: 3
+      messageLimit: 3,
+      optionalSuffix: connectorName ? `(${connectorName})` : ''
     })
   }
 
@@ -155,17 +158,6 @@ export async function getAiResponseForBotNonStream({
         metadata: {
           tokensPerMessage: usage?.totalTokens ?? 0,
           timeStamp: new Date()
-        }
-      })
-      .then(() => {
-        // generate title if more than 4 messages not waiting for this
-        if (messages.length == 4) {
-          generateTitleFromModelMessages({
-            modelId,
-            provider,
-            messages,
-            conversationId
-          })
         }
       })
       .catch(() => {

@@ -1,0 +1,38 @@
+name: Build Linux
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  build:
+    name: Build Linux (x64 and arm64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          cache: 'bun'
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Install Linux ARM64 native bindings
+        run: bun add --os=linux --cpu=arm64 --no-save @libsql/linux-arm64-gnu@0.5.22
+
+      - name: Build Linux (x64 and arm64)
+        run: bun run build:linux:all
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-builds
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+          if-no-files-found: error
+          retention-days: 7
+

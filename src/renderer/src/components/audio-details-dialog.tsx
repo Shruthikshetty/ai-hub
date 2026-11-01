@@ -64,7 +64,12 @@ const AudioDetailsDialog = ({
         {audio?.mediaUrl && (
           <div className="px-5 py-3 w-full">
             <AudioPlayer className="w-full [&_media-control-bar]:w-full [&_[role=group]]:w-full [&_media-time-range]:flex-1">
-              <AudioPlayerElement src={audio.mediaUrl} ref={audioRef} preload="auto" />
+              <AudioPlayerElement
+                src={audio.mediaUrl}
+                ref={audioRef}
+                preload="auto"
+                crossOrigin="anonymous"
+              />
               <AudioPlayerControlBar>
                 <AudioPlayerSeekBackwardButton size="icon-lg" />
                 <AudioPlayerPlayButton size="icon-lg" />

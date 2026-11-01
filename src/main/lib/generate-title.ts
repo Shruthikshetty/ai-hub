@@ -45,13 +45,15 @@ export async function generateTitleFromModelMessages({
   provider,
   messages,
   conversationId,
-  messageLimit = 4
+  messageLimit = 4,
+  optionalSuffix
 }: {
   modelId: string
   provider: string
   messages: ModelMessage[]
   conversationId: number
   messageLimit?: number
+  optionalSuffix?: string
 }) {
   try {
     // Take up to messageLimit messages
@@ -86,7 +88,11 @@ export async function generateTitleFromModelMessages({
     //Update the conversation title in database
     await db
       .update(conversations)
-      .set({ title: result?.text?.replace(/^["'\s]+|["'\s]+$/g, '') ?? 'New Chat' })
+      .set({
+        title:
+          (result?.text?.replace(/^["'\s]+|["'\s]+$/g, '') ?? 'New Chat') +
+          (optionalSuffix ? ` ${optionalSuffix}` : '')
+      })
       .where(eq(conversations.id, conversationId))
   } catch (error) {
     // silent fail

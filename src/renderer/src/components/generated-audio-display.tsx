@@ -74,6 +74,8 @@ const GeneratedAudioDisplay = ({
         <audio
           ref={audioRef}
           src={media.mediaUrl}
+          preload="none"
+          crossOrigin="anonymous"
           onEnded={() => setPlaying(false)}
           className="hidden"
         />
