@@ -27,7 +27,13 @@ process.on('uncaughtException', (err: any) => {
     console.warn('[Main Process] Suppressed stream close race condition:', err.message)
     return
   }
+
   console.error('[Main Process] Uncaught Exception:', err)
+  dialog.showErrorBox(
+    'Unexpected Error',
+    'A fatal error occurred. The application needs to restart to prevent data corruption.'
+  )
+  app.exit(1)
 })
 
 // Custom media:// protocol

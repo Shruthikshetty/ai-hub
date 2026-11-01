@@ -136,14 +136,15 @@ export async function getAiResponseForBotNonStream({
     messages: messages
   })
 
-  // generate title if more than 4 messages not waiting for this
-  if (messages.length == 3) {
+  // generate title after 2nd user prompt
+  if (messages.length === 3) {
     generateTitleFromModelMessages({
       modelId,
       provider,
       messages,
       conversationId,
-      messageLimit: 3
+      messageLimit: 3,
+      optionalSuffix: connectorName ? `(${connectorName})` : ''
     })
   }
 
@@ -157,18 +158,6 @@ export async function getAiResponseForBotNonStream({
         metadata: {
           tokensPerMessage: usage?.totalTokens ?? 0,
           timeStamp: new Date()
-        }
-      })
-      .then(() => {
-        // generate title if more than 4 messages not waiting for this
-        if (messages.length == 4) {
-          generateTitleFromModelMessages({
-            modelId,
-            provider,
-            messages,
-            conversationId,
-            optionalSuffix: connectorName ? `(${connectorName})` : ''
-          })
         }
       })
       .catch(() => {
