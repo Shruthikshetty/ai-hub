@@ -50,6 +50,17 @@ export const createConnector: AppRouteHandler<CreateConnectorRoute> = async (c) 
   // insert new connector into db
   const [newConnector] = await db.insert(connectors).values(body).returning()
 
+  // If newConnector is undefined, it means another request already inserted it!
+  if (!newConnector) {
+    return c.json(
+      {
+        success: false,
+        message: `Connector '${body.name}' already exists`
+      },
+      HTTP_STATUS_CODES.CONFLICT
+    )
+  }
+
   return c.json(
     {
       success: true,
@@ -86,6 +97,14 @@ export const updateConnector: AppRouteHandler<PatchConnectorByNameRoute> = async
       },
       HTTP_STATUS_CODES.NOT_FOUND
     )
+  }
+
+  // get the connector service
+  const service = CONNECTOR_SERVICES?.[name]
+
+  //if the service is already running then restart it
+  if (service && service.isRunning()) {
+    await service.restart()
   }
 
   // return the updated data

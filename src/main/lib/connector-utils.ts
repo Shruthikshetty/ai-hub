@@ -168,6 +168,10 @@ export async function getAiResponseForBotNonStream({
           })
         }
       })
+      .catch(() => {
+        console.error('message db insertion failed')
+        /**ignore insert errors */
+      })
   }
 
   return assistantMessage

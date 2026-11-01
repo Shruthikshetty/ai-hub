@@ -5,6 +5,7 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import {
+  conflictDocObject,
   internalServerErrorDocObject,
   zodNotFoundDocObject,
   zodValidationErrorDocObject
@@ -66,6 +67,7 @@ export const createConnector = createRoute({
       },
       description: 'Connector created successfully'
     },
+    [HTTP_STATUS_CODES.CONFLICT]: conflictDocObject,
     [HTTP_STATUS_CODES.UNPROCESSABLE_ENTITY]: zodValidationErrorDocObject,
     [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
   }

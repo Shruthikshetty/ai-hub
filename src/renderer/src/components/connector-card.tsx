@@ -297,7 +297,6 @@ const ConnectorCard = ({
         <p className="text-muted-foreground">Fill in the required fields to continue</p>
         {/* button for connect and apply */}
         <div className="gap-2 flex flex-row">
-          {/*@TODO restart the connector on change of configs create a new endpoint and a new method in the service */}
           <Button
             variant={'default'}
             className="active:scale-95"

@@ -127,6 +127,14 @@ class TelegramBotService {
       console.log(`[TelegramBot] Bot stopped.`)
     }
   }
+
+  /**
+   * Restart bot polling
+   */
+  public async restart(): Promise<{ botUsername: string }> {
+    await this.stop()
+    return this.start()
+  }
 }
 
 export const telegramBotService = new TelegramBotService()
