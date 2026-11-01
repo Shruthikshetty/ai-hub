@@ -6,7 +6,7 @@ import { z } from 'zod'
  */
 export const connectorFormValidationSchema = z.object({
   botToken: z.string().min(1, 'Bot token is required'),
-  allowedUsers: z.array(z.string()),
+  allowedUsers: z.array(z.string()).min(1, 'at least one allowed user is required'),
   modelId: z.string().min(1, 'Model is required'),
   provider: z.string().min(1, 'Provider is required'),
   systemPrompt: z.string().nullish(),

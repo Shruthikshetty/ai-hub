@@ -103,7 +103,20 @@ export const updateConnector: AppRouteHandler<PatchConnectorByNameRoute> = async
 
   //if the service is already running then restart it
   if (service && service.isRunning()) {
-    await service.restart()
+    try {
+      await service.restart()
+    } catch (error) {
+      console.error(`[ConnectorHandler] Failed to restart connector '${name}':`, error)
+      // return with the warning message
+      return c.json(
+        {
+          success: true,
+          data: updatedConnector,
+          message: 'Update succeeded, but failed to restart connector'
+        },
+        HTTP_STATUS_CODES.OK
+      )
+    }
   }
 
   // return the updated data
