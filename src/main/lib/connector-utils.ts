@@ -5,6 +5,7 @@ import { connectors, conversations, messages } from '../db/schema'
 import { asc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
+export { autoStartConnectors } from './startup'
 
 //@TODO this logic is yet to be implemented
 export function splitMessage(text: string, maxLength: number = 4000): string[] {

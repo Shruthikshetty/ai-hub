@@ -156,7 +156,6 @@ class TelegramBotService {
     if (bot) {
       await bot.stop()
       this.bot = null
-      console.log(`[TelegramBot] Bot stopped.`)
     }
   }
 
