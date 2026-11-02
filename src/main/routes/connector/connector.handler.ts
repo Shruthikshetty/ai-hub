@@ -12,7 +12,7 @@ import {
 import { connectors } from '../../db/schema'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { encryptText } from '../../../common/utils/encryption.util'
-import { CONNECTOR_SERVICES } from '../../constants/config.constanst'
+import { CONNECTOR_SERVICES } from '../../constants/config.constants'
 
 // handler to fetch all the connectors
 export const fetchConnectors: AppRouteHandler<GetConnectorsRoute> = async (c) => {

@@ -5,14 +5,20 @@ import { connectors, conversations, messages } from '../db/schema'
 import { asc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
+export { autoStartConnectors } from './startup'
 
-//@TODO this logic is yet to be implemented
+/**
+ * split message into chunks my provided maxLength
+ */
 export function splitMessage(text: string, maxLength: number = 4000): string[] {
+  // check length of the text  if less direct return
   if (text.length <= maxLength) return [text]
+  // create a array of chunks to hold all the text segments
   const chunks: string[] = []
   let remaining = text
 
   while (remaining.length > 0) {
+    // push the last chunk
     if (remaining.length <= maxLength) {
       chunks.push(remaining)
       break
@@ -26,6 +32,7 @@ export function splitMessage(text: string, maxLength: number = 4000): string[] {
       splitIndex = maxLength
     }
 
+    // push the chunk
     chunks.push(remaining.slice(0, splitIndex).trim())
     remaining = remaining.slice(splitIndex).trim()
   }
@@ -44,20 +51,23 @@ export async function getConnectorChatContext({
   connectorName: string
   newPrompt: string
 }) {
-  // get the current connector data
+  // get the current connector data with active conversation populated
   const connector = await db.query.connectors.findFirst({
-    where: eq(connectors.name, connectorName)
+    where: eq(connectors.name, connectorName),
+    with: {
+      activeConversation: true
+    }
   })
 
   if (!connector) {
     throw new Error(`Connector ${connectorName} not found`)
   }
-  // @TODO what with the conversation itself is deleted but the ref is there in connector db
-  let conversationId = connector.activeConversationId
-  // in case no conversation id
-  if (!conversationId) {
-    // create a conversation
-    // add a new conversation to db
+
+  let conversationId: number
+
+  // in case no active conversation id or conversation was deleted
+  if (!connector.activeConversation) {
+    // create a new conversation and add to db
     const [newConversation] = await db
       .insert(conversations)
       .values({
@@ -77,7 +87,10 @@ export async function getConnectorChatContext({
         activeConversationId: conversationId
       })
       .where(eq(connectors.name, connectorName))
+  } else {
+    conversationId = connector.activeConversation.id
   }
+
   // Insert incoming user prompt into messages
   await db.insert(messages).values({
     role: 'user',
@@ -167,4 +180,67 @@ export async function getAiResponseForBotNonStream({
   }
 
   return assistantMessage
+}
+/**
+ * returns a detailed info string about the connector
+ */
+export const getInfoConnectorByName = async (name: string) => {
+  // get the current connector data
+  const connector = await db.query.connectors.findFirst({
+    where: eq(connectors.name, name)
+  })
+
+  // if no connector found
+  if (!connector) {
+    return 'No info found try again later'
+  }
+
+  const info = [
+    `Bot details :`,
+    `Model provider : ${connector.provider}`,
+    `Model id : ${connector.modelId}`
+  ].join('\n')
+
+  return info
+}
+
+/**
+ * create a new chant and wire up with the connector
+ */
+export const setNewConversationByConnectorName = async (name: string) => {
+  try {
+    // get the current connector data
+    const connector = await db.query.connectors.findFirst({
+      where: eq(connectors.name, name)
+    })
+
+    // if no connector found
+    if (!connector) {
+      return 'No connector found check your ai hub interface to add one'
+    }
+
+    // add a new conversation to db
+    const [newConversation] = await db
+      .insert(conversations)
+      .values({
+        modelId: connector.modelId,
+        provider: connector.provider,
+        systemPrompt: connector.systemPrompt,
+        title: `${connector.displayName} chat` // default title
+      })
+      .returning()
+
+    // update the connector db with the generated conversation id
+    await db
+      .update(connectors)
+      .set({
+        activeConversationId: newConversation.id
+      })
+      .where(eq(connectors.name, name))
+
+    // return success repose
+    return 'New chat created successfully'
+  } catch {
+    return 'Failed to create new chat retry again'
+  }
 }

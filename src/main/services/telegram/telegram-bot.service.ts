@@ -1,9 +1,14 @@
 import { Bot } from 'grammy'
-import db from '../db'
-import { connectors } from '../db/schema'
+import db from '../../db'
+import { connectors } from '../../db/schema'
 import { eq } from 'drizzle-orm'
-import { decryptText } from '../../common/utils/encryption.util'
-import { getConnectorChatContext, getAiResponseForBotNonStream } from '../lib/connector-utils'
+import { decryptText } from '../../../common/utils/encryption.util'
+import {
+  getConnectorChatContext,
+  getAiResponseForBotNonStream,
+  splitMessage
+} from '../../lib/connector-utils'
+import { replyMarkdown, TELEGRAM_BOT_COMMAND_MENU, telegramCommands } from './telegram-commands'
 
 /**
  * This is the main telegram service that handles the connection and chat with telegram bot
@@ -23,7 +28,7 @@ class TelegramBotService {
    * check if bot is running
    */
   public isRunning(): boolean {
-    return this.bot !== null
+    return this.bot !== null || this.startPromise !== null
   }
 
   /**
@@ -69,19 +74,25 @@ class TelegramBotService {
         const newBot = new Bot(token)
         const newBotInfo = await newBot.api.getMe()
 
-        // attach listeners
-        newBot.command('start', (ctx) =>
-          ctx.reply(
-            'Hello from AI Hub! \nIts recommended to wait for the reply before sending another request , the bot might not remember your previous request'
-          )
-        )
-        newBot.on('message:text', async (ctx) => {
-          // only allow authorized users
+        //Checks authorization for EVERYTHING (commands AND text)
+        newBot.use(async (ctx, next) => {
           if (!allowedUsers.includes(String(ctx.from?.id))) {
-            ctx.reply('⛔ Unauthorized please request access from the admin to use this bot')
-            return
+            await ctx.reply('⛔ Unauthorized: please request access from the admin to use this bot')
+            return // Stop here for strangers
           }
+          await next()
+        })
 
+        // attach command menu
+        newBot.use(telegramCommands)
+
+        // all commands attached here
+        await newBot.api.setMyCommands(TELEGRAM_BOT_COMMAND_MENU).catch((err) => {
+          console.warn('[TelegramBot] Failed to set command menu:', err)
+        })
+
+        // attach listeners
+        newBot.on('message:text', async (ctx) => {
           // new mess from the user
           const newPrompt =
             ctx.message?.text || 'reply to user that u did not receive any valid request'
@@ -106,9 +117,14 @@ class TelegramBotService {
             connectorName: 'telegram'
           })
 
-          // send response to user
-          ctx.reply(response)
+          // chunk split message if necessary
+          const messageChunks = splitMessage(response)
+          // Send chunks in guaranteed order
+          for (const chunk of messageChunks) {
+            await replyMarkdown(ctx, chunk)
+          }
         })
+
         newBot.catch(async (err) => {
           console.error('[TelegramBot] Unhandled bot error:', err.error)
           // Inform the user in Telegram if possible and not a connection error
@@ -154,7 +170,6 @@ class TelegramBotService {
     if (bot) {
       await bot.stop()
       this.bot = null
-      console.log(`[TelegramBot] Bot stopped.`)
     }
   }
 

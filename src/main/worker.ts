@@ -18,6 +18,7 @@ import image from './routes/image-gen/image-gen.index'
 import video from './routes/video-gen/video-gen.index'
 import tts from './routes/tts/tts.index'
 import connector from './routes/connector/connector.index'
+import { startupBoot } from './lib/startup'
 
 import { runMigrations } from './db/migrate'
 import { seed } from './db/seed'
@@ -35,6 +36,13 @@ const migrationPromise =
           console.error('Migration/Seed failed:', err)
           process.exit(1)
         })
+
+// Run background startup tasks (e.g. auto-start connectors) without blocking app/API readiness
+migrationPromise.then(() => {
+  startupBoot().catch((err) => {
+    console.error('[Worker] Startup boot error:', err)
+  })
+})
 
 //configure open api
 configureOpenApi(app)

@@ -1,4 +1,4 @@
-import { telegramBotService } from '../services/telegram-bot.service'
+import { telegramBotService } from '../services/telegram/telegram-bot.service'
 import { ConnectorService } from '../types'
 
 // Map of all connector services
