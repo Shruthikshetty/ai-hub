@@ -46,7 +46,7 @@ telegramCommands.command('start', async (ctx) =>
   )
 )
 
-telegramCommands.command(['bot-info', 'botinfo'], async (ctx) => {
+telegramCommands.command(['bot_info', 'botinfo'], async (ctx) => {
   const info = await getInfoConnectorByName('telegram')
   replyMarkdown(ctx, info)
 })
