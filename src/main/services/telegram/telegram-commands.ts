@@ -43,11 +43,11 @@ export async function replyMarkdown(ctx: Context, text: string) {
 // all the comments handlers go here
 
 telegramCommands.command('help', async (ctx) => {
-  replyMarkdown(ctx, helpMessage)
+  await replyMarkdown(ctx, helpMessage)
 })
 
-telegramCommands.command('start', async (ctx) =>
-  replyMarkdown(
+telegramCommands.command('start', async (ctx) => {
+  await replyMarkdown(
     ctx,
     [
       `*👋 Hello from AI Hub!*`,
@@ -57,14 +57,14 @@ telegramCommands.command('start', async (ctx) =>
       `💡 *Note:* _Please wait for a reply before sending another message to keep conversation context._`
     ].join('\n')
   )
-)
+})
 
 telegramCommands.command(['bot_info', 'botinfo'], async (ctx) => {
   const info = await getInfoConnectorByName('telegram')
-  replyMarkdown(ctx, info)
+  await replyMarkdown(ctx, info)
 })
 
 telegramCommands.command(['new_chat', 'new', 'newchat'], async (ctx) => {
   const message = await setNewConversationByConnectorName('telegram')
-  replyMarkdown(ctx, message)
+  await replyMarkdown(ctx, message)
 })

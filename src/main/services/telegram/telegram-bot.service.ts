@@ -8,7 +8,7 @@ import {
   getAiResponseForBotNonStream,
   splitMessage
 } from '../../lib/connector-utils'
-import { TELEGRAM_BOT_COMMAND_MENU, telegramCommands } from './telegram-commands'
+import { replyMarkdown, TELEGRAM_BOT_COMMAND_MENU, telegramCommands } from './telegram-commands'
 
 /**
  * This is the main telegram service that handles the connection and chat with telegram bot
@@ -116,7 +116,7 @@ class TelegramBotService {
           const messageChunks = splitMessage(response)
           // Send chunks in guaranteed order
           for (const chunk of messageChunks) {
-            await ctx.reply(chunk)
+            await replyMarkdown(ctx, chunk)
           }
         })
 

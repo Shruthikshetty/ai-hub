@@ -51,20 +51,23 @@ export async function getConnectorChatContext({
   connectorName: string
   newPrompt: string
 }) {
-  // get the current connector data
+  // get the current connector data with active conversation populated
   const connector = await db.query.connectors.findFirst({
-    where: eq(connectors.name, connectorName)
+    where: eq(connectors.name, connectorName),
+    with: {
+      activeConversation: true
+    }
   })
 
   if (!connector) {
     throw new Error(`Connector ${connectorName} not found`)
   }
-  // @TODO what with the conversation itself is deleted but the ref is there in connector db
-  let conversationId = connector.activeConversationId
-  // in case no conversation id
-  if (!conversationId) {
-    // create a conversation
-    // add a new conversation to db
+
+  let conversationId: number
+
+  // in case no active conversation id or conversation was deleted
+  if (!connector.activeConversation) {
+    // create a new conversation and add to db
     const [newConversation] = await db
       .insert(conversations)
       .values({
@@ -84,7 +87,10 @@ export async function getConnectorChatContext({
         activeConversationId: conversationId
       })
       .where(eq(connectors.name, connectorName))
+  } else {
+    conversationId = connector.activeConversation.id
   }
+
   // Insert incoming user prompt into messages
   await db.insert(messages).values({
     role: 'user',
