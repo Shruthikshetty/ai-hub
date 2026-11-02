@@ -1,9 +1,10 @@
 import { Bot } from 'grammy'
-import db from '../db'
-import { connectors } from '../db/schema'
+import db from '../../db'
+import { connectors } from '../../db/schema'
 import { eq } from 'drizzle-orm'
-import { decryptText } from '../../common/utils/encryption.util'
-import { getConnectorChatContext, getAiResponseForBotNonStream } from '../lib/connector-utils'
+import { decryptText } from '../../../common/utils/encryption.util'
+import { getConnectorChatContext, getAiResponseForBotNonStream } from '../../lib/connector-utils'
+import { TELEGRAM_BOT_COMMAND_MENU, telegramCommands } from './telegram-commands'
 
 /**
  * This is the main telegram service that handles the connection and chat with telegram bot
@@ -69,12 +70,13 @@ class TelegramBotService {
         const newBot = new Bot(token)
         const newBotInfo = await newBot.api.getMe()
 
+        // all commands attached here
+        await newBot.api.setMyCommands(TELEGRAM_BOT_COMMAND_MENU).catch((err) => {
+          console.warn('[TelegramBot] Failed to set command menu:', err)
+        })
+
+        newBot.use(telegramCommands)
         // attach listeners
-        newBot.command('start', (ctx) =>
-          ctx.reply(
-            'Hello from AI Hub! \nIts recommended to wait for the reply before sending another request , the bot might not remember your previous request'
-          )
-        )
         newBot.on('message:text', async (ctx) => {
           // only allow authorized users
           if (!allowedUsers.includes(String(ctx.from?.id))) {

@@ -168,3 +168,25 @@ export async function getAiResponseForBotNonStream({
 
   return assistantMessage
 }
+/**
+ * returns a detailed info string about the connector
+ */
+export const getInfoConnectorByName = async (name: string) => {
+  // get the current connector data
+  const connector = await db.query.connectors.findFirst({
+    where: eq(connectors.name, name)
+  })
+
+  // if no connector found
+  if (!connector) {
+    return 'No info found try again later'
+  }
+
+  const info = [
+    `Bot details :`,
+    `Model provider : ${connector.provider}`,
+    `Model id : ${connector.modelId}`
+  ].join('\n')
+
+  return info
+}
