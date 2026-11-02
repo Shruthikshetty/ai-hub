@@ -17,19 +17,25 @@ export const TELEGRAM_BOT_COMMAND_MENU = [
 
 // constants
 const helpMessage = [
-  `👋 *Welcome to AI Hub telegram Bot!*`,
+  `*🤖 Welcome to AI Hub Telegram Bot!*`,
+  `_Your personal AI assistant right inside Telegram._`,
   ``,
-  `Available Commands:`,
-  TELEGRAM_BOT_COMMAND_MENU.map((c) => `\`/${c.command}\` - ${c.description}`).join('\n'),
+  `*📋 Available Commands:*`,
+  ...TELEGRAM_BOT_COMMAND_MENU.map((c) => `• \`/${c.command}\` — _${c.description}_`),
   ``,
-  `💡 *Tip:* Send any text message to talk to the AI. Wait for a reply before sending another message.`
+  `💡 *Tip:* _Send any regular text message to talk to the AI._`,
+  `⚠️ *Note:* _Please wait for a reply before sending another message._`
 ].join('\n')
 
 // utils
-async function replyMarkdown(ctx: Context, text: string) {
+export async function replyMarkdown(ctx: Context, text: string) {
   try {
     await ctx.reply(text, { parse_mode: 'Markdown' })
-  } catch {
+  } catch (err) {
+    console.warn(
+      '[Telegram] replyMarkdown failed with parse_mode: Markdown. Falling back to plain text. Error:',
+      err
+    )
     await ctx.reply(text)
   }
 }
@@ -41,8 +47,15 @@ telegramCommands.command('help', async (ctx) => {
 })
 
 telegramCommands.command('start', async (ctx) =>
-  ctx.reply(
-    'Hello from AI Hub! \nIts recommended to wait for the reply before sending another request , the bot might not remember your previous request'
+  replyMarkdown(
+    ctx,
+    [
+      `*👋 Hello from AI Hub!*`,
+      ``,
+      `Send any message to start chatting with the AI.`,
+      ``,
+      `💡 *Note:* _Please wait for a reply before sending another message to keep conversation context._`
+    ].join('\n')
   )
 )
 
