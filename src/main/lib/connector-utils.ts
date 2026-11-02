@@ -7,13 +7,18 @@ import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
 export { autoStartConnectors } from './startup'
 
-//@TODO this logic is yet to be implemented
+/**
+ * split message into chunks my provided maxLength
+ */
 export function splitMessage(text: string, maxLength: number = 4000): string[] {
+  // check length of the text  if less direct return
   if (text.length <= maxLength) return [text]
+  // create a array of chunks to hold all the text segments
   const chunks: string[] = []
   let remaining = text
 
   while (remaining.length > 0) {
+    // push the last chunk
     if (remaining.length <= maxLength) {
       chunks.push(remaining)
       break
@@ -27,6 +32,7 @@ export function splitMessage(text: string, maxLength: number = 4000): string[] {
       splitIndex = maxLength
     }
 
+    // push the chunk
     chunks.push(remaining.slice(0, splitIndex).trim())
     remaining = remaining.slice(splitIndex).trim()
   }

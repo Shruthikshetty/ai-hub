@@ -3,7 +3,11 @@ import db from '../../db'
 import { connectors } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { decryptText } from '../../../common/utils/encryption.util'
-import { getConnectorChatContext, getAiResponseForBotNonStream } from '../../lib/connector-utils'
+import {
+  getConnectorChatContext,
+  getAiResponseForBotNonStream,
+  splitMessage
+} from '../../lib/connector-utils'
 import { TELEGRAM_BOT_COMMAND_MENU, telegramCommands } from './telegram-commands'
 
 /**
@@ -108,9 +112,14 @@ class TelegramBotService {
             connectorName: 'telegram'
           })
 
-          // send response to user
-          ctx.reply(response)
+          // chunk split message if necessary
+          const messageChunks = splitMessage(response)
+          // Send chunks in guaranteed order
+          for (const chunk of messageChunks) {
+            await ctx.reply(chunk)
+          }
         })
+
         newBot.catch(async (err) => {
           console.error('[TelegramBot] Unhandled bot error:', err.error)
           // Inform the user in Telegram if possible and not a connection error
