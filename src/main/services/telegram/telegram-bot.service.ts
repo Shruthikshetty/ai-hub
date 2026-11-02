@@ -28,7 +28,7 @@ class TelegramBotService {
    * check if bot is running
    */
   public isRunning(): boolean {
-    return this.bot !== null
+    return this.bot !== null || this.startPromise !== null
   }
 
   /**
@@ -74,20 +74,25 @@ class TelegramBotService {
         const newBot = new Bot(token)
         const newBotInfo = await newBot.api.getMe()
 
+        //Checks authorization for EVERYTHING (commands AND text)
+        newBot.use(async (ctx, next) => {
+          if (!allowedUsers.includes(String(ctx.from?.id))) {
+            await ctx.reply('⛔ Unauthorized: please request access from the admin to use this bot')
+            return // Stop here for strangers
+          }
+          await next()
+        })
+
+        // attach command menu
+        newBot.use(telegramCommands)
+
         // all commands attached here
         await newBot.api.setMyCommands(TELEGRAM_BOT_COMMAND_MENU).catch((err) => {
           console.warn('[TelegramBot] Failed to set command menu:', err)
         })
 
-        newBot.use(telegramCommands)
         // attach listeners
         newBot.on('message:text', async (ctx) => {
-          // only allow authorized users
-          if (!allowedUsers.includes(String(ctx.from?.id))) {
-            ctx.reply('⛔ Unauthorized please request access from the admin to use this bot')
-            return
-          }
-
           // new mess from the user
           const newPrompt =
             ctx.message?.text || 'reply to user that u did not receive any valid request'
