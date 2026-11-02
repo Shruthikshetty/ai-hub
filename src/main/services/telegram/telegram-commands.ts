@@ -1,5 +1,8 @@
 import { Composer, Context } from 'grammy'
-import { getInfoConnectorByName } from '../../lib/connector-utils'
+import {
+  getInfoConnectorByName,
+  setNewConversationByConnectorName
+} from '../../lib/connector-utils'
 
 // create a composer instance
 export const telegramCommands = new Composer()
@@ -8,7 +11,8 @@ export const telegramCommands = new Composer()
 export const TELEGRAM_BOT_COMMAND_MENU = [
   { command: 'start', description: 'welcome message' },
   { command: 'help', description: 'Show available commands' },
-  { command: 'bot_info', description: 'Show model, provider & token stats' }
+  { command: 'bot_info', description: 'Show model, provider & token stats' },
+  { command: 'new_chat', description: 'start a fresh chat, by forgetting past messages' }
 ]
 
 // constants
@@ -45,4 +49,9 @@ telegramCommands.command('start', async (ctx) =>
 telegramCommands.command(['bot-info', 'botinfo'], async (ctx) => {
   const info = await getInfoConnectorByName('telegram')
   replyMarkdown(ctx, info)
+})
+
+telegramCommands.command(['new_chat', 'new', 'newchat'], async (ctx) => {
+  const message = await setNewConversationByConnectorName('telegram')
+  replyMarkdown(ctx, message)
 })

@@ -191,3 +191,44 @@ export const getInfoConnectorByName = async (name: string) => {
 
   return info
 }
+
+/**
+ * create a new chant and wire up with the connector
+ */
+export const setNewConversationByConnectorName = async (name: string) => {
+  try {
+    // get the current connector data
+    const connector = await db.query.connectors.findFirst({
+      where: eq(connectors.name, name)
+    })
+
+    // if no connector found
+    if (!connector) {
+      return 'No connector found check your ai hub interface to add one'
+    }
+
+    // add a new conversation to db
+    const [newConversation] = await db
+      .insert(conversations)
+      .values({
+        modelId: connector.modelId,
+        provider: connector.provider,
+        systemPrompt: connector.systemPrompt,
+        title: `${connector.displayName} chat` // default title
+      })
+      .returning()
+
+    // update the connector db with the generated conversation id
+    await db
+      .update(connectors)
+      .set({
+        activeConversationId: newConversation.id
+      })
+      .where(eq(connectors.name, name))
+
+    // return success repose
+    return 'New chat created successfully'
+  } catch {
+    return 'Failed to create new chat retry again'
+  }
+}
