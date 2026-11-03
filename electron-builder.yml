@@ -36,7 +36,8 @@ linux:
   maintainer: shruthik shetty <shrutikshetty14@gmail.com>
   category: Utility
   desktop:
-    StartupWMClass: ai-hub
+    entry:
+      StartupWMClass: ai-hub
 appImage:
   artifactName: ${name}-${version}-${arch}.${ext}
 deb:
