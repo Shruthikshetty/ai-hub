@@ -2,7 +2,7 @@ import { convertToModelMessages, generateText, ModelMessage } from 'ai'
 import { getProviderInstanceModel } from './get-provider-instance'
 import db from '../db'
 import { connectors, conversations, messages } from '../db/schema'
-import { asc, eq } from 'drizzle-orm'
+import { asc, count, desc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
 export { autoStartConnectors } from './startup'
@@ -98,12 +98,20 @@ export async function getConnectorChatContext({
     parts: [{ type: 'text', text: newPrompt }]
   })
 
-  //@TODO later make it configurable such that how many last messages are taken optionally
-  // 3. Fetch conversation messages in chronological order by conversation id
-  const dbMessages = await db.query.messages.findMany({
-    where: eq(messages.conversationId, conversationId),
-    orderBy: [asc(messages.createdAt)]
-  })
+  // Fetch conversation messages in chronological order by conversation id
+  const dbMessages =
+    connector.messageLimit && connector.messageLimit > 0
+      ? (
+          await db.query.messages.findMany({
+            where: eq(messages.conversationId, conversationId),
+            orderBy: [desc(messages.createdAt)],
+            limit: connector.messageLimit + 1 // +1 includes the current user prompt that was just inserted along with N previous messages
+          })
+        ).reverse()
+      : await db.query.messages.findMany({
+          where: eq(messages.conversationId, conversationId),
+          orderBy: [asc(messages.createdAt)]
+        })
 
   // Normalize messages to feed into model @TODO this is skipped for now any attachments have to be stored in locally or or it wont work in the ui here
   // convert to core messages
@@ -149,17 +157,23 @@ export async function getAiResponseForBotNonStream({
     messages: messages
   })
 
-  // generate title after 2nd user prompt
-  if (messages.length === 3) {
-    generateTitleFromModelMessages({
-      modelId,
-      provider,
-      messages,
-      conversationId,
-      messageLimit: 3,
-      optionalSuffix: connectorName ? `(${connectorName})` : ''
+  // generate title after 2nd user prompt (when total conversation count is exactly 3)
+  db.select({ totalCount: count() })
+    .from(messageSchema)
+    .where(eq(messageSchema.conversationId, conversationId))
+    .then(([{ totalCount }]) => {
+      if (totalCount === 3) {
+        generateTitleFromModelMessages({
+          modelId,
+          provider,
+          messages,
+          conversationId,
+          messageLimit: 3,
+          optionalSuffix: connectorName ? `(${connectorName})` : ''
+        })
+      }
     })
-  }
+    .catch(() => {})
 
   // store assistant message no waiting here
   if (assistantMessage) {
@@ -199,9 +213,13 @@ export const getInfoConnectorByName = async (name: string) => {
     `Bot details :`,
     `Model provider : ${connector.provider}`,
     `Model id : ${connector.modelId}`
-  ].join('\n')
+  ]
 
-  return info
+  if (connector.messageLimit) {
+    info.push(`Message limit : ${connector.messageLimit}`)
+  }
+
+  return info.join('\n')
 }
 
 /**

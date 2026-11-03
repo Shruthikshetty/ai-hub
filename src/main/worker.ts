@@ -44,8 +44,10 @@ migrationPromise.then(() => {
   })
 })
 
-//configure open api
-configureOpenApi(app)
+// configure open api; requests wait for this to settle
+const openApiPromise = configureOpenApi(app).catch((err) => {
+  console.error('[Worker] OpenAPI setup failed:', err)
+})
 
 // all routes go here
 const routes = [
@@ -72,11 +74,13 @@ routes.forEach((route) => {
   app.route('/api', route)
 })
 
-// expose the app for local development only
+// expose the app for local development only, after OpenAPI routes are registered
 if (process.env.NODE_ENV === 'development') {
-  serve({
-    fetch: app.fetch,
-    port: 3000 // local dev only
+  openApiPromise.then(() => {
+    serve({
+      fetch: app.fetch,
+      port: 3000 // local dev only
+    })
   })
 }
 
@@ -86,7 +90,7 @@ process.parentPort.on('message', async (e) => {
   const { type, path, method, body } = e.data
 
   if (type === 'hono-request') {
-    await migrationPromise
+    await Promise.all([migrationPromise, openApiPromise])
 
     // AbortController lets us cancel the upstream fetch when the user presses Stop
     const abortController = new AbortController()

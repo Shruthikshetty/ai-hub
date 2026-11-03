@@ -3,6 +3,7 @@ dist
 out
 .DS_Store
 .eslintcache
+*.tsbuildinfo
 *.log*
 .env
 .vscode
@@ -10,6 +11,9 @@ out
 # database 
 dev.db
 test.db
+*.db
+*.db-wal
+*.db-shm
 
 # env files
 .env.test

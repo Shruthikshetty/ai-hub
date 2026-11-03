@@ -1,5 +1,6 @@
 appId: com.electron.app
 productName: ai-hub
+compression: maximum
 directories:
   buildResources: build
 files:
@@ -29,11 +30,15 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  executableName: ai-hub
   target:
     - AppImage
     - deb
   maintainer: shruthik shetty <shrutikshetty14@gmail.com>
   category: Utility
+  desktop:
+    entry:
+      StartupWMClass: ai-hub
 appImage:
   artifactName: ${name}-${version}-${arch}.${ext}
 deb:

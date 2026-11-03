@@ -32,6 +32,8 @@ import { maskedText } from '@renderer/lib/format.utils'
 import { cn } from '@renderer/lib/utils'
 import { Spinner } from './ui/spinner'
 import { FetchAllConnectorResponseSchemaType } from '@common/schemas/connector.schema'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion'
+import { handleNumberChangeWithNull } from '@renderer/lib/form.utils'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -77,6 +79,7 @@ const ConnectorCard = ({
       modelId: connector.modelId ?? '',
       provider: connector.provider ?? '',
       systemPrompt: connector.systemPrompt ?? '',
+      messageLimit: connector.messageLimit ?? null,
       autoStart: connector.autoStart ?? false
     } as ConnectorFormValidationSchemaType,
     validators: { onSubmit: connectorFormValidationSchema },
@@ -271,6 +274,41 @@ const ConnectorCard = ({
               )
             }}
           </form.Field>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="additional-options" className="border-none">
+              <AccordionTrigger className="text-muted-foreground text-base font-bold hover:no-underline py-2 cursor-pointer hover:text-foreground transition-colors">
+                ADDITIONAL OPTIONS
+              </AccordionTrigger>
+              <AccordionContent className="pt-2">
+                {/* optional message limit */}
+                <form.Field name="messageLimit">
+                  {(field) => {
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name}>Message limit</FieldLabel>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          type="number"
+                          min={1}
+                          value={field.state.value ?? ''}
+                          onBlur={field.handleBlur}
+                          placeholder="e.g. 10 (leave empty for unlimited)"
+                          onChange={(e) => handleNumberChangeWithNull(e, field.handleChange)}
+                        />
+                        <FieldDescription className="line-clamp-2">
+                          Maximum number of previous messages sent to AI as context (empty for
+                          unlimited).
+                        </FieldDescription>
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                      </Field>
+                    )
+                  }}
+                </form.Field>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
           <Separator />
           {/* auto start field */}
           <form.Field name="autoStart">

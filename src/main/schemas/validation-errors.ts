@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from '@hono/zod-openapi'
 
 /*
 defines the zod validated error format used in response

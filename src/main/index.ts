@@ -7,7 +7,8 @@ import {
   MessageChannelMain,
   protocol,
   net,
-  dialog
+  dialog,
+  nativeImage
 } from 'electron'
 import { join } from 'path'
 import path from 'node:path'
@@ -59,7 +60,7 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform !== 'darwin' ? { icon } : {}),
+    ...(process.platform !== 'darwin' ? { icon: nativeImage.createFromPath(icon) } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -90,6 +91,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
+  app.setName('ai-hub')
   electronApp.setAppUserModelId('com.electron')
 
   // electron-context-menu might be exported as .default in some build environments sets up spell check and copy paste

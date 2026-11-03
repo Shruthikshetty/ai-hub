@@ -7,7 +7,26 @@ import Pages from 'vite-plugin-pages'
 export default defineConfig({
   main: {
     build: {
-      externalizeDeps: true,
+      externalizeDeps: {
+        exclude: [
+          '@ai-sdk/alibaba',
+          '@ai-sdk/cerebras',
+          '@ai-sdk/cohere',
+          '@ai-sdk/elevenlabs',
+          '@ai-sdk/fireworks',
+          '@ai-sdk/google',
+          '@ai-sdk/groq',
+          '@ai-sdk/huggingface',
+          '@ai-sdk/mistral',
+          '@ai-sdk/openai',
+          '@ai-sdk/openai-compatible',
+          '@ai-sdk/togetherai',
+          '@ai-sdk/xai',
+          'ai',
+          '@openrouter/ai-sdk-provider',
+          'ollama-ai-provider-v2'
+        ]
+      },
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/main/index.ts'),

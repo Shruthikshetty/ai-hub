@@ -1,7 +1,7 @@
 /**
  * @file contains the conversation schema with zod validation
  */
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import type {
@@ -11,28 +11,32 @@ import type {
 import { REASONING_OPTIONS } from '../constants/global.constants'
 
 //tables ----------->
-export const conversations = sqliteTable('conversations', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  title: text().default('New Chat'),
-  modelId: text().notNull(), // current selected model
-  provider: text().notNull(), //  current selected provider
-  reasoning: text({ enum: REASONING_OPTIONS }).default('none'),
-  systemPrompt: text(),
-  metadata: integer({ mode: 'boolean' }).notNull().default(true),
-  tools: text({ mode: 'json' })
-    .$type<ConversationToolsSchemaType>()
-    .default({ search: { enabled: false }, imageGeneration: { enabled: false } }),
-  additionalOptions: text({ mode: 'json' })
-    .$type<ConversationAdditionalOptionType>()
-    .default({
-      speech: { enabled: false }
-    }),
-  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' })
-    .notNull()
-    .$defaultFn(() => new Date())
-    .$onUpdate(() => new Date())
-})
+export const conversations = sqliteTable(
+  'conversations',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    title: text().default('New Chat'),
+    modelId: text().notNull(), // current selected model
+    provider: text().notNull(), //  current selected provider
+    reasoning: text({ enum: REASONING_OPTIONS }).default('none'),
+    systemPrompt: text(),
+    metadata: integer({ mode: 'boolean' }).notNull().default(true),
+    tools: text({ mode: 'json' })
+      .$type<ConversationToolsSchemaType>()
+      .default({ search: { enabled: false }, imageGeneration: { enabled: false } }),
+    additionalOptions: text({ mode: 'json' })
+      .$type<ConversationAdditionalOptionType>()
+      .default({
+        speech: { enabled: false }
+      }),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+    updatedAt: integer('updated_at', { mode: 'timestamp' })
+      .notNull()
+      .$defaultFn(() => new Date())
+      .$onUpdate(() => new Date())
+  },
+  (table) => [index('conversations_updated_at_idx').on(table.updatedAt)]
+)
 
 // zod schema for inserting conversation
 export const conversationsInsertSchema = createInsertSchema(conversations, {

@@ -10,6 +10,17 @@ export const handleNumberChange = (
 }
 
 /**
+ * function to validated number and set undefined if empty
+ */
+export const handleNumberChangeWithNull = (
+  e: React.ChangeEvent<HTMLInputElement>,
+  fn: (value: number | null) => void
+) => {
+  const val = e.target?.value
+  fn(val === '' ? null : Number(val))
+}
+
+/**
  * function to only let positive int with out decimal
  */
 export const handlePositiveIntNoDecimal = (
