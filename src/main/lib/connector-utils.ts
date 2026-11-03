@@ -2,7 +2,7 @@ import { convertToModelMessages, generateText, ModelMessage } from 'ai'
 import { getProviderInstanceModel } from './get-provider-instance'
 import db from '../db'
 import { connectors, conversations, messages } from '../db/schema'
-import { asc, desc, eq } from 'drizzle-orm'
+import { asc, count, desc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
 export { autoStartConnectors } from './startup'
@@ -157,17 +157,23 @@ export async function getAiResponseForBotNonStream({
     messages: messages
   })
 
-  // generate title after 2nd user prompt
-  if (messages.length === 3) {
-    generateTitleFromModelMessages({
-      modelId,
-      provider,
-      messages,
-      conversationId,
-      messageLimit: 3,
-      optionalSuffix: connectorName ? `(${connectorName})` : ''
+  // generate title after 2nd user prompt (when total conversation count is exactly 3)
+  db.select({ totalCount: count() })
+    .from(messageSchema)
+    .where(eq(messageSchema.conversationId, conversationId))
+    .then(([{ totalCount }]) => {
+      if (totalCount === 3) {
+        generateTitleFromModelMessages({
+          modelId,
+          provider,
+          messages,
+          conversationId,
+          messageLimit: 3,
+          optionalSuffix: connectorName ? `(${connectorName})` : ''
+        })
+      }
     })
-  }
+    .catch(() => {})
 
   // store assistant message no waiting here
   if (assistantMessage) {
