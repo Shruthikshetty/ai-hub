@@ -1,5 +1,6 @@
 appId: com.electron.app
 productName: ai-hub
+compression: maximum
 directories:
   buildResources: build
 files:

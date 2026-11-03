@@ -7,7 +7,9 @@ import Pages from 'vite-plugin-pages'
 export default defineConfig({
   main: {
     build: {
-      externalizeDeps: true,
+      externalizeDeps: {
+        exclude: ['@ai-sdk/*', 'ai', '@openrouter/ai-sdk-provider']
+      },
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/main/index.ts'),
