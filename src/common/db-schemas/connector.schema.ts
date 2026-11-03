@@ -20,6 +20,7 @@ export const connectors = sqliteTable('connectors', {
   systemPrompt: text('system-prompt').default(
     'You are a helpful, concise AI assistant. Format your replies with clean markdown suitable for Telegram mobile screens.'
   ),
+  messageLimit: integer('message_limit'),
   autoStart: integer('auto_start', { mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
@@ -32,14 +33,16 @@ export const connectors = sqliteTable('connectors', {
 export const connectorSelectSchema = createSelectSchema(connectors, {
   name: (field) => field.max(150),
   activeConversationId: (field) => field.nullish(),
-  allowedUsers: () => z.array(z.string())
+  allowedUsers: () => z.array(z.string()),
+  messageLimit: (field) => field.nullish()
 }).omit({
   createdAt: true,
   updatedAt: true
 })
 
 export const connectorInsertSchema = createInsertSchema(connectors, {
-  allowedUsers: () => z.array(z.string())
+  allowedUsers: () => z.array(z.string()),
+  messageLimit: (field) => field.nullish()
 })
 
 export const connectorUpdateSchema = connectorSelectSchema.partial().omit({

@@ -2,7 +2,7 @@ import { convertToModelMessages, generateText, ModelMessage } from 'ai'
 import { getProviderInstanceModel } from './get-provider-instance'
 import db from '../db'
 import { connectors, conversations, messages } from '../db/schema'
-import { asc, eq } from 'drizzle-orm'
+import { asc, desc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
 export { autoStartConnectors } from './startup'
@@ -98,12 +98,20 @@ export async function getConnectorChatContext({
     parts: [{ type: 'text', text: newPrompt }]
   })
 
-  //@TODO later make it configurable such that how many last messages are taken optionally
-  // 3. Fetch conversation messages in chronological order by conversation id
-  const dbMessages = await db.query.messages.findMany({
-    where: eq(messages.conversationId, conversationId),
-    orderBy: [asc(messages.createdAt)]
-  })
+  // Fetch conversation messages in chronological order by conversation id
+  const dbMessages =
+    connector.messageLimit && connector.messageLimit > 0
+      ? (
+          await db.query.messages.findMany({
+            where: eq(messages.conversationId, conversationId),
+            orderBy: [desc(messages.createdAt)],
+            limit: connector.messageLimit
+          })
+        ).reverse()
+      : await db.query.messages.findMany({
+          where: eq(messages.conversationId, conversationId),
+          orderBy: [asc(messages.createdAt)]
+        })
 
   // Normalize messages to feed into model @TODO this is skipped for now any attachments have to be stored in locally or or it wont work in the ui here
   // convert to core messages
@@ -199,9 +207,13 @@ export const getInfoConnectorByName = async (name: string) => {
     `Bot details :`,
     `Model provider : ${connector.provider}`,
     `Model id : ${connector.modelId}`
-  ].join('\n')
+  ]
 
-  return info
+  if (connector.messageLimit) {
+    info.push(`Message limit : ${connector.messageLimit}`)
+  }
+
+  return info.join('\n')
 }
 
 /**

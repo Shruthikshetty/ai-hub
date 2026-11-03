@@ -10,6 +10,11 @@ export const connectorFormValidationSchema = z.object({
   modelId: z.string().min(1, 'Model is required'),
   provider: z.string().min(1, 'Provider is required'),
   systemPrompt: z.string().nullish(),
+  messageLimit: z
+    .number('must be a number')
+    .int('must be a integer')
+    .positive('must be a positive number')
+    .nullish(),
   autoStart: z.boolean()
 })
 

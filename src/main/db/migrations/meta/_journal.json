@@ -71,6 +71,13 @@
       "when": 1793718371696,
       "tag": "0009_red_stryfe",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1793719132282,
+      "tag": "0010_fresh_warhawk",
+      "breakpoints": true
     }
   ]
 }
