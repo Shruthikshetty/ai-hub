@@ -2,25 +2,31 @@
  * @file contains the message schema with zod validation
  */
 
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { MessageMetadataType, MessagePartsType } from '../schemas/messages.schema'
 import { conversations } from './conversation.schema'
 
 // create a message table
-export const messages = sqliteTable('message', {
-  id: text()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  role: text({ enum: ['user', 'assistant', 'system'] }).notNull(),
-  metadata: text({ mode: 'json' }).$type<MessageMetadataType>().default({}),
-  parts: text({ mode: 'json' }).$type<MessagePartsType[]>().notNull(),
-  conversationId: integer()
-    .references(() => conversations.id, { onDelete: 'cascade' })
-    .notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
-})
+export const messages = sqliteTable(
+  'message',
+  {
+    id: text()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    role: text({ enum: ['user', 'assistant', 'system'] }).notNull(),
+    metadata: text({ mode: 'json' }).$type<MessageMetadataType>().default({}),
+    parts: text({ mode: 'json' }).$type<MessagePartsType[]>().notNull(),
+    conversationId: integer()
+      .references(() => conversations.id, { onDelete: 'cascade' })
+      .notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+  },
+  (table) => [
+    index('messages_conv_created_idx').on(table.conversationId, table.createdAt) // message sorted
+  ]
+)
 
 // zod schema for getting messages
 export const messagesSchema = createSelectSchema(messages)
