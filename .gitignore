@@ -11,6 +11,9 @@ out
 # database 
 dev.db
 test.db
+*.db
+*.db-wal
+*.db-shm
 
 # env files
 .env.test
