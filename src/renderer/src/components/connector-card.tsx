@@ -33,7 +33,7 @@ import { cn } from '@renderer/lib/utils'
 import { Spinner } from './ui/spinner'
 import { FetchAllConnectorResponseSchemaType } from '@common/schemas/connector.schema'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion'
-import { handleNumberChange } from '@renderer/lib/form.utils'
+import { handleNumberChangeWithNull } from '@renderer/lib/form.utils'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -295,7 +295,7 @@ const ConnectorCard = ({
                           value={field.state.value ?? ''}
                           onBlur={field.handleBlur}
                           placeholder="e.g. 10 (leave empty for unlimited)"
-                          onChange={(e) => handleNumberChange(e, field.handleChange)}
+                          onChange={(e) => handleNumberChangeWithNull(e, field.handleChange)}
                         />
                         <FieldDescription className="line-clamp-2">
                           Maximum number of previous messages sent to AI as context (empty for

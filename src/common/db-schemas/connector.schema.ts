@@ -34,7 +34,7 @@ export const connectorSelectSchema = createSelectSchema(connectors, {
   name: (field) => field.max(150),
   activeConversationId: (field) => field.nullish(),
   allowedUsers: () => z.array(z.string()),
-  messageLimit: (field) => field.nullish()
+  messageLimit: (field) => field.positive().nullish()
 }).omit({
   createdAt: true,
   updatedAt: true

@@ -105,7 +105,7 @@ export async function getConnectorChatContext({
           await db.query.messages.findMany({
             where: eq(messages.conversationId, conversationId),
             orderBy: [desc(messages.createdAt)],
-            limit: connector.messageLimit
+            limit: connector.messageLimit + 1 // +1 includes the current user prompt that was just inserted along with N previous messages
           })
         ).reverse()
       : await db.query.messages.findMany({

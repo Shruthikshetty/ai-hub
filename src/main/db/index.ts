@@ -35,6 +35,10 @@ client.execute('PRAGMA journal_mode = WAL;').catch((err) => {
 client.execute('PRAGMA synchronous = NORMAL;').catch((err) => {
   console.error('[Database] Failed to set synchronous NORMAL:', err)
 })
+// reduce checkpoint for personal app
+client.execute('PRAGMA wal_autocheckpoint = 100;').catch((err) => {
+  console.error('[Database] Failed to set wal_autocheckpoint:', err)
+})
 // define the data base with schemas
 const db = drizzle(client, {
   schema
