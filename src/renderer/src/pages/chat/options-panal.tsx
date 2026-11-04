@@ -398,8 +398,7 @@ const ChatOptionsPanel = ({
 
                               // derive available voices for the selected provider
                               const selectedProvider = providerField.state.value as
-                                | string
-                                | undefined
+                                string | undefined
                               const voiceOptions: readonly { id: string; label: string }[] =
                                 selectedProvider && selectedProvider in VOICE_OPTIONS
                                   ? VOICE_OPTIONS[selectedProvider as keyof typeof VOICE_OPTIONS]

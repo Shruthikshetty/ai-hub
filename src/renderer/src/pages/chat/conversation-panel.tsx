@@ -53,21 +53,6 @@ const ChatConversationsHistory = (props: {
   const { conversation: selectedConversation, setConversation: setSelectedConversation } =
     useSelectedConversation()
 
-  //in case there are no conversations then create a new one
-  useEffect(() => {
-    if (!conversations?.data?.length && isSuccess && selectedModel?.id) {
-      handleNewChat()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPending, selectedModel?.id])
-
-  // by default select the first conversation
-  useEffect(() => {
-    if (!selectedConversation && conversations?.data?.length) {
-      setSelectedConversation(conversations?.data[0])
-    }
-  }, [conversations?.data, selectedConversation, setSelectedConversation])
-
   // handle new conversation
   const handleNewChat = () => {
     // in case model is not selected
@@ -90,6 +75,21 @@ const ChatConversationsHistory = (props: {
       }
     )
   }
+
+  //in case there are no conversations then create a new one
+  useEffect(() => {
+    if (!conversations?.data?.length && isSuccess && selectedModel?.id) {
+      handleNewChat()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPending, selectedModel?.id])
+
+  // by default select the first conversation
+  useEffect(() => {
+    if (!selectedConversation && conversations?.data?.length) {
+      setSelectedConversation(conversations?.data[0])
+    }
+  }, [conversations?.data, selectedConversation, setSelectedConversation])
 
   // handle conversation delete
   const handleDelete = (id?: number) => {

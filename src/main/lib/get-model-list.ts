@@ -290,13 +290,7 @@ export type CohereModel = {
   context_length: number
   tokenizer_url?: string
   default_endpoints: (
-    | 'chat'
-    | 'embed'
-    | 'classify'
-    | 'summarize'
-    | 'rerank'
-    | 'rate'
-    | 'generate'
+    'chat' | 'embed' | 'classify' | 'summarize' | 'rerank' | 'rate' | 'generate'
   )[]
   features: string[]
   sampling_defaults: {
