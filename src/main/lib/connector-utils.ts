@@ -153,7 +153,7 @@ export async function getAiResponseForBotNonStream({
   // generate response
   const { text: assistantMessage, usage } = await generateText({
     model: modelProvider(modelId),
-    system: systemPrompt,
+    instructions: systemPrompt,
     messages: messages
   })
 

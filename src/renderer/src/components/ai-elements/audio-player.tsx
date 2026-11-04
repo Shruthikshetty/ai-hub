@@ -1,4 +1,4 @@
-import type { Experimental_SpeechResult as SpeechResult } from 'ai'
+import type { SpeechResult } from 'ai'
 import {
   MediaControlBar,
   MediaController,

@@ -78,7 +78,7 @@ AI Hub supports a wide range of cloud and local providers:
 
 ### Prerequisites
 
-- Node.js (v20 LTS or higher recommended)
+- Node.js (v22.22 or higher recommended)
 - npm (or bun/yarn/pnpm)
 
 ### Installation
