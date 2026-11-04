@@ -4,7 +4,7 @@
 import { StreamChatRoute } from './chat.routes'
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { createIdGenerator, convertToModelMessages, streamText, stepCountIs } from 'ai'
+import { createIdGenerator, convertToModelMessages, streamText, isStepCount } from 'ai'
 import { OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
 import { getProviderInstanceModel } from '../../lib/get-provider-instance'
 import db from '../../db'
@@ -65,8 +65,8 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
     model: modelProvider(model.id),
     messages: coreMessages,
     tools,
-    stopWhen: stepCountIs(20),
-    system: conversation?.systemPrompt ?? undefined,
+    stopWhen: isStepCount(20),
+    instructions: conversation?.systemPrompt ?? undefined,
     providerOptions: {
       openai: {
         reasoningEffort: 'low',
@@ -95,7 +95,7 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
       }
       return undefined
     },
-    onFinish: async ({ messages }) => {
+    onEnd: async ({ messages }) => {
       // generate title if first message
       if (messages.length <= 2) {
         // do not wait for this to complete

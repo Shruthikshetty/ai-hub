@@ -18,7 +18,7 @@ import type { Readable } from 'stream'
 export function buildNinjaChatFetch(apiKey: string): typeof fetch {
   return async (url, init) => {
     // NinjaChat uses /chat not /chat/completions
-    const reqUrl = url.toString().replace('/chat/completions', '/chat')
+    const reqUrl = url.toString().replace('https://ninjachat.ai', 'https://www.ninjachat.ai')
 
     // detect streaming from the JSON body
     let isStreaming = false

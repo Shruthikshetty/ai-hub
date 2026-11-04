@@ -15,7 +15,7 @@ export class NinjaChatImageModel implements ImageModelV3 {
   constructor(
     readonly modelId: string,
     private readonly apiKey: string,
-    private readonly baseURL: string = 'https://ninjachat.ai/api/v1'
+    private readonly baseURL: string = 'https://www.ninjachat.ai/api/v1'
   ) {}
 
   async doGenerate(

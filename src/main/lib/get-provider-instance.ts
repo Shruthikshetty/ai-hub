@@ -5,8 +5,8 @@ import { decryptText } from '../../common/utils/encryption.util'
 import { createGateway } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
 import { normalizeProviderUrl } from '../../common/utils/url.util'
-import { createOpenRouter, LanguageModelV3 } from '@openrouter/ai-sdk-provider'
-import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { createOpenRouter, LanguageModelV4 } from '@openrouter/ai-sdk-provider'
+import { createGoogle } from '@ai-sdk/google'
 import { createGroq } from '@ai-sdk/groq'
 import { createHuggingFace } from '@ai-sdk/huggingface'
 import { createXai } from '@ai-sdk/xai'
@@ -58,7 +58,7 @@ export async function getProviderInstanceModel({
       return openrouterInstance
     }
     case 'google': {
-      const googleInstance = createGoogleGenerativeAI({
+      const googleInstance = createGoogle({
         apiKey
       })
       return googleInstance
@@ -83,7 +83,7 @@ export async function getProviderInstanceModel({
        *https://ai-sdk.dev/providers/ai-sdk-providers/xai
        */
       if (toolAccess) {
-        return xaiInstance.responses as unknown as (id: string) => LanguageModelV3
+        return xaiInstance.responses as unknown as (id: string) => LanguageModelV4
       }
       return xaiInstance
     }

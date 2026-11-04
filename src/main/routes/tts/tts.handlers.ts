@@ -2,7 +2,7 @@
  * @file contains all the handlers related to tts routes
  */
 
-import { experimental_generateSpeech as generateSpeech } from 'ai'
+import { generateSpeech as generateSpeech } from 'ai'
 import { AppRouteHandler } from '../../types'
 import { GenerateSpeechFromTextRoute, DeleteGeneratedTTSAudioRoute } from './tts.routes'
 import { saveFile, deleteMediaFile } from '../../lib/file-storage'

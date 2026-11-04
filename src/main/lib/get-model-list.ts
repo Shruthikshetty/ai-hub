@@ -489,7 +489,7 @@ export async function getModelListFromProvider(
         break
       }
       case 'ninjachat': {
-        response = await axios.get('https://ninjachat.ai/api/v1/models', {
+        response = await axios.get('https://www.ninjachat.ai/api/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
         })
