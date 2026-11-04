@@ -33,12 +33,7 @@ import {
 export type AttachmentData = (FileUIPart & { id: string }) | (SourceDocumentUIPart & { id: string })
 
 export type AttachmentMediaCategory =
-  | 'image'
-  | 'video'
-  | 'audio'
-  | 'document'
-  | 'source'
-  | 'unknown'
+  'image' | 'video' | 'audio' | 'document' | 'source' | 'unknown'
 
 const mediaCategoryIcons: Record<AttachmentMediaCategory, typeof ImageIcon> = {
   audio: Music2Icon,
