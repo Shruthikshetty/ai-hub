@@ -96,7 +96,7 @@
     "eslint-plugin-react-refresh": "^0.4.26",
     "lucide-react": "^1.67.0",
     "media-chrome": "^4.19.4",
-    "motion": "^12.34.5",
+    "motion": "^14.9.0",
     "pino-pretty": "^13.2.0",
     "prettier": "^3.9.10",
     "radix-ui": "^1.8.1",
