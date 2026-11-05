@@ -20,6 +20,7 @@ import {
   buildNinjaChatModel
 } from './extract-model-capabilities'
 import { NINJACHAT_STATIC_MODELS } from '../../common/custom-providers/ninjachat'
+import { OPENAI_UNLISTED_MODELS } from '../../common/constants/models.constnats'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
 // types
@@ -547,8 +548,11 @@ export async function getModelListFromProvider(
     switch (provider.provider as ModelProviderType) {
       case 'openai': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
-        if (!data) return []
-        return data.map((model: OpenAiModel) => buildOpenAiModel(model.id, provider.provider))
+        const fetchedModels = data
+          ? data.map((model: OpenAiModel) => buildOpenAiModel(model.id, provider.provider))
+          : []
+        // append unlisted models
+        return [...fetchedModels, ...OPENAI_UNLISTED_MODELS]
       }
       case 'openrouter': {
         const data = (response.data as OpenAiResponse<OpenRouterModel>).data

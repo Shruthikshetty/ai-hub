@@ -50,7 +50,7 @@ const ChatOptionsPanel = ({
     if (!providers?.data) return []
 
     return providers.data.reduce<string[]>((acc, provider) => {
-      if (provider.enabled && PROVIDERS_WITH_SEARCH_TOOL.has(provider.provider)) {
+      if (provider.enabled && !provider.hide && PROVIDERS_WITH_SEARCH_TOOL.has(provider.provider)) {
         acc.push(provider.provider)
       }
       return acc
