@@ -15,6 +15,7 @@ import { eq } from 'drizzle-orm'
 import { conversations } from '../../db/schema'
 import { normalizeMessages } from '../../lib/normalize-messages'
 import { getTools } from '../../lib/get-tools'
+// import { createMCPClient, MCPClient } from '@ai-sdk/mcp'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
@@ -59,6 +60,29 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
     provider: model.provider,
     toolAccess: !!tools
   })
+
+  // let mcpClient: MCPClient | undefined = undefined
+  // try {
+  //   // testing mcp
+  //   mcpClient = await createMCPClient({
+  //     transport: {
+  //       type: 'http',
+  //       url: 'http://localhost:8080/mcp/hello/',
+  //       // optional: configure HTTP headers
+  //       headers: { Authorization: 'Bearer my-api-key' }
+  //       // optional: provide an OAuth client provider for automatic authorization
+  //       // authProvider: myOAuthClientProvider,
+  //       // optional: allow redirect responses (default is 'error' to prevent SSRF)
+  //       // redirect: 'follow'
+  //     }
+  //   })
+  // } catch (err) {
+  //   //ignore
+  //   console.error(err)
+  // }
+  // const mcpTools = mcpClient ? await mcpClient.tools() : {}
+  // console.log('Discovered MCP Tools:', Object.keys(mcpTools)) // <-- Check this log!
+  // const allTools = { ...(tools || {}), ...mcpTools }
 
   // stream the response from ai model
   const result = streamText({
