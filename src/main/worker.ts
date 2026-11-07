@@ -18,6 +18,7 @@ import image from './routes/image-gen/image-gen.index'
 import video from './routes/video-gen/video-gen.index'
 import tts from './routes/tts/tts.index'
 import connector from './routes/connector/connector.index'
+import mcp from './routes/mcp/mcp.index'
 import { startupBoot } from './lib/startup'
 
 import { runMigrations } from './db/migrate'
@@ -62,7 +63,8 @@ const routes = [
   image,
   video,
   tts,
-  connector
+  connector,
+  mcp
 ]
 
 routes.forEach((route) => {

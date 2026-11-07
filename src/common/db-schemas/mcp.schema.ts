@@ -7,7 +7,9 @@ import { z } from 'zod'
 
 // create a mcp server table
 export const mcpServers = sqliteTable('mcp_servers', {
-  id: text('id').primaryKey(),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
   type: text('type', { enum: ['http', 'stdio'] })
     .notNull()
