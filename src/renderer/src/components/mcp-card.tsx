@@ -22,7 +22,7 @@ import {
 import { errorToast } from '@renderer/lib/toast-wrapper'
 import { Spinner } from './ui/spinner'
 import { cn } from '@renderer/lib/utils'
-import { Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { Switch } from './ui/switch'
 
 // types
@@ -61,12 +61,25 @@ function generateTestRequestBody(data: McpFormValidationSchemaType) {
  * Mcp card is used for both the edit and addition of a MCP Server
  */
 export function McpCard(props: McpCardProps) {
+  // store editing state used when mode is update
+  const [isEditing, setIsEditing] = useState(false)
+
+  // if mode is add
+  if (props.mode === 'ADD') {
+    return (
+      <div>
+        <AddUpdateForm mode="ADD" onClose={props.onClose} />
+      </div>
+    )
+  }
+
+  // if mode is update
   return (
     <div>
-      {props.mode === 'ADD' ? (
-        <AddUpdateForm mode={props.mode} onClose={props.onClose} />
+      {isEditing ? (
+        <AddUpdateForm mode="UPDATE" data={props.data} onClose={() => setIsEditing(false)} />
       ) : (
-        <DisplayDetails data={props.data} />
+        <DisplayDetails data={props.data} onEdit={() => setIsEditing(true)} />
       )}
     </div>
   )
@@ -82,7 +95,8 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
   const [isTested, setIsTested] = useState(false)
 
   // hooks
-  const { mutate: addMcpServerMutation } = useAddMcpServer()
+  const { mutate: addMcpServerMutation, isPending: isAddPending } = useAddMcpServer()
+  const { mutate: updateMcpServerMutation, isPending: isUpdatePending } = useUpdateMcpServer()
   const { mutate: testMcpServerMutation, isPending: isTestPending } = useTestMcpServer()
 
   // form
@@ -92,22 +106,22 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
       type: data?.type ?? 'http',
       url: data?.url,
       command: data?.command,
-      args: data?.args ?? ([] as string[]),
+      args: data?.args ?? [],
       cwd: data?.cwd,
       authToken: data?.authToken,
-      enabled: true // will be true when adding or updating
+      enabled: data?.enabled ?? true
     } as McpFormValidationSchemaType,
     validators: { onSubmit: mcpFormValidationSchema },
     onSubmit: ({ value }) => {
-      //generate req body
+      // generate req body - undefined values are excluded by JSON.stringify in PATCH
       const serverPayload = {
         name: value.name,
         type: value.type,
-        url: value.type === 'http' ? value.url : undefined,
-        command: value.type === 'stdio' ? value.command : undefined,
-        args: value.type === 'stdio' ? (value.args ?? []) : [],
-        cwd: value.type === 'stdio' && value.cwd ? value.cwd : undefined,
-        authToken: value.authToken,
+        url: value.type === 'http' ? value?.url : undefined,
+        command: value.type === 'stdio' ? value?.command : undefined,
+        args: value.type === 'stdio' ? (value?.args ?? []) : [],
+        cwd: value.type === 'stdio' ? value?.cwd : undefined,
+        authToken: value?.authToken,
         enabled: value.enabled
       }
 
@@ -133,8 +147,18 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
           handleAdd()
         }
       } else {
-        //@TODO yet to be added
-        console.log(value)
+        if (!data) return
+        updateMcpServerMutation(
+          {
+            id: data.id,
+            mcpServer: serverPayload
+          },
+          {
+            onSuccess: () => {
+              onClose?.()
+            }
+          }
+        )
       }
     }
   })
@@ -260,7 +284,7 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
                       <Field>
                         <FieldLabel htmlFor={field.name}>Arguments</FieldLabel>
                         <MultiInput
-                          value={field.state.value}
+                          value={field.state.value ?? []}
                           onChange={field.handleChange}
                           placeholder="e.g. -y, @modelcontextprotocol/server-filesystem"
                         />
@@ -333,9 +357,10 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
           <Button
             className="active:scale-95 sm:min-w-15 hover:bg-success!"
             onClick={form.handleSubmit}
-            disabled={isTestPending}
+            disabled={isTestPending || isUpdatePending || isAddPending}
           >
-            {mode == 'ADD' ? 'Add' : 'Update'}
+            {mode === 'ADD' ? 'Add' : 'Update'}
+            {isAddPending || isUpdatePending ? <Spinner /> : null}
           </Button>
         </div>
       </CardFooter>
@@ -346,7 +371,7 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
 /**
  * display details of already added mcp
  */
-function DisplayDetails({ data }: { data: McpServerItem }) {
+function DisplayDetails({ data, onEdit }: { data: McpServerItem; onEdit?: () => void }) {
   // hook to delete an mcp server
   const { mutate: deleteMcpServerMutation, isPending: isDeletePending } = useDeleteMcpServer()
   // hook to update an mcp server
@@ -376,7 +401,7 @@ function DisplayDetails({ data }: { data: McpServerItem }) {
             </Badge>
           </div>
           {/* action buttons */}
-          <div className="flex flex-row items-center gap-3">
+          <div className="flex flex-row items-center gap-2">
             <Switch
               className="shrink-0"
               checked={!!data.enabled}
@@ -390,6 +415,14 @@ function DisplayDetails({ data }: { data: McpServerItem }) {
                 })
               }}
             />
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              className="text-muted-foreground hover:text-foreground active:scale-95 p-2"
+              onClick={onEdit}
+            >
+              <Pencil className="size-4" />
+            </Button>
             <Button
               size="icon-sm"
               variant="ghost"

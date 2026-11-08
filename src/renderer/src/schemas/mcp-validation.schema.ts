@@ -7,11 +7,11 @@ export const mcpFormValidationSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     type: z.enum(['http', 'stdio']).default('http'),
-    url: z.string().optional().default(''),
-    command: z.string().optional().default(''),
-    args: z.array(z.string()).default([]),
-    cwd: z.string().optional().default(''),
-    authToken: z.string().optional().default(''),
+    url: z.string().nullish().default(''),
+    command: z.string().nullish().default(''),
+    args: z.array(z.string()).nullish().default([]),
+    cwd: z.string().nullish().default(''),
+    authToken: z.string().nullish().default(''),
     enabled: z.boolean().default(true)
   })
   .superRefine((data, ctx) => {
