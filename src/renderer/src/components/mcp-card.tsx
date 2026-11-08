@@ -13,9 +13,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { MultiInput } from './multi-input'
 import { FetchAllMcpServersResponseSchemaType } from '@common/schemas/mcp.schema'
 import { hiddenText } from '@renderer/lib/format.utils'
-import { useAddMcpServer, useTestMcpServer } from '@renderer/services/mcp'
+import {
+  useAddMcpServer,
+  useDeleteMcpServer,
+  useTestMcpServer,
+  useUpdateMcpServer
+} from '@renderer/services/mcp'
 import { errorToast } from '@renderer/lib/toast-wrapper'
 import { Spinner } from './ui/spinner'
+import { cn } from '@renderer/lib/utils'
+import { Trash2 } from 'lucide-react'
+import { Switch } from './ui/switch'
 
 // types
 type McpServerItem = FetchAllMcpServersResponseSchemaType['data'][number]
@@ -339,27 +347,83 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
  * display details of already added mcp
  */
 function DisplayDetails({ data }: { data: McpServerItem }) {
+  // hook to delete an mcp server
+  const { mutate: deleteMcpServerMutation, isPending: isDeletePending } = useDeleteMcpServer()
+  // hook to update an mcp server
+  const { mutate: updateMcpServerMutation, isPending: isUpdatePending } = useUpdateMcpServer()
+
   return (
-    <Card>
+    <Card
+      className={cn(
+        data.enabled ? 'border bg-green-400/10! ring-green-500/50!' : 'border border-border'
+      )}
+    >
       <CardContent>
-        {/* badges */}
-        <div>
-          <Badge>{data.type}</Badge>
-          <Badge>{data.enabled ? 'Connected' : 'Disconnected'}</Badge>
+        <div className="flex flex-row justify-between gap-5 items-center">
+          {/* badges */}
+          <div className="pb-2 flex flex-row gap-2">
+            <Badge variant={'secondary'} className="border border-border px-4 text-sm py-2">
+              {data.type}
+            </Badge>
+            <Badge
+              variant={data.enabled ? 'default' : 'secondary'}
+              className={cn(
+                'border border-border px-4 text-sm py-2',
+                data.enabled ? 'bg-success' : ''
+              )}
+            >
+              {data.enabled ? 'Connected' : 'Disconnected'}
+            </Badge>
+          </div>
+          {/* action buttons */}
+          <div className="flex flex-row items-center gap-3">
+            <Switch
+              className="shrink-0"
+              checked={!!data.enabled}
+              disabled={isUpdatePending}
+              onCheckedChange={(checked) => {
+                updateMcpServerMutation({
+                  id: data.id,
+                  mcpServer: {
+                    enabled: checked
+                  }
+                })
+              }}
+            />
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              className="text-destructive hover:text-destructive active:scale-95 p-2"
+              disabled={isDeletePending}
+              onClick={() => deleteMcpServerMutation(data.id)}
+            >
+              {isDeletePending ? <Spinner className="size-4" /> : <Trash2 className="size-4" />}
+            </Button>
+          </div>
         </div>
         {/* details  */}
         <div>
-          <h2>{data.name}</h2>
+          <h2 className="text-base font-semibold py-2">{data.name}</h2>
           {data.type === 'http' ? (
             <>
-              <p>{data.url}</p>
-              {data.authToken ? <p>{hiddenText(data.authToken, 4, 2)}</p> : null}
+              <p>
+                <b>URL:</b> {data.url}
+              </p>
+              {data.authToken ? <p> {hiddenText(data.authToken, 4, 2)}</p> : null}
             </>
           ) : (
             <>
-              <p>{data.command}</p>
-              <p>{data.cwd}</p>
-              <p> {`[ ${data?.args?.map((arg) => arg).join(',')} ]`}</p>
+              <p>
+                <b>Command:</b> {data.command}
+              </p>
+              <p>
+                {' '}
+                <b>CWD:</b> {data.cwd}
+              </p>
+              <p>
+                {' '}
+                <b>Args:</b> {`[ ${data?.args?.map((arg) => arg).join(',')} ]`}
+              </p>
             </>
           )}
         </div>

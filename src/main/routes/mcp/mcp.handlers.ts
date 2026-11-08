@@ -46,7 +46,7 @@ export const createMcpServer: AppRouteHandler<CreateMcpServerRoute> = async (c) 
     body.authToken = encryptText(body.authToken)
   }
 
-  //create a new mcp server
+  // create a new mcp server (unique constraint violations are handled by global errorHandler)
   const [newServer] = await db.insert(mcpServers).values(body).returning()
 
   if (!newServer) {
