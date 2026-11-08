@@ -11,29 +11,35 @@
  * This helper converts each case to something the SDK accepts without fetching.
  */
 import fs from 'node:fs/promises'
+import path from 'node:path'
 import { AppUIMessage } from '../../common/schemas/messages.schema'
 import { resolveMediaPath } from './file-storage'
+import { EXT_TO_MIME } from '../../common/constants/global.constants'
 
 async function normalizeFileParts(parts: AppUIMessage['parts']): Promise<any[]> {
   // Use Promise.all to handle multiple parts concurrently
-  return Promise.all(
+  const resolved = await Promise.all(
     parts.map(async (part) => {
       if (part.type !== 'file') return part
 
       const { url } = part
 
-      // media:// URL → read file from disk as Buffer asynchronously
+      // media:// URL → read file from disk as data URI
       if (url?.startsWith('media://')) {
         const relativePath = url.slice('media://'.length)
         const absolutePath = resolveMediaPath(relativePath)
         if (absolutePath) {
           try {
+            const ext = path.extname(absolutePath).replace('.', '').toLowerCase()
+            const mediaType = part.mediaType || EXT_TO_MIME[ext] || 'application/octet-stream'
+            const fileBuffer = await fs.readFile(absolutePath)
+            const base64Data = fileBuffer.toString('base64')
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { url: _url, ...rest } = part
             return {
               ...rest,
-              // await fs.readFile ensures the event loop is not blocked
-              url: await fs.readFile(absolutePath)
+              mediaType,
+              url: `data:${mediaType};base64,${base64Data}`
             }
           } catch (e) {
             // Fallback if file read fails
@@ -45,22 +51,23 @@ async function normalizeFileParts(parts: AppUIMessage['parts']): Promise<any[]> 
         return null
       }
 
-      // data: URI → strip prefix, put raw base64 in url
+      // data: URI → Ensure mediaType is populated and keep intact so new URL(part.url) succeeds
       if (url?.startsWith('data:')) {
         const commaIdx = url.indexOf(',')
         if (commaIdx < 0) return part
         const prefix = url.slice(0, commaIdx)
-        const base64 = url.slice(commaIdx + 1)
-        if (!base64) return part
-        const inferredMediaType = prefix.split(':')[1]?.split(';')[0] ?? part.mediaType
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { url: _url, ...rest } = part
-        return { ...rest, mediaType: inferredMediaType, url: base64 }
+        const inferredMediaType = prefix.split(':')[1]?.split(';')[0] || part.mediaType
+        return {
+          ...part,
+          mediaType: inferredMediaType
+        }
       }
 
       return part
     })
   )
+
+  return resolved.filter(Boolean)
 }
 
 /**
