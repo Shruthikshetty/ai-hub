@@ -8,6 +8,7 @@ import AppearanceTab from './appearance-setting'
 import SecurityTab from './security-settings'
 import { useLocation } from 'react-router'
 import ConnectorTab from './connectors-setting'
+import ToolsTab from './tools-tab'
 
 /**
  * Settings page
@@ -31,6 +32,8 @@ function Settings(): React.JSX.Element {
         return <SecurityTab />
       case 'Connectors':
         return <ConnectorTab />
+      case 'Tools':
+        return <ToolsTab />
       default:
         return <div className="text-2xl h-full w-full">In Progress</div>
     }
