@@ -28,12 +28,34 @@ export const deleteMcpServerResponseSchema = z.object({
 })
 
 // request schema for testing an MCP connection
-export const testMcpServerRequestSchema = z.object({
-  type: z.enum(['http', 'stdio']).default('http'),
-  url: z.string().min(1, 'URL or command path is required'),
-  command: z.string().nullish(),
-  authToken: z.string().nullish()
-})
+export const testMcpServerRequestSchema = z
+  .object({
+    type: z.enum(['http', 'stdio']).default('http'),
+    url: z.string().nullish(),
+    command: z.string().nullish(),
+    args: z.array(z.string()).nullish(),
+    cwd: z.string().nullish(),
+    authToken: z.string().nullish()
+  })
+  .superRefine((data, ctx) => {
+    if (data.type === 'http') {
+      if (!data.url || data.url.trim().length === 0) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'URL is required for HTTP MCP servers',
+          path: ['url']
+        })
+      }
+    } else if (data.type === 'stdio') {
+      if (!data.command || data.command.trim().length === 0) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Command is required for stdio MCP servers',
+          path: ['command']
+        })
+      }
+    }
+  })
 
 // response schema for testing an MCP connection
 export const testMcpServerResponseSchema = z.object({

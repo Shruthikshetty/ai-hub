@@ -21,9 +21,11 @@ export type ActiveMcpSession = {
 
 export type CreateMcpClientParams = {
   type: 'http' | 'stdio'
-  url: string
+  url?: string
   command?: string | null
   authToken?: string | null
+  args?: string[] | null
+  cwd?: string | null
 }
 
 // utils ----------------
@@ -35,6 +37,9 @@ export type CreateMcpClientParams = {
 export async function createMcpClientInstance(params: CreateMcpClientParams): Promise<MCPClient> {
   // handle mode http
   if (params.type === 'http') {
+    if (!params.url) {
+      throw new Error('http server requires a url')
+    }
     return await createMCPClient({
       transport: {
         type: 'http',
@@ -46,12 +51,16 @@ export async function createMcpClientInstance(params: CreateMcpClientParams): Pr
   }
 
   // stdio transport
-  const runner = params.command || (params.url.endsWith('.py') ? 'python' : 'node')
+  if (!params.command) {
+    throw new Error('stdio server requires a command')
+  }
   return await createMCPClient({
     transport: new StdioMCPTransport({
-      command: runner,
-      args: [params.url]
-    })
+      command: params.command,
+      args: params.args ?? [],
+      cwd: params.cwd ?? undefined
+    }),
+    protocolVersionDiscovery: false // disable discover it caused issue with connecting to fast mcp
   })
 }
 
@@ -119,8 +128,10 @@ export async function getActiveMcpTools(): Promise<ActiveMcpSession> {
       // create client instance
       const client = await createMcpClientInstance({
         type: server.type as 'http' | 'stdio',
-        url: server.url,
+        url: server.url ?? '',
         command: server.command,
+        args: server.args,
+        cwd: server.cwd,
         authToken: token
       })
 

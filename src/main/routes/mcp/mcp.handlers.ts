@@ -151,8 +151,10 @@ export const testMcpServer: AppRouteHandler<TestMcpServerRoute> = async (c) => {
     // run a test on the mcp data provided
     const result = await testMcpConnection({
       type: body.type,
-      url: body.url,
+      url: body.url ?? undefined,
       command: body.command,
+      args: body.args,
+      cwd: body.cwd,
       authToken: body.authToken
     })
 

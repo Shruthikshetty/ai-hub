@@ -10,12 +10,14 @@ export const mcpServers = sqliteTable('mcp_servers', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  name: text('name').notNull(),
+  name: text('name').notNull().unique(),
   type: text('type', { enum: ['http', 'stdio'] })
     .notNull()
     .default('http'),
-  url: text('url').notNull(), // can store both the stdio path or the http url
-  command: text('command'), // optional used for stdio servers
+  url: text('url'), // for HTTP transport: url of the MCP server
+  command: text('command'), // for stdio transport: command/executable
+  args: text('args', { mode: 'json' }).$type<string[]>().default([]), // arguments for stdio command
+  cwd: text('cwd'), // working directory for stdio
   authToken: text('auth_token'), // optional since some maybe local running servers
   enabled: integer('enabled', {
     mode: 'boolean'
@@ -30,13 +32,40 @@ export const mcpServers = sqliteTable('mcp_servers', {
 })
 
 // zod schema for mcp crud actions
-export const mcpServerGetSchema = createSelectSchema(mcpServers)
-export const mcpServerInsertSchema = createInsertSchema(mcpServers).omit({
+export const mcpServerGetSchema = createSelectSchema(mcpServers, {
+  args: () => z.array(z.string()).default([])
+})
+
+const baseMcpServerInsertSchema = createInsertSchema(mcpServers, {
+  name: (field) => field.min(1, 'Name is required'),
+  args: () => z.array(z.string()).optional().default([])
+}).omit({
   id: true,
   createdAt: true,
   updatedAt: true
 })
-export const mcpServerUpdateSchema = mcpServerInsertSchema.partial()
+
+export const mcpServerUpdateSchema = baseMcpServerInsertSchema.partial()
+
+export const mcpServerInsertSchema = baseMcpServerInsertSchema.superRefine((data, ctx) => {
+  if (data.type === 'http') {
+    if (!data.url || data.url.trim().length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'URL is required for HTTP MCP servers',
+        path: ['url']
+      })
+    }
+  } else if (data.type === 'stdio') {
+    if (!data.command || data.command.trim().length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Command is required for stdio MCP servers',
+        path: ['command']
+      })
+    }
+  }
+})
 
 // export all the types
 export type McpGetSchema = z.infer<typeof mcpServerGetSchema>
