@@ -5,6 +5,7 @@ import { connectors, conversations, messages } from '../db/schema'
 import { asc, count, desc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
+import { mcpService } from '../services/mcp/mcp.service'
 export { autoStartConnectors } from './startup'
 
 /**
@@ -150,11 +151,15 @@ export async function getAiResponseForBotNonStream({
     provider
   })
 
+  // add mcp tools for testing
+  const tools = mcpService.getTools()
+
   // generate response
   const { text: assistantMessage, usage } = await generateText({
     model: modelProvider(modelId),
     instructions: systemPrompt,
-    messages: messages
+    messages: messages,
+    tools: Object.keys(tools).length > 0 ? (tools as any) : undefined
   })
 
   // generate title after 2nd user prompt (when total conversation count is exactly 3)
