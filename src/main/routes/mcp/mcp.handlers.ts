@@ -15,6 +15,7 @@ import { mcpServers } from '../../db/schema'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
 import { decryptText, encryptText } from '../../../common/utils/encryption.util'
 import { testMcpConnection } from '../../lib/mcp'
+import { mcpService } from '../../services/mcp/mcp.service'
 
 // handler to fetch all MCP servers
 export const fetchMcpServers: AppRouteHandler<GetMcpServersRoute> = async (c) => {
@@ -59,6 +60,13 @@ export const createMcpServer: AppRouteHandler<CreateMcpServerRoute> = async (c) 
     )
   }
 
+  // Auto-connect if newly created server is enabled
+  if (newServer.enabled) {
+    mcpService.start(newServer).catch((err) => {
+      console.error('[MCP Route] Error starting new server:', err)
+    })
+  }
+
   // send success response
   return c.json(
     {
@@ -101,6 +109,11 @@ export const updateMcpServer: AppRouteHandler<PatchMcpServerByIdRoute> = async (
     )
   }
 
+  // Reload the server connection in the background (or stop if disabled)
+  mcpService.restart(updatedServer).catch((err) => {
+    console.error('[MCP Route] Error restarting updated server:', err)
+  })
+
   //return post successfully updating
   return c.json(
     {
@@ -132,6 +145,11 @@ export const deleteMcpServer: AppRouteHandler<DeleteMcpServerByIdRoute> = async 
       HTTP_STATUS_CODES.NOT_FOUND
     )
   }
+
+  // Disconnect client and remove from active pool
+  mcpService.stop(id).catch((err) => {
+    console.error('[MCP Route] Error stopping deleted server:', err)
+  })
 
   // send success response
   return c.json(

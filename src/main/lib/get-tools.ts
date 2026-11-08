@@ -11,6 +11,7 @@ import { generateImage } from 'ai'
 import { deleteMediaFile, saveFile } from './file-storage'
 import { GoogleProvider } from '@ai-sdk/google'
 import { GroqProvider } from '@ai-sdk/groq'
+import { mcpService } from '../services/mcp/mcp.service'
 
 /**
  * Generate tools as per the provider
@@ -131,6 +132,14 @@ export const getTools = async (
         }
       }
     })
+  }
+
+  // Load active tools from MCP persistent pool
+  try {
+    const mcpTools = mcpService.getTools()
+    Object.assign(tools, mcpTools)
+  } catch (error) {
+    console.error('[getTools] Failed to load MCP tools:', error)
   }
 
   return Object.keys(tools).length === 0 ? undefined : tools

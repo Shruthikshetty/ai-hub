@@ -2,6 +2,7 @@ import db from '../db'
 import { connectors } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import { CONNECTOR_SERVICES } from '../constants/config.constants'
+import { mcpService } from '../services/mcp/mcp.service'
 
 /**
  * Auto-starts any connector that has `autoStart: true` in the database.
@@ -57,10 +58,13 @@ export async function autoStartConnectors(): Promise<void> {
  * Any future background initialization tasks can be added here.
  */
 export async function startupBoot(): Promise<void> {
-  // start all the connectors that have auto start enabled
-  await autoStartConnectors()
+  // fire all star tup task in parallel
+  await Promise.allSettled([
+    // start all the connectors that have auto start enabled
+    autoStartConnectors(),
+    // start all enabled MCP servers
+    mcpService.startAll()
+  ])
 
   // Future startup tasks can easily be appended below:
-  // await cleanupTempFiles()
-  // await checkModelUpdates()
 }

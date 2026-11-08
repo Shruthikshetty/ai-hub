@@ -20,6 +20,7 @@ import tts from './routes/tts/tts.index'
 import connector from './routes/connector/connector.index'
 import mcp from './routes/mcp/mcp.index'
 import { startupBoot } from './lib/startup'
+import { shutdownApp } from './lib/shutdown'
 
 import { runMigrations } from './db/migrate'
 import { seed } from './db/seed'
@@ -161,4 +162,19 @@ process.parentPort.on('message', async (e) => {
       port.close()
     }
   }
+})
+
+// Clean up background services and child processes on worker shutdown
+process.on('beforeExit', async () => {
+  await shutdownApp()
+})
+// triggered when the process is terminated by signal from parent system
+process.on('SIGTERM', async () => {
+  await shutdownApp()
+  process.exit(0)
+})
+// triggered when user presses Ctrl + C
+process.on('SIGINT', async () => {
+  await shutdownApp()
+  process.exit(0)
 })

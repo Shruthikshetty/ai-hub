@@ -5,19 +5,10 @@
  */
 import { createMCPClient, type MCPClient } from '@ai-sdk/mcp'
 import { StdioMCPTransport } from '@ai-sdk/mcp/mcp-stdio'
-import db from '../db'
-import { eq } from 'drizzle-orm'
-import { mcpServers } from '../../common/db-schemas/mcp.schema'
-import { decryptText } from '../../common/utils/encryption.util'
 
 // types -------------
 
 export type McpToolSet = Awaited<ReturnType<MCPClient['tools']>>
-
-export type ActiveMcpSession = {
-  tools: McpToolSet
-  cleanup: () => Promise<void>
-}
 
 export type CreateMcpClientParams = {
   type: 'http' | 'stdio'
@@ -78,7 +69,6 @@ export async function testMcpConnection(params: CreateMcpClientParams): Promise<
   try {
     // create a client
     client = await createMcpClientInstance(params)
-
     const tools = await client.tools()
 
     // extract the tool list
@@ -104,65 +94,4 @@ export async function testMcpConnection(params: CreateMcpClientParams): Promise<
       }
     }
   }
-}
-
-/**
- * Connects to all enabled MCP servers in the database, extracts tools,
- * and returns a cleanup callback
- */
-export async function getActiveMcpTools(): Promise<ActiveMcpSession> {
-  // get all the enabled servers from the database
-  const enabledServers = await db.query.mcpServers.findMany({
-    where: eq(mcpServers.enabled, true)
-  })
-
-  const clients: MCPClient[] = []
-  let combinedTools: McpToolSet = {}
-
-  // connect to all servers in parallel
-  const results = await Promise.allSettled(
-    enabledServers.map(async (server) => {
-      // decrypt the token
-      const token = server.authToken ? decryptText(server.authToken) : undefined
-
-      // create client instance
-      const client = await createMcpClientInstance({
-        type: server.type as 'http' | 'stdio',
-        url: server.url ?? '',
-        command: server.command,
-        args: server.args,
-        cwd: server.cwd,
-        authToken: token
-      })
-
-      // return  the tools
-      const tools = await client.tools()
-      return { client, tools }
-    })
-  )
-
-  // collect tools from fulfilled connections
-  for (const result of results) {
-    if (result.status === 'fulfilled') {
-      clients.push(result.value.client)
-      combinedTools = { ...combinedTools, ...result.value.tools }
-    } else {
-      console.error('[MCP] Failed to connect to server:', result.reason)
-    }
-  }
-
-  // clean up call back to close all the connections
-  const cleanup = async () => {
-    await Promise.allSettled(
-      clients.map(async (c) => {
-        try {
-          await c.close()
-        } catch (err) {
-          console.error('[MCP] Error closing client during cleanup:', err)
-        }
-      })
-    )
-  }
-
-  return { tools: combinedTools, cleanup }
 }
