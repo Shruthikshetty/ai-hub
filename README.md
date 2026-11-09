@@ -5,14 +5,17 @@ AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)**
 ## 🚀 Key Features
 
 - **Local App, Your Keys**: AI Hub runs entirely on your machine — no servers, no telemetry. However, when using cloud providers, your prompts and responses are processed by those providers and may be subject to their data retention policies. For full privacy, use local providers like Ollama or LM Studio.
-- **Multi-Provider Support**: Seamlessly switch between 11+ AI providers — cloud or local.
+- **Multi-Provider Support**: Seamlessly switch between 20+ AI providers — cloud or local.
 - **Advanced AI Chat**: Modular chat interface with multi-model support, conversation history, and context persistence.
-- **Built-in AI Tools**: Extend model capabilities with tools available within the chat:
-  - 🔍 **Web Search** — Ground model responses with real-time search results (supported on OpenAI, xAI, Groq [only `openai/gpt-oss-20b`, `openai/gpt-oss-120b`], Google).
+- **Built-in AI Tools & Extensibility**: Extend model capabilities with tools available within the chat:
+  - 🔍 **Web Search** — Ground model responses with real-time search results (supported on OpenAI, xAI, Groq, Google, Vercel AI Gateway).
+  - 🔌 **Model Context Protocol (MCP)** — Connect custom local (`stdio`) and remote (`http`) MCP servers to dynamically equip models with external tools and workflows.
   - 👤 **User Profile Access** — Models can access your personal profile for more personalized responses.
   - 🖼️ **Image Generation** — Generate images directly from the chat interface using supported models.
 - **Image Generation & Gallery**: Dedicated view for generating images with a full gallery, detailed metadata, and download/delete support.
 - **Video Generation & Gallery**: Dedicated view for generating videos with a full gallery, hover-to-play grid, and detailed metadata support.
+- **Voice Generation (TTS)**: Dedicated text-to-speech synthesis view powered by ElevenLabs.
+- **Telegram Bot Connector**: Interact with your models externally with Telegram integration, command handling, and configurable message limits.
 - **Reasoning Support**: Native support for reasoning/thinking models (e.g., GPT-5, Grok).
 - **Secure Key Management**: API keys are encrypted at rest using AES encryption.
 - **Modern UI/UX**: Stunning interface with Light, Dark, and System theme support.
@@ -21,10 +24,11 @@ AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)**
 
 Get the latest version of AI Hub for your operating system:
 
-| Platform    | Download                                                                  |
-| :---------- | :------------------------------------------------------------------------ |
-| **Windows** | [Download .exe](https://github.com/shruthikshetty/ai-hub/releases/latest) |
-| **macOS**   | [Download .dmg](https://github.com/shruthikshetty/ai-hub/releases/latest) |
+| Platform    | Download                                                                              |
+| :---------- | :------------------------------------------------------------------------------------ |
+| **Windows** | [Download .exe](https://github.com/shruthikshetty/ai-hub/releases/latest)             |
+| **macOS**   | [Download .dmg](https://github.com/shruthikshetty/ai-hub/releases/latest)             |
+| **Linux**   | [Download .AppImage / .deb](https://github.com/shruthikshetty/ai-hub/releases/latest) |
 
 > [!TIP]
 > After downloading, just run the installer and you're ready to go! No complex setup required.
@@ -33,19 +37,20 @@ Get the latest version of AI Hub for your operating system:
 
 AI Hub supports a wide range of cloud and local providers:
 
-- **Cloud Providers**: OpenAI, Google AI Studio, Open Router, Groq, xAI, Together AI, Fireworks AI, Vercel AI Gateway, Hugging Face.
-- **Local Providers**: Ollama, LM Studio.
+- **Cloud Providers**: OpenAI, Google AI Studio, OpenRouter, Groq, xAI, Together AI, Fireworks AI, Vercel AI Gateway, Hugging Face, Mistral, Cerebras, Cohere, Alibaba Cloud, Nvidia NIM, ElevenLabs, Ninja Chat, OpenCode, Poe.
+- **Local & Custom Providers**: Ollama, LM Studio, Custom OpenAI-compatible endpoints.
 
 ## 🛠️ Tech Stack
 
 - **Runtime**: [Electron](https://www.electronjs.org/), [Node.js](https://nodejs.org/)
 - **Frontend**: [React](https://react.dev/) (v19), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/) (v4), [Zustand](https://zustand-demo.pmnd.rs/)
-- **UI & Styling**: [Radix UI](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/), [Lucide React](https://lucide.dev/)
+- **UI & Styling**: [Radix UI](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/), [Lucide React](https://lucide.dev/), [Streamdown](https://github.com/streamdown/streamdown)
 - **Backend/Logic**: [Hono](https://hono.dev/)
 - **Data Fetching**: [TanStack React Query](https://tanstack.com/query/latest)
-- **Database**: [Drizzle ORM](https://orm.drizzle.team/), [LibSQL](https://github.com/tursodatabase/libsql)
+- **Database**: [Drizzle ORM](https://orm.drizzle.team/), [LibSQL](https://github.com/tursodatabase/libsql) (SQLite)
 - **Validation**: [Zod](https://zod.dev/)
-- **AI Integration**: [Vercel AI SDK](https://sdk.vercel.ai/)
+- **AI Integration**: [Vercel AI SDK](https://sdk.vercel.ai/) (v7), [@ai-sdk/mcp](https://www.npmjs.com/package/@ai-sdk/mcp) (Model Context Protocol)
+- **Bot Connectors**: [GrammY](https://grammy.dev/) (Telegram bot integration)
 - **Testing**: [Vitest](https://vitest.dev/)
 
 ## 📦 Project Structure
@@ -107,7 +112,7 @@ AI Hub uses **Zod OpenAPI** to generate a standard OpenAPI 3.0 specification. Du
 - **OpenAPI Spec**: [http://localhost:3000/doc](http://localhost:3000/doc)
 
 > [!NOTE]
-> This is only available when running the app in development mode (`bun run dev`).
+> This is only available when running the app in development mode (`npm run dev` or `bun run dev`).
 
 ### Database Management
 
