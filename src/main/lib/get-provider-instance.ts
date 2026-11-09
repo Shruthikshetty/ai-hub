@@ -147,7 +147,7 @@ export async function getProviderInstanceModel({
       })
       return poeInstance
     }
-    case 'open-code': {
+    case 'opencode': {
       const openCodeInstance = createOpenAI({
         baseURL: 'https://opencode.ai/inference/openai/v1',
         apiKey
