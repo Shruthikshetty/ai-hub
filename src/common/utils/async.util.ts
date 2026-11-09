@@ -25,17 +25,21 @@ export async function withTimeout<T>(
 
   let cleanup: CleanupFn | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
+  let isFinished = false
 
-  const registerCleanup: OnCleanup & { onCleanup: OnCleanup } = Object.assign(
-    (fn: CleanupFn) => {
+  const handleRegister = (fn: CleanupFn) => {
+    if (isFinished) {
+      Promise.resolve(fn()).catch((err) =>
+        console.error('[withTimeout] Error during late cleanup:', err)
+      )
+    } else {
       cleanup = fn
-    },
-    {
-      onCleanup: (fn: CleanupFn) => {
-        cleanup = fn
-      }
     }
-  )
+  }
+
+  const registerCleanup: OnCleanup & { onCleanup: OnCleanup } = Object.assign(handleRegister, {
+    onCleanup: handleRegister
+  })
 
   // create timer
   const timeoutPromise = new Promise<never>((_, reject) => {
@@ -47,6 +51,7 @@ export async function withTimeout<T>(
   try {
     return await Promise.race([task(registerCleanup), timeoutPromise])
   } finally {
+    isFinished = true
     // clear timer if it exist
     if (timer !== undefined) {
       clearTimeout(timer)
@@ -83,11 +88,13 @@ export class KeyedAsyncQueue {
 
     this.queues.set(key, ourTask)
 
-    ourTask.finally(() => {
+    const cleanup = (): void => {
       if (this.queues.get(key) === ourTask) {
         this.queues.delete(key)
       }
-    })
+    }
+    //run clean up on success or failure
+    ourTask.then(cleanup, cleanup)
 
     return ourTask
   }

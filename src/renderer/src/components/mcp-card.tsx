@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from './ui/button'
 import { Card, CardContent, CardFooter } from './ui/card'
 import { useForm } from '@tanstack/react-form'
@@ -93,6 +93,7 @@ export function McpCard(props: McpCardProps) {
 function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
   // stores tested state
   const [isTested, setIsTested] = useState(false)
+  const formRevision = useRef(0)
 
   // hooks
   const { mutate: addMcpServerMutation, isPending: isAddPending } = useAddMcpServer()
@@ -114,6 +115,7 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
     validators: { onSubmit: mcpFormValidationSchema },
     listeners: {
       onChange: () => {
+        formRevision.current++
         if (isTested) {
           setIsTested(false) //reset when form is updated
         }
@@ -179,11 +181,13 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
       errorToast('Form is invalid. Please check the errors. before testing')
       return
     }
-
+    const testRevision = formRevision.current
     // hit test endpoint
     testMcpServerMutation(generateTestRequestBody(form.state.values), {
       onSuccess: () => {
-        setIsTested(true)
+        if (testRevision === formRevision.current) {
+          setIsTested(true)
+        }
       }
     })
   }
