@@ -45,7 +45,14 @@ const baseMcpServerInsertSchema = createInsertSchema(mcpServers, {
   updatedAt: true
 })
 
-export const mcpServerUpdateSchema = baseMcpServerInsertSchema.partial()
+export const mcpServerUpdateSchema = baseMcpServerInsertSchema
+  .partial()
+  .extend({
+    args: z.array(z.string()).optional()
+  })
+  .refine((data) => Object.values(data).some((v) => v !== undefined), {
+    message: 'At least one field must be provided'
+  })
 
 export const mcpServerInsertSchema = baseMcpServerInsertSchema.superRefine((data, ctx) => {
   if (data.type === 'http') {
