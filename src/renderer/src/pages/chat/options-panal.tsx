@@ -192,7 +192,7 @@ const ChatOptionsPanel = ({
                         id={field.name}
                         name={field.name}
                         checked={field.state.value}
-                        disabled={searchProvidersOptions.length === 0}
+                        disabled={searchProvidersOptions.length === 0 && !field.state.value}
                         onCheckedChange={(value) => {
                           field.handleChange(value)
                           // if search is disabled, clear the provider and model

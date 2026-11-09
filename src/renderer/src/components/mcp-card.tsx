@@ -112,6 +112,13 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
       enabled: data?.enabled ?? true
     } as McpFormValidationSchemaType,
     validators: { onSubmit: mcpFormValidationSchema },
+    listeners: {
+      onChange: () => {
+        if (isTested) {
+          setIsTested(false) //reset when form is updated
+        }
+      }
+    },
     onSubmit: ({ value }) => {
       // generate req body - undefined values are excluded by JSON.stringify in PATCH
       const serverPayload = {

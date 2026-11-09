@@ -280,11 +280,7 @@ export const MEDIA_TYPE = ['image', 'video', 'tts'] as const
 
 export const MEDIA_REQUEST_TYPES = [...MEDIA_TYPE, 'all'] as const
 
-/**
- * disabling 'vercel'since there is an open issue and not working as expected
- * https://github.com/vercel/ai/issues/12178
- */
-export const PROVIDERS_WITH_SEARCH_TOOL = new Set(['openai', 'xai', 'google', 'groq'])
+export const PROVIDERS_WITH_SEARCH_TOOL = new Set(['openai', 'xai', 'google', 'groq', 'vercel'])
 
 // available connectors
 export const AVAILABLE_CONNECTORS = [
