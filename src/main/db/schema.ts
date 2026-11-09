@@ -11,6 +11,7 @@ export * from '../../common/db-schemas/message.schema'
 export * from '../../common/db-schemas/relations.schema'
 export * from '../../common/db-schemas/media.schema'
 export * from '../../common/db-schemas/connector.schema'
+export * from '../../common/db-schemas/mcp.schema'
 
 // When you add more tables, just add more re-exports here:
 // export * from '../../common/db-schemas/messages.schema'

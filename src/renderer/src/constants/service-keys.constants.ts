@@ -11,7 +11,8 @@ export const QUERY_KEYS = {
   mediaFetch: 'media-fetch',
   mediaFetchInfinite: 'media-fetch-infinite',
   mediaTtsFetch: 'media-tts-fetch',
-  connectorsFetch: 'connectors-fetch'
+  connectorsFetch: 'connectors-fetch',
+  mcpServersFetch: 'mcp-servers-fetch'
 }
 
 export const MUTATION_KEYS = {
@@ -33,5 +34,9 @@ export const MUTATION_KEYS = {
   addConnector: 'add-connector',
   deleteConnectorByName: 'delete-connector-by-name',
   startConnectorByName: 'start-connector-by-name',
-  stopConnectorByName: 'stop-connector-by-name'
+  stopConnectorByName: 'stop-connector-by-name',
+  addMcpServer: 'add-mcp-server',
+  updateMcpServerById: 'update-mcp-server-by-id',
+  deleteMcpServerById: 'delete-mcp-server-by-id',
+  testMcpServer: 'test-mcp-server'
 }

@@ -88,6 +88,12 @@ const ImageToolSchema = ToolInvocationBase.extend({
   type: z.literal('tool-img_gen')
 }).and(ToolStateSchema)
 
+// Dynamic MCP tool schema (AI SDK emits `type: 'dynamic-tool'` with `toolName`)
+const DynamicToolSchema = ToolInvocationBase.extend({
+  type: z.literal('dynamic-tool'),
+  toolName: z.string()
+}).and(ToolStateSchema)
+
 //added additional parts as required
 export const MessagePartSchema = z.union([
   TextUIPartSchema,
@@ -96,7 +102,8 @@ export const MessagePartSchema = z.union([
   FileUIPartSchema,
   SearchToolSchema,
   ProfileAccessToolSchema,
-  ImageToolSchema
+  ImageToolSchema,
+  DynamicToolSchema
 ])
 
 // metadata schema for message

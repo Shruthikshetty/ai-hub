@@ -9,7 +9,7 @@ import {
   internalServerErrorDocObject,
   zodValidationErrorDocObject
 } from '../../constants/doc-constants'
-import { UIMessageSchema } from '../../../common/schemas/messages.schema'
+import { AppUIMessage } from '../../../common/schemas/messages.schema'
 import { modelSchema } from '../../../common/schemas/model.schema'
 
 // route to stream chat response
@@ -23,7 +23,7 @@ export const streamChat = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            messages: UIMessageSchema.array(),
+            messages: z.array(z.any()) as unknown as z.ZodType<AppUIMessage[]>, // allowing with loose types to  allow dynamic tool parts like external mcp , tools
             model: modelSchema,
             conversationId: z.number()
           })

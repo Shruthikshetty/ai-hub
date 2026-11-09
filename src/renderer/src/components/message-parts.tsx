@@ -42,7 +42,9 @@ function MessageParts({
   // check if there are any file parts
   const hasFileParts = message.parts.some((part) => part.type === 'file')
   // check if there are any tool parts
-  const toolCalls = message.parts.filter((part) => part.type.startsWith('tool-'))
+  const toolCalls = message.parts.filter(
+    (part) => part.type.startsWith('tool-') || part.type === 'dynamic-tool'
+  )
   const hasToolCalls = toolCalls.length > 0
 
   return (
@@ -121,6 +123,17 @@ function MessageParts({
                   } else {
                     return null
                   }
+                case 'dynamic-tool': {
+                  // dynamic external tools (mcp)
+                  const anyPart = part as any
+                  const toolName = anyPart.toolName || 'tool'
+                  return (
+                    <TaskItem key={`${message.id}-${index}`}>
+                      <p className="font-semibold">dynamic tool called : {toolName}</p>
+                      <p>{anyPart?.input ? JSON.stringify(anyPart.input) : ''}</p>
+                    </TaskItem>
+                  )
+                }
                 default:
                   return null
               }

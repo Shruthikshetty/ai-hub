@@ -18,7 +18,9 @@ import image from './routes/image-gen/image-gen.index'
 import video from './routes/video-gen/video-gen.index'
 import tts from './routes/tts/tts.index'
 import connector from './routes/connector/connector.index'
+import mcp from './routes/mcp/mcp.index'
 import { startupBoot } from './lib/startup'
+import { shutdownApp } from './lib/shutdown'
 
 import { runMigrations } from './db/migrate'
 import { seed } from './db/seed'
@@ -62,7 +64,8 @@ const routes = [
   image,
   video,
   tts,
-  connector
+  connector,
+  mcp
 ]
 
 routes.forEach((route) => {
@@ -79,7 +82,8 @@ if (process.env.NODE_ENV === 'development') {
   openApiPromise.then(() => {
     serve({
       fetch: app.fetch,
-      port: 3000 // local dev only
+      port: 3000, // local dev only
+      hostname: '127.0.0.1' // only allow requests from same machine
     })
   })
 }
@@ -159,4 +163,19 @@ process.parentPort.on('message', async (e) => {
       port.close()
     }
   }
+})
+
+// Clean up background services and child processes on worker shutdown
+process.on('beforeExit', async () => {
+  await shutdownApp()
+})
+// triggered when the process is terminated by signal from parent system
+process.on('SIGTERM', async () => {
+  await shutdownApp()
+  process.exit(0)
+})
+// triggered when user presses Ctrl + C
+process.on('SIGINT', async () => {
+  await shutdownApp()
+  process.exit(0)
 })
