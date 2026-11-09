@@ -82,7 +82,8 @@ if (process.env.NODE_ENV === 'development') {
   openApiPromise.then(() => {
     serve({
       fetch: app.fetch,
-      port: 3000 // local dev only
+      port: 3000, // local dev only
+      hostname: '127.0.0.1' // only allow requests from same machine
     })
   })
 }

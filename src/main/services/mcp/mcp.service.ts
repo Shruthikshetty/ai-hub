@@ -3,6 +3,7 @@ import db from '../../db'
 import { eq } from 'drizzle-orm'
 import { mcpServers, McpGetSchema } from '../../../common/db-schemas/mcp.schema'
 import { decryptText } from '../../../common/utils/encryption.util'
+import { KeyedAsyncQueue } from '../../../common/utils/async.util'
 import { createMcpClientInstance, McpToolSet } from '../../lib/mcp'
 
 // types
@@ -19,11 +20,49 @@ type ActiveServerEntry = {
 class McpService {
   // store for all mcp servers
   private activeServers = new Map<string, ActiveServerEntry>()
+  // FIFO queue per server ID to serialize start/stop/restart operations
+  private queue = new KeyedAsyncQueue()
 
   /**
    * Start an MCP server connection, extract tools, and cache in memory
    */
   public async start(serverOrId: McpGetSchema | string): Promise<boolean> {
+    const id = typeof serverOrId === 'string' ? serverOrId : serverOrId.id
+    return this.queue.run(id, () => this.doStart(serverOrId))
+  }
+
+  /**
+   * Stop an active MCP server and close its transport/process
+   */
+  public async stop(serverId: string): Promise<void> {
+    return this.queue.run(serverId, () => this.doStop(serverId))
+  }
+
+  /**
+   * Restart an MCP server with updated configuration, or stop if disabled/deleted
+   */
+  public async restart(serverOrId: McpGetSchema | string): Promise<boolean> {
+    const id = typeof serverOrId === 'string' ? serverOrId : serverOrId.id
+    return this.queue.run(id, async () => {
+      const server =
+        typeof serverOrId === 'string'
+          ? await db.query.mcpServers.findFirst({
+              where: eq(mcpServers.id, serverOrId)
+            })
+          : serverOrId
+
+      // If deleted from DB or toggled OFF, ensure it is stopped
+      if (!server || !server.enabled) {
+        await this.doStop(id)
+        return false
+      }
+
+      // start
+      return await this.doStart(server)
+    })
+  }
+
+  private async doStart(serverOrId: McpGetSchema | string): Promise<boolean> {
     let server: McpGetSchema | undefined
 
     // fetch server if id is passed
@@ -36,18 +75,16 @@ class McpService {
     }
 
     if (!server) {
-      console.warn('[MCP Service] Server not found, cannot start.')
       return false
     }
 
     if (!server.enabled) {
-      console.log(`[MCP Service] Server "${server.name}" is disabled, skipping start.`)
       return false
     }
 
     // If already running, cleanly close previous connection before reconnecting
     if (this.activeServers.has(server.id)) {
-      await this.stop(server.id)
+      await this.doStop(server.id)
     }
 
     // start a connecting
@@ -75,10 +112,7 @@ class McpService {
     }
   }
 
-  /**
-   * Stop an active MCP server and close its transport/process
-   */
-  public async stop(serverId: string): Promise<void> {
+  private async doStop(serverId: string): Promise<void> {
     const entry = this.activeServers.get(serverId)
     if (!entry) return
     // delete from store
@@ -92,29 +126,6 @@ class McpService {
   }
 
   /**
-   * Restart an MCP server with updated configuration, or stop if disabled/deleted
-   */
-  public async restart(serverOrId: McpGetSchema | string): Promise<boolean> {
-    const id = typeof serverOrId === 'string' ? serverOrId : serverOrId.id
-
-    const server =
-      typeof serverOrId === 'string'
-        ? await db.query.mcpServers.findFirst({
-            where: eq(mcpServers.id, serverOrId)
-          })
-        : serverOrId
-
-    // If deleted from DB or toggled OFF, ensure it is stopped
-    if (!server || !server.enabled) {
-      await this.stop(id)
-      return false
-    }
-
-    // start
-    return await this.start(server)
-  }
-
-  /**
    * Start all enabled MCP servers in parallel (called on startup)
    */
   public async startAll(): Promise<void> {
@@ -124,7 +135,6 @@ class McpService {
       })
 
       if (!enabledServers.length) {
-        console.log('[MCP Service] No enabled MCP servers found to auto-start.')
         return
       }
       // start all

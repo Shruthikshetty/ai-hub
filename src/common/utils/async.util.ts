@@ -61,3 +61,34 @@ export async function withTimeout<T>(
     }
   }
 }
+
+/**
+ * Keyed asynchronous FIFO queue.
+ *
+ * Ensures that async operations sharing the same string key execute strictly
+ * one after another in order, while operations with different keys execute in parallel.
+ */
+export class KeyedAsyncQueue {
+  private queues = new Map<string, Promise<unknown>>()
+
+  /**
+   * Enqueues an async task under the specified key.
+   *
+   * @param key - The identifier to serialize operations on.
+   * @param task - The async operation to execute.
+   */
+  public run<T>(key: string, task: () => Promise<T>): Promise<T> {
+    const runningTask = this.queues.get(key) ?? Promise.resolve()
+    const ourTask = runningTask.catch(() => {}).then(task)
+
+    this.queues.set(key, ourTask)
+
+    ourTask.finally(() => {
+      if (this.queues.get(key) === ourTask) {
+        this.queues.delete(key)
+      }
+    })
+
+    return ourTask
+  }
+}
