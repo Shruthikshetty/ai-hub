@@ -5,6 +5,7 @@
  */
 import { createMCPClient, type MCPClient } from '@ai-sdk/mcp'
 import { StdioMCPTransport } from '@ai-sdk/mcp/mcp-stdio'
+import { withTimeout } from '../../common/utils/async.util'
 
 // types -------------
 
@@ -59,39 +60,39 @@ export async function createMcpClientInstance(params: CreateMcpClientParams): Pr
  * Tests an MCP server connection by creating a temporary client,
  * listing its tools, and immediately closing the connection.
  */
-export async function testMcpConnection(params: CreateMcpClientParams): Promise<{
+export async function testMcpConnection(
+  params: CreateMcpClientParams,
+  timeoutMs = 10000
+): Promise<{
   success: boolean
   message: string
   tools: { name: string; description?: string }[]
 }> {
-  let client: MCPClient | undefined = undefined
+  return await withTimeout(
+    async (onCleanup) => {
+      // create a client and immediately register its cleanup
+      const client = await createMcpClientInstance(params)
+      onCleanup(() => client.close())
 
-  try {
-    // create a client
-    client = await createMcpClientInstance(params)
-    const tools = await client.tools()
+      // get the tools
+      const tools = await client.tools()
 
-    // extract the tool list
-    const toolList = Object.entries(tools).map(([name, toolDef]) => ({
-      name,
-      description: typeof toolDef?.description === 'string' ? toolDef.description : ''
-    }))
+      // extract the tool list
+      const toolList = Object.entries(tools).map(([name, toolDef]) => ({
+        name,
+        description: typeof toolDef?.description === 'string' ? toolDef.description : ''
+      }))
 
-    // return a response with the tool list
-    return {
-      success: true,
-      message: `Connected successfully! Found ${toolList?.length} tool${toolList?.length === 1 ? '' : 's'}.`,
-      tools: toolList
-    }
-  } finally {
-    if (client) {
-      try {
-        // close the client
-        await client.close()
-      } catch (err) {
-        // catch any error in closing
-        console.error('[MCP] Error closing test client:', err)
+      // return a response with the tool list
+      return {
+        success: true,
+        message: `Connected successfully! Found ${toolList.length} tool${toolList.length === 1 ? '' : 's'}.`,
+        tools: toolList
       }
+    },
+    {
+      timeoutMs,
+      errorMessage: `Connection timed out after ${timeoutMs / 1000}s. Check your command, arguments, or URL.`
     }
-  }
+  )
 }
