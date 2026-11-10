@@ -345,6 +345,31 @@ const ConnectorCard = ({
                     )
                   }}
                 </form.Field>
+
+                {/* Profile Access Tool */}
+                <form.Field name="tools.profileAccess.enabled">
+                  {(field) => {
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <div className="flex flex-row items-center justify-between">
+                          <FieldLabel className="text-sm font-semibold" htmlFor={field.name}>
+                            Profile Access
+                          </FieldLabel>
+                          <Switch
+                            id={field.name}
+                            name={field.name}
+                            className="shrink-0"
+                            checked={field.state.value}
+                            onCheckedChange={(value) => field.handleChange(value)}
+                          />
+                        </div>
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                      </Field>
+                    )
+                  }}
+                </form.Field>
+
                 {/* Search tool */}
                 <form.Field name="tools.search.enabled">
                   {(field) => {

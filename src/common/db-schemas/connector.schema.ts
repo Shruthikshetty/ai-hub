@@ -27,7 +27,11 @@ export const connectors = sqliteTable('connectors', {
   messageLimit: integer('message_limit'),
   tools: text('tools', { mode: 'json' })
     .$type<ConversationToolsSchemaType>()
-    .default({ search: { enabled: false }, imageGeneration: { enabled: false } }),
+    .default({
+      search: { enabled: false },
+      profileAccess: { enabled: false },
+      imageGeneration: { enabled: false }
+    }),
   additionalOptions: text('additional_options', { mode: 'json' })
     .$type<ConversationAdditionalOptionType>()
     .default({
