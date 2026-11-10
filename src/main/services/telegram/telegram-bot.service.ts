@@ -114,7 +114,9 @@ class TelegramBotService {
             systemPrompt,
             messages: modelMessages,
             conversationId,
-            connectorName: 'telegram'
+            connectorName: 'telegram',
+            additionalOptions: connector?.additionalOptions,
+            tools: connector?.tools
           })
 
           // chunk split message if necessary

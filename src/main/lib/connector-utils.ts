@@ -1,10 +1,11 @@
-import { convertToModelMessages, generateText, ModelMessage } from 'ai'
+import { convertToModelMessages, generateText, isStepCount, ModelMessage } from 'ai'
 import { getProviderInstanceModel } from './get-provider-instance'
 import db from '../db'
-import { connectors, conversations, messages } from '../db/schema'
+import { ConnectorGetSchema, connectors, conversations, messages } from '../db/schema'
 import { asc, count, desc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
+import { getTools } from './get-tools'
 export { autoStartConnectors } from './startup'
 
 /**
@@ -138,7 +139,9 @@ export async function getAiResponseForBotNonStream({
   systemPrompt,
   messages,
   conversationId,
-  connectorName
+  connectorName,
+  additionalOptions,
+  tools
 }: {
   modelId: string
   provider: string
@@ -146,17 +149,28 @@ export async function getAiResponseForBotNonStream({
   messages: ModelMessage[]
   conversationId: number
   connectorName?: string
+  additionalOptions: ConnectorGetSchema['additionalOptions']
+  tools: ConnectorGetSchema['tools']
 }): Promise<string> {
   // const get the provider as per user model
   const modelProvider = await getProviderInstanceModel({
     provider
+  })
+  // get the tools
+  const toolList = await getTools({
+    provider: provider,
+    modelId: modelId,
+    additionalOptions,
+    tools
   })
 
   // generate response
   const { text: assistantMessage, usage } = await generateText({
     model: modelProvider(modelId),
     instructions: systemPrompt,
-    messages: messages
+    messages: messages,
+    tools: toolList,
+    stopWhen: isStepCount(20)
   })
 
   // generate title after 2nd user prompt (when total conversation count is exactly 3)

@@ -13,11 +13,16 @@ import { GoogleProvider } from '@ai-sdk/google'
 import { GroqProvider } from '@ai-sdk/groq'
 import { mcpService } from '../services/mcp/mcp.service'
 
+//types
+type ConversationToolsContext = Partial<ConversationsGetSchema> & {
+  tools: ConversationsGetSchema['tools']
+}
+
 /**
  * Generate tools as per the provider
  */
 export const getTools = async (
-  conversation: ConversationsGetSchema
+  conversation: ConversationToolsContext
 ): Promise<ToolSet | undefined> => {
   const tools: Record<string, Tool<any, any>> = {}
   // check for search tool
