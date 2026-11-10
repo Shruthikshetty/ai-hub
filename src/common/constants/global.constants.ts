@@ -246,6 +246,17 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     siteUrl: 'https://opencode.ai/console',
     description:
       'OpenCode provider offering curated models optimized for coding agents and developer workflows.'
+  },
+  {
+    provider: 'demonroute',
+    name: 'Demon Route',
+    icon: 'https://models.dev/logos/custom.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://demonroute.com/models',
+    description:
+      'Demon Route OpenAI-compatible gateway for 1,700+ open-weight models, including uncensored and roleplay fine-tunes.'
   }
 ]
 
@@ -270,7 +281,8 @@ export const AVAILABLE_PROVIDER_LIST = [
   'cohere',
   'alibaba',
   'ninjachat',
-  'open-code'
+  'open-code',
+  'demonroute'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const

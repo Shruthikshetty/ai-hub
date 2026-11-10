@@ -33,7 +33,7 @@ Get the latest version of AI Hub for your operating system:
 
 AI Hub supports a wide range of cloud and local providers:
 
-- **Cloud Providers**: OpenAI, Google AI Studio, Open Router, Groq, xAI, Together AI, Fireworks AI, Vercel AI Gateway, Hugging Face.
+- **Cloud Providers**: OpenAI, Google AI Studio, Open Router, Groq, xAI, Together AI, Fireworks AI, Vercel AI Gateway, Hugging Face, Demon Route.
 - **Local Providers**: Ollama, LM Studio.
 
 ## 🛠️ Tech Stack

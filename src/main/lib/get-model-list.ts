@@ -503,6 +503,13 @@ export async function getModelListFromProvider(
         })
         break
       }
+      case 'demonroute': {
+        response = await axios.get('https://api.demonroute.com/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 5000 //5 seconds
+        })
+        break
+      }
       case 'huggingface': {
         // Each request targets one pipeline_tag — HuggingFace only supports one at a time.
         // Fire them all in parallel and merge the results.
