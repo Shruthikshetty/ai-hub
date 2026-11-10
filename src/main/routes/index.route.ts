@@ -24,7 +24,7 @@ const router = createRouter().openapi(
   (c) => {
     return c.json(
       {
-        message: 'example hono react electron app'
+        message: 'AI hub backend is running'
       },
       200
     )
