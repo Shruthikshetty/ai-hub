@@ -125,7 +125,9 @@ export async function getConnectorChatContext({
     modelMessages,
     modelId: connector.modelId,
     provider: connector.provider,
-    systemPrompt: connector?.systemPrompt ?? undefined
+    systemPrompt: connector?.systemPrompt ?? undefined,
+    additionalOptions: connector.additionalOptions,
+    tools: connector.tools
   }
 }
 
@@ -141,7 +143,9 @@ export async function getAiResponseForBotNonStream({
   conversationId,
   connectorName,
   additionalOptions,
-  tools
+  tools,
+  onToolExecutionStart,
+  onToolExecutionEnd
 }: {
   modelId: string
   provider: string
@@ -149,20 +153,24 @@ export async function getAiResponseForBotNonStream({
   messages: ModelMessage[]
   conversationId: number
   connectorName?: string
-  additionalOptions: ConnectorGetSchema['additionalOptions']
-  tools: ConnectorGetSchema['tools']
+  additionalOptions?: ConnectorGetSchema['additionalOptions']
+  tools?: ConnectorGetSchema['tools']
+  onToolExecutionStart?: Parameters<typeof generateText>[0]['onToolExecutionStart']
+  onToolExecutionEnd?: Parameters<typeof generateText>[0]['onToolExecutionEnd']
 }): Promise<string> {
   // const get the provider as per user model
   const modelProvider = await getProviderInstanceModel({
     provider
   })
   // get the tools
-  const toolList = await getTools({
-    provider: provider,
-    modelId: modelId,
-    additionalOptions,
-    tools
-  })
+  const toolList = tools
+    ? await getTools({
+        provider: provider,
+        modelId: modelId,
+        additionalOptions,
+        tools
+      })
+    : undefined
 
   // generate response
   const { text: assistantMessage, usage } = await generateText({
@@ -170,7 +178,9 @@ export async function getAiResponseForBotNonStream({
     instructions: systemPrompt,
     messages: messages,
     tools: toolList,
-    stopWhen: isStepCount(20)
+    stopWhen: isStepCount(20),
+    onToolExecutionStart,
+    onToolExecutionEnd
   })
 
   // generate title after 2nd user prompt (when total conversation count is exactly 3)

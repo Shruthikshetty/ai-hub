@@ -1,14 +1,21 @@
-import { Bot } from 'grammy'
+import { Bot, InputFile } from 'grammy'
 import db from '../../db'
 import { connectors } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { decryptText } from '../../../common/utils/encryption.util'
+import { resolveMediaPath } from '../../lib/file-storage'
 import {
   getConnectorChatContext,
   getAiResponseForBotNonStream,
   splitMessage
 } from '../../lib/connector-utils'
-import { replyMarkdown, TELEGRAM_BOT_COMMAND_MENU, telegramCommands } from './telegram-commands'
+import {
+  formatTelegramToolBlock,
+  replyHtml,
+  replyMarkdown,
+  TELEGRAM_BOT_COMMAND_MENU,
+  telegramCommands
+} from './telegram-commands'
 
 /**
  * This is the main telegram service that handles the connection and chat with telegram bot
@@ -98,11 +105,18 @@ class TelegramBotService {
             ctx.message?.text || 'reply to user that u did not receive any valid request'
 
           // get existing messages or create a new conversation
-          const { conversationId, modelMessages, modelId, provider, systemPrompt } =
-            await getConnectorChatContext({
-              connectorName: 'telegram',
-              newPrompt
-            })
+          const {
+            conversationId,
+            modelMessages,
+            modelId,
+            provider,
+            systemPrompt,
+            additionalOptions,
+            tools
+          } = await getConnectorChatContext({
+            connectorName: 'telegram',
+            newPrompt
+          })
 
           // show typing in ui
           ctx.replyWithChatAction('typing').catch(() => {})
@@ -115,8 +129,38 @@ class TelegramBotService {
             messages: modelMessages,
             conversationId,
             connectorName: 'telegram',
-            additionalOptions: connector?.additionalOptions,
-            tools: connector?.tools
+            additionalOptions,
+            tools,
+            onToolExecutionStart: async (event) => {
+              //show a tool called ui
+              const toolCard = formatTelegramToolBlock(
+                event.toolCall.toolName,
+                event.toolCall.input
+              )
+              await replyHtml(ctx, toolCard)
+              ctx.replyWithChatAction('typing').catch(() => {})
+            },
+            onToolExecutionEnd: async (event) => {
+              // handling for image gen tool
+              if (event.toolCall.toolName === 'img_gen') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const rawOutput = (event.toolOutput as any)?.output
+                const relativePath: string | undefined = rawOutput?.relativePath
+                // if relative path exist
+                if (relativePath) {
+                  const absolutePath = resolveMediaPath(relativePath)
+                  if (absolutePath) {
+                    // attach photo in chat
+                    await ctx.replyWithPhoto(new InputFile(absolutePath)).catch((err) => {
+                      console.error('[TelegramBot] Failed to send photo:', err)
+                    })
+                    ctx.replyWithChatAction('typing').catch(() => {})
+                  } else {
+                    console.warn('[TelegramBot] Could not resolve media path:', relativePath)
+                  }
+                }
+              }
+            }
           })
 
           // chunk split message if necessary

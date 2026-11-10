@@ -130,6 +130,7 @@ export const getTools = async (
 
           return {
             mediaUrl: mediaUrl,
+            relativePath: relativePath,
             message: 'Image generated successfully'
           }
         } catch {
