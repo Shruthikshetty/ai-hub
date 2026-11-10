@@ -237,7 +237,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     description: 'Ninja chat provider One API key for GPT-5, Claude, Gemini, and 30+ more models.'
   },
   {
-    provider: 'open-code',
+    provider: 'opencode',
     name: 'Open code',
     icon: 'https://models.dev/logos/opencode.svg',
     enabled: false,
@@ -270,7 +270,7 @@ export const AVAILABLE_PROVIDER_LIST = [
   'cohere',
   'alibaba',
   'ninjachat',
-  'open-code'
+  'opencode'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const

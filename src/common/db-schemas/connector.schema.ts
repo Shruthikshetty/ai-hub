@@ -5,6 +5,10 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { conversations } from './conversation.schema'
+import type {
+  ConversationAdditionalOptionType,
+  ConversationToolsSchemaType
+} from '../schemas/conversation.schema'
 
 export const connectors = sqliteTable('connectors', {
   name: text('name').primaryKey(), // name of the connection  telegram , discord etc ...
@@ -21,6 +25,18 @@ export const connectors = sqliteTable('connectors', {
     'You are a helpful, concise AI assistant. Format your replies with clean markdown suitable for Telegram mobile screens.'
   ),
   messageLimit: integer('message_limit'),
+  tools: text('tools', { mode: 'json' })
+    .$type<ConversationToolsSchemaType>()
+    .default({
+      search: { enabled: false },
+      profileAccess: { enabled: false },
+      imageGeneration: { enabled: false }
+    }),
+  additionalOptions: text('additional_options', { mode: 'json' })
+    .$type<ConversationAdditionalOptionType>()
+    .default({
+      speech: { enabled: false }
+    }),
   autoStart: integer('auto_start', { mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' })

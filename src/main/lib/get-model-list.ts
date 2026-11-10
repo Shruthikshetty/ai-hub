@@ -496,7 +496,7 @@ export async function getModelListFromProvider(
         })
         break
       }
-      case 'open-code': {
+      case 'opencode': {
         response = await axios.get('https://opencode.ai/inference/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds

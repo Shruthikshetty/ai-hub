@@ -1,11 +1,12 @@
 import { Composer, Context } from 'grammy'
 import {
   getInfoConnectorByName,
-  setNewConversationByConnectorName
+  setNewConversationByConnectorName,
+  splitMessage,
+  truncateText
 } from '../../lib/connector-utils'
 
-// create a composer instance
-export const telegramCommands = new Composer()
+// constants --------------
 
 // list of all commands
 export const TELEGRAM_BOT_COMMAND_MENU = [
@@ -15,7 +16,12 @@ export const TELEGRAM_BOT_COMMAND_MENU = [
   { command: 'new_chat', description: 'start a fresh chat, by forgetting past messages' }
 ]
 
-// constants
+const TOOL_ICONS: Record<string, string> = {
+  search: '🔍',
+  profile: '👤',
+  img_gen: '🎨'
+}
+
 const helpMessage = [
   `*🤖 Welcome to AI Hub Telegram Bot!*`,
   `_Your personal AI assistant right inside Telegram._`,
@@ -27,7 +33,34 @@ const helpMessage = [
   `⚠️ *Note:* _Please wait for a reply before sending another message._`
 ].join('\n')
 
-// utils
+// create a composer instance
+export const telegramCommands = new Composer()
+
+// utils --------
+
+// strip html tags
+export function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+export async function replyHtml(ctx: Context, text: string) {
+  try {
+    await ctx.reply(text, { parse_mode: 'HTML' })
+  } catch (err) {
+    console.warn(
+      '[Telegram] replyHtml failed with parse_mode: HTML. Falling back to plain text. Error:',
+      err
+    )
+    for (const chunk of splitMessage(text)) {
+      try {
+        await ctx.reply(chunk)
+      } catch (fallbackErr) {
+        console.warn('[Telegram] replyHtml fallback plain text failed:', fallbackErr)
+      }
+    }
+  }
+}
+
 export async function replyMarkdown(ctx: Context, text: string) {
   try {
     await ctx.reply(text, { parse_mode: 'Markdown' })
@@ -36,8 +69,36 @@ export async function replyMarkdown(ctx: Context, text: string) {
       '[Telegram] replyMarkdown failed with parse_mode: Markdown. Falling back to plain text. Error:',
       err
     )
-    await ctx.reply(text)
+    for (const chunk of splitMessage(text)) {
+      try {
+        await ctx.reply(chunk)
+      } catch (fallbackErr) {
+        console.warn('[Telegram] replyMarkdown fallback plain text failed:', fallbackErr)
+      }
+    }
   }
+}
+
+// tool call ui for telegram collapsible block
+export function formatTelegramToolBlock(toolName: string, input: unknown): string {
+  const icon = TOOL_ICONS?.[toolName] || '🛠️'
+
+  let details = ''
+  // handle known cases else fallback to raw input
+  if (typeof input === 'object' && input !== null) {
+    const record = input as Record<string, unknown>
+    if ('query' in record && typeof record.query === 'string') {
+      details = `\n<b>Query:</b> <code>${escapeHtml(truncateText(record.query))}</code>`
+    } else if ('prompt' in record && typeof record.prompt === 'string') {
+      details = `\n<b>Prompt:</b> <code>${escapeHtml(truncateText(record.prompt))}</code>`
+    } else if (Object.keys(record).length > 0) {
+      details = `\n<code>${escapeHtml(truncateText(JSON.stringify(record)))}</code>`
+    }
+  } else if (input) {
+    details = `\n<code>${escapeHtml(truncateText(String(input)))}</code>`
+  }
+
+  return `<blockquote expandable>${icon} <b>Tool Called:</b> ${escapeHtml(toolName)} : ${details}</blockquote>`
 }
 
 // all the comments handlers go here

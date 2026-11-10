@@ -1,4 +1,8 @@
 import { z } from 'zod'
+import {
+  chatToolsValidationSchema,
+  chatAdditionalOptionsValidationSchema
+} from './chat-options-validation.schema'
 
 /**
  * Validation schema for the connector configuration form.
@@ -15,6 +19,8 @@ export const connectorFormValidationSchema = z.object({
     .int('must be a integer')
     .positive('must be a positive number')
     .nullish(),
+  tools: chatToolsValidationSchema,
+  additionalOptions: chatAdditionalOptionsValidationSchema,
   autoStart: z.boolean()
 })
 

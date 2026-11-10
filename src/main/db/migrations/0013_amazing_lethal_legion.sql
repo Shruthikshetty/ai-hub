@@ -1,0 +1,2 @@
+ALTER TABLE `connectors` ADD `tools` text DEFAULT '{"search":{"enabled":false},"imageGeneration":{"enabled":false}}';--> statement-breakpoint
+ALTER TABLE `connectors` ADD `additional_options` text DEFAULT '{"speech":{"enabled":false}}';

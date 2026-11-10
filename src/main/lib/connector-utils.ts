@@ -1,10 +1,11 @@
-import { convertToModelMessages, generateText, ModelMessage } from 'ai'
+import { convertToModelMessages, generateText, isStepCount, ModelMessage } from 'ai'
 import { getProviderInstanceModel } from './get-provider-instance'
 import db from '../db'
-import { connectors, conversations, messages } from '../db/schema'
+import { ConnectorGetSchema, connectors, conversations, messages } from '../db/schema'
 import { asc, count, desc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
+import { getTools } from './get-tools'
 export { autoStartConnectors } from './startup'
 
 /**
@@ -41,6 +42,19 @@ export function splitMessage(text: string, maxLength: number = 4000): string[] {
 }
 
 /**
+ * Safely truncates a string to a given maxLength without breaking UTF-16 surrogate pairs.
+ */
+export function truncateText(
+  text: string,
+  maxLength: number = 4000,
+  suffix: string = '...'
+): string {
+  if (text.length <= maxLength) return text
+  const sliced = text.slice(0, maxLength).replace(/[\uD800-\uDBFF]$/, '')
+  return `${sliced}${suffix}`
+}
+
+/**
  *  fetches the messages of a conversation and converts into the model readable format
  *  if no conversations id passed creates new conversation and updates the connector
  */
@@ -74,7 +88,9 @@ export async function getConnectorChatContext({
         modelId: connector.modelId,
         provider: connector.provider,
         systemPrompt: connector.systemPrompt,
-        title: `${connectorName} chat` // default title
+        title: `${connectorName} chat`, // default title,
+        additionalOptions: connector?.additionalOptions,
+        tools: connector?.tools
       })
       .returning()
 
@@ -122,7 +138,9 @@ export async function getConnectorChatContext({
     modelMessages,
     modelId: connector.modelId,
     provider: connector.provider,
-    systemPrompt: connector?.systemPrompt ?? undefined
+    systemPrompt: connector?.systemPrompt ?? undefined,
+    additionalOptions: connector.additionalOptions,
+    tools: connector.tools
   }
 }
 
@@ -136,7 +154,11 @@ export async function getAiResponseForBotNonStream({
   systemPrompt,
   messages,
   conversationId,
-  connectorName
+  connectorName,
+  additionalOptions,
+  tools,
+  onToolExecutionStart,
+  onToolExecutionEnd
 }: {
   modelId: string
   provider: string
@@ -144,17 +166,34 @@ export async function getAiResponseForBotNonStream({
   messages: ModelMessage[]
   conversationId: number
   connectorName?: string
+  additionalOptions?: ConnectorGetSchema['additionalOptions']
+  tools?: ConnectorGetSchema['tools']
+  onToolExecutionStart?: Parameters<typeof generateText>[0]['onToolExecutionStart']
+  onToolExecutionEnd?: Parameters<typeof generateText>[0]['onToolExecutionEnd']
 }): Promise<string> {
   // const get the provider as per user model
   const modelProvider = await getProviderInstanceModel({
     provider
   })
+  // get the tools
+  const toolList = tools
+    ? await getTools({
+        provider: provider,
+        modelId: modelId,
+        additionalOptions,
+        tools
+      })
+    : undefined
 
   // generate response
   const { text: assistantMessage, usage } = await generateText({
     model: modelProvider(modelId),
     instructions: systemPrompt,
-    messages: messages
+    messages: messages,
+    tools: toolList,
+    stopWhen: isStepCount(20),
+    onToolExecutionStart,
+    onToolExecutionEnd
   })
 
   // generate title after 2nd user prompt (when total conversation count is exactly 3)
@@ -244,7 +283,9 @@ export const setNewConversationByConnectorName = async (name: string) => {
         modelId: connector.modelId,
         provider: connector.provider,
         systemPrompt: connector.systemPrompt,
-        title: `${connector.displayName} chat` // default title
+        title: `${connector.displayName} chat`, // default title,
+        additionalOptions: connector?.additionalOptions,
+        tools: connector?.tools
       })
       .returning()
 
