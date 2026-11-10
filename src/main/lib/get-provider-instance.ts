@@ -154,6 +154,15 @@ export async function getProviderInstanceModel({
       })
       return openCodeInstance
     }
+    case 'demonroute': {
+      // OpenAI-compatible chat completions endpoint
+      const demonRouteInstance = createOpenAICompatible({
+        name: 'demonroute',
+        baseURL: 'https://api.demonroute.com/v1',
+        apiKey
+      })
+      return demonRouteInstance
+    }
     case 'mistral': {
       const mistralInstance = createMistral({
         apiKey
