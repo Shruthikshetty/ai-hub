@@ -174,6 +174,7 @@ function AddUpdateForm({ mode, onClose, data }: McpCardProps) {
 
   // function to test the MCP Server
   const handleTest = async () => {
+    setIsTested(false)
     // validate the form
     const errors = await form.validate('submit')
     // Check if there are errors (or !form.state.isValid)

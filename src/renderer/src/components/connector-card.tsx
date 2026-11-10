@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { MessageSquare, Trash2 } from 'lucide-react'
 import { Button } from './ui/button'
 import { useForm } from '@tanstack/react-form'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   connectorFormValidationSchema,
   ConnectorFormValidationSchemaType
@@ -17,10 +17,10 @@ import {
 } from '@renderer/components/ui/field'
 import { Input } from './ui/input'
 import { MultiInput } from './multi-input'
-import AppModelSelector from './model-selector'
 import { Textarea } from './ui/textarea'
 import { Switch } from './ui/switch'
 import { Separator } from './ui/separator'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import {
   useAddConnector,
   useDeleteConnector,
@@ -34,6 +34,10 @@ import { Spinner } from './ui/spinner'
 import { FetchAllConnectorResponseSchemaType } from '@common/schemas/connector.schema'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion'
 import { handleNumberChangeWithNull } from '@renderer/lib/form.utils'
+import { useFetchProviders } from '@renderer/services/provider'
+import { PROVIDERS_WITH_SEARCH_TOOL } from '@common/constants/global.constants'
+import { VOICE_OPTIONS } from '@common/constants/voices.constants'
+import AppModelSelector from '@renderer/components/model-selector'
 
 /**
  * Card that display the connector details and allows to set up connections
@@ -71,6 +75,20 @@ const ConnectorCard = ({
     }
   }
 
+  // fetch the providers list for search tool
+  const { data: providers } = useFetchProviders()
+  // filter out the options for search which are enabled by user
+  const searchProvidersOptions = useMemo(() => {
+    if (!providers?.data) return []
+
+    return providers.data.reduce<string[]>((acc, provider) => {
+      if (provider.enabled && !provider.hide && PROVIDERS_WITH_SEARCH_TOOL.has(provider.provider)) {
+        acc.push(provider.provider)
+      }
+      return acc
+    }, [])
+  }, [providers])
+
   // for used to take in the connector details
   const form = useForm({
     defaultValues: {
@@ -80,7 +98,28 @@ const ConnectorCard = ({
       provider: connector.provider ?? '',
       systemPrompt: connector.systemPrompt ?? '',
       messageLimit: connector.messageLimit ?? null,
-      autoStart: connector.autoStart ?? false
+      autoStart: connector.autoStart ?? false,
+      tools: {
+        search: {
+          enabled: connector.tools?.search?.enabled ?? false,
+          provider: connector.tools?.search?.provider ?? ''
+        },
+        profileAccess: {
+          enabled: connector.tools?.profileAccess?.enabled ?? false
+        },
+        imageGeneration: {
+          enabled: connector.tools?.imageGeneration?.enabled ?? false,
+          provider: connector.tools?.imageGeneration?.provider ?? '',
+          modelId: connector.tools?.imageGeneration?.modelId ?? ''
+        }
+      },
+      additionalOptions: {
+        speech: {
+          enabled: connector.additionalOptions?.speech?.enabled ?? false,
+          voice: connector.additionalOptions?.speech?.voice ?? undefined,
+          model: connector.additionalOptions?.speech?.model ?? undefined
+        }
+      }
     } as ConnectorFormValidationSchemaType,
     validators: { onSubmit: connectorFormValidationSchema },
     onSubmit: async ({ value }) => {
@@ -279,7 +318,7 @@ const ConnectorCard = ({
               <AccordionTrigger className="text-muted-foreground text-base font-bold hover:no-underline py-2 cursor-pointer hover:text-foreground transition-colors">
                 ADDITIONAL OPTIONS
               </AccordionTrigger>
-              <AccordionContent className="pt-2">
+              <AccordionContent className="pt-2 flex flex-col gap-4">
                 {/* optional message limit */}
                 <form.Field name="messageLimit">
                   {(field) => {
@@ -306,6 +345,274 @@ const ConnectorCard = ({
                     )
                   }}
                 </form.Field>
+                {/* Search tool */}
+                <form.Field name="tools.search.enabled">
+                  {(field) => {
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <div className="flex flex-row items-center justify-between">
+                          <FieldLabel className="text-sm font-semibold" htmlFor={field.name}>
+                            Search
+                          </FieldLabel>
+                          <Switch
+                            id={field.name}
+                            name={field.name}
+                            className="shrink-0"
+                            checked={field.state.value}
+                            onCheckedChange={(value) => {
+                              field.handleChange(value)
+                              if (!value) {
+                                form.setFieldValue('tools.search.provider', '')
+                              }
+                            }}
+                          />
+                        </div>
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                      </Field>
+                    )
+                  }}
+                </form.Field>
+
+                {/* Provider search options selector */}
+                <form.Subscribe selector={(state) => state.values.tools?.search?.enabled}>
+                  {(isSearchEnabled) => {
+                    if (!isSearchEnabled) return null
+                    return (
+                      <form.Field name="tools.search.provider">
+                        {(field) => (
+                          <Field className="flex flex-col gap-1 my-1 animate-in fade-in slide-in-from-top-1">
+                            <Select
+                              onValueChange={(value) => field.handleChange(value)}
+                              value={field.state.value}
+                              disabled={searchProvidersOptions.length === 0}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select a provider" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {searchProvidersOptions.map((provider) => (
+                                  <SelectItem key={provider} value={provider}>
+                                    {provider}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {field.state.meta.isTouched && field.state.meta.errors && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                            <p className="text-xs text-muted-foreground mt-3">
+                              ❗Note : if your provider or model does not support search tool then
+                              it will not be used (some tools will only support their provider
+                              models)
+                            </p>
+                          </Field>
+                        )}
+                      </form.Field>
+                    )
+                  }}
+                </form.Subscribe>
+
+                {/* Image generation tool */}
+                <form.Field name="tools.imageGeneration.enabled">
+                  {(field) => {
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <div className="flex flex-row items-center justify-between">
+                          <FieldLabel className=" text-sm font-semibold" htmlFor={field.name}>
+                            Image generation
+                          </FieldLabel>
+                          <Switch
+                            id={field.name}
+                            name={field.name}
+                            className="shrink-0"
+                            checked={field.state.value}
+                            onCheckedChange={(value) => {
+                              field.handleChange(value)
+                              if (!value) {
+                                form.setFieldValue('tools.imageGeneration.provider', '')
+                                form.setFieldValue('tools.imageGeneration.modelId', '')
+                              }
+                            }}
+                          />
+                        </div>
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                      </Field>
+                    )
+                  }}
+                </form.Field>
+
+                {/* Image model selector */}
+                <form.Subscribe selector={(state) => state.values.tools?.imageGeneration?.enabled}>
+                  {(isImageGenerationEnabled) => {
+                    if (!isImageGenerationEnabled) return null
+                    return (
+                      <form.Field name="tools.imageGeneration.provider">
+                        {(providerField) => (
+                          <form.Field name="tools.imageGeneration.modelId">
+                            {(modelField) => {
+                              const isProviderInvalid =
+                                providerField.state.meta.isTouched &&
+                                !providerField.state.meta.isValid
+                              const isModelInvalid =
+                                modelField.state.meta.isTouched && !modelField.state.meta.isValid
+                              return (
+                                <Field className="flex flex-col gap-1 my-1 animate-in fade-in slide-in-from-top-1">
+                                  <AppModelSelector
+                                    modelType="image"
+                                    output="image"
+                                    className="border border-input bg-input/30"
+                                    disableDefaultSelection
+                                    controlled
+                                    selectedModelId={modelField.state.value}
+                                    selectedProvider={providerField.state.value}
+                                    onSelect={(selected) => {
+                                      providerField.handleChange(selected.provider)
+                                      modelField.handleChange(selected.id)
+                                    }}
+                                  />
+                                  {(isModelInvalid || isProviderInvalid) && (
+                                    <p className="text-sm font-normal text-destructive">
+                                      Please select a model
+                                    </p>
+                                  )}
+                                </Field>
+                              )
+                            }}
+                          </form.Field>
+                        )}
+                      </form.Field>
+                    )
+                  }}
+                </form.Subscribe>
+
+                {/* Speech toggle */}
+                <form.Field name="additionalOptions.speech.enabled">
+                  {(field) => {
+                    const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <div className="flex flex-row items-center justify-between">
+                          <FieldLabel className="text-sm font-semibold" htmlFor={field.name}>
+                            Speech (Text-to-Speech)
+                          </FieldLabel>
+                          <Switch
+                            id={field.name}
+                            name={field.name}
+                            className="shrink-0"
+                            checked={field.state.value}
+                            onCheckedChange={(value) => {
+                              field.handleChange(value)
+                              if (!value) {
+                                form.setFieldValue('additionalOptions.speech.model', undefined)
+                                form.setFieldValue('additionalOptions.speech.voice', undefined)
+                              }
+                            }}
+                          />
+                        </div>
+                        {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                      </Field>
+                    )
+                  }}
+                </form.Field>
+                {/* Speech model and voice selector */}
+                <form.Subscribe
+                  selector={(state) => state.values.additionalOptions?.speech?.enabled}
+                >
+                  {(isSpeechEnabled) => {
+                    if (!isSpeechEnabled) return null
+                    return (
+                      <form.Field name="additionalOptions.speech.model.provider">
+                        {(providerField) => (
+                          <form.Field name="additionalOptions.speech.model.id">
+                            {(modelIdField) => (
+                              <form.Field name="additionalOptions.speech.model.name">
+                                {(modelNameField) => {
+                                  const isProviderInvalid =
+                                    providerField.state.meta.isTouched &&
+                                    !providerField.state.meta.isValid
+                                  const isModelInvalid =
+                                    modelIdField.state.meta.isTouched &&
+                                    !modelIdField.state.meta.isValid
+
+                                  const selectedProvider = providerField.state.value as
+                                    string | undefined
+                                  const voiceOptions: readonly { id: string; label: string }[] =
+                                    selectedProvider && selectedProvider in VOICE_OPTIONS
+                                      ? VOICE_OPTIONS[
+                                          selectedProvider as keyof typeof VOICE_OPTIONS
+                                        ]
+                                      : []
+
+                                  return (
+                                    <Field className="flex flex-col gap-2 my-1 animate-in fade-in slide-in-from-top-1">
+                                      <p className="text-xs text-muted-foreground">
+                                        ❗Note : if you get an error try switching the model and try
+                                        selecting a voice (only openai is supported currently)
+                                      </p>
+                                      <AppModelSelector
+                                        modelType="tts"
+                                        output="audio"
+                                        className="border border-input bg-input/30"
+                                        disableDefaultSelection
+                                        controlled
+                                        selectedModelId={modelIdField.state.value}
+                                        selectedProvider={providerField.state.value}
+                                        onSelect={(selected) => {
+                                          providerField.handleChange(selected.provider)
+                                          modelIdField.handleChange(selected.id)
+                                          modelNameField.handleChange(selected.name)
+                                          form.setFieldValue(
+                                            'additionalOptions.speech.voice',
+                                            undefined
+                                          )
+                                        }}
+                                      />
+                                      {(isModelInvalid || isProviderInvalid) && (
+                                        <p className="text-sm font-normal text-destructive">
+                                          Please select a model
+                                        </p>
+                                      )}
+                                      {voiceOptions.length > 0 && (
+                                        <form.Field name="additionalOptions.speech.voice">
+                                          {(voiceField) => (
+                                            <Field className="flex flex-col gap-1">
+                                              <FieldLabel className="text-muted-foreground text-xs font-semibold">
+                                                Voice
+                                              </FieldLabel>
+                                              <Select
+                                                value={voiceField.state.value ?? ''}
+                                                onValueChange={(value) =>
+                                                  voiceField.handleChange(value)
+                                                }
+                                              >
+                                                <SelectTrigger className="border border-input bg-input/30 w-full">
+                                                  <SelectValue placeholder="Select a voice" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  {voiceOptions.map((voice) => (
+                                                    <SelectItem key={voice.id} value={voice.id}>
+                                                      {voice.label}
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectContent>
+                                              </Select>
+                                            </Field>
+                                          )}
+                                        </form.Field>
+                                      )}
+                                    </Field>
+                                  )
+                                }}
+                              </form.Field>
+                            )}
+                          </form.Field>
+                        )}
+                      </form.Field>
+                    )
+                  }}
+                </form.Subscribe>
               </AccordionContent>
             </AccordionItem>
           </Accordion>

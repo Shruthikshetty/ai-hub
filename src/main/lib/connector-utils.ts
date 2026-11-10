@@ -74,7 +74,9 @@ export async function getConnectorChatContext({
         modelId: connector.modelId,
         provider: connector.provider,
         systemPrompt: connector.systemPrompt,
-        title: `${connectorName} chat` // default title
+        title: `${connectorName} chat`, // default title,
+        additionalOptions: connector?.additionalOptions,
+        tools: connector?.tools
       })
       .returning()
 
@@ -244,7 +246,9 @@ export const setNewConversationByConnectorName = async (name: string) => {
         modelId: connector.modelId,
         provider: connector.provider,
         systemPrompt: connector.systemPrompt,
-        title: `${connector.displayName} chat` // default title
+        title: `${connector.displayName} chat`, // default title,
+        additionalOptions: connector?.additionalOptions,
+        tools: connector?.tools
       })
       .returning()
 
