@@ -8,7 +8,7 @@ AI Hub is your personal AI aggregator built on the **Bring Your Own Key (BYOK)**
 - **Multi-Provider Support**: Seamlessly switch between 20+ AI providers — cloud or local.
 - **Advanced AI Chat**: Modular chat interface with multi-model support, conversation history, and context persistence.
 - **Built-in AI Tools & Extensibility**: Extend model capabilities with tools available within the chat:
-  - 🔍 **Web Search** — Ground model responses with real-time search results (supported on OpenAI, xAI, Groq, Google, Vercel AI Gateway).
+  - 🔍 **Web Search** — Ground model responses with real-time search results (supported on OpenAI [OpenAI only], xAI, Groq [only `openai/gpt-oss-20b`, `openai/gpt-oss-120b`], Google, Vercel AI Gateway).
   - 🔌 **Model Context Protocol (MCP)** — Connect custom local (`stdio`) and remote (`http`) MCP servers to dynamically equip models with external tools and workflows.
   - 👤 **User Profile Access** — Models can access your personal profile for more personalized responses.
   - 🖼️ **Image Generation** — Generate images directly from the chat interface using supported models.
@@ -44,7 +44,7 @@ AI Hub supports a wide range of cloud and local providers:
 
 - **Runtime**: [Electron](https://www.electronjs.org/), [Node.js](https://nodejs.org/)
 - **Frontend**: [React](https://react.dev/) (v19), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/) (v4), [Zustand](https://zustand-demo.pmnd.rs/)
-- **UI & Styling**: [Radix UI](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/), [Lucide React](https://lucide.dev/), [Streamdown](https://github.com/streamdown/streamdown)
+- **UI & Styling**: [Radix UI](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/), [Lucide React](https://lucide.dev/), [Streamdown](https://github.com/vercel/streamdown)
 - **Backend/Logic**: [Hono](https://hono.dev/)
 - **Data Fetching**: [TanStack React Query](https://tanstack.com/query/latest)
 - **Database**: [Drizzle ORM](https://orm.drizzle.team/), [LibSQL](https://github.com/tursodatabase/libsql) (SQLite)

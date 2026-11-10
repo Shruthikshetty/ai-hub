@@ -42,6 +42,19 @@ export function splitMessage(text: string, maxLength: number = 4000): string[] {
 }
 
 /**
+ * Safely truncates a string to a given maxLength without breaking UTF-16 surrogate pairs.
+ */
+export function truncateText(
+  text: string,
+  maxLength: number = 4000,
+  suffix: string = '...'
+): string {
+  if (text.length <= maxLength) return text
+  const sliced = text.slice(0, maxLength).replace(/[\uD800-\uDBFF]$/, '')
+  return `${sliced}${suffix}`
+}
+
+/**
  *  fetches the messages of a conversation and converts into the model readable format
  *  if no conversations id passed creates new conversation and updates the connector
  */
