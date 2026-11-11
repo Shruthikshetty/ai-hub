@@ -20,19 +20,27 @@ export const generateImageProviderBasedOption = ({
   quality: string | undefined
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): Record<string, any> | undefined => {
-  if (!provider || !quality) return undefined
+  if (!provider) return undefined
   switch (provider) {
     case 'openai':
+      if (!quality) return undefined
       return {
         openai: {
           quality: quality
         } as OpenAiImageModelGenerationOptions
       }
     case 'xai':
+      if (!quality) return undefined
       return {
         xai: {
           quality: quality === DEFAULT_IMAGE_ASPECT_RATIO ? undefined : quality
         } as XaiImageModelOptions
+      }
+    case 'custom':
+      return {
+        [provider]: {
+          response_format: 'b64_json'
+        }
       }
     default:
       return undefined

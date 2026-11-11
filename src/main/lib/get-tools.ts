@@ -9,6 +9,7 @@ import z from 'zod'
 import db from '../db'
 import { generateImage } from 'ai'
 import { deleteMediaFile, saveFile } from './file-storage'
+import { generateImageProviderBasedOption } from './image-gen-options-per-provider'
 import { GoogleProvider } from '@ai-sdk/google'
 import { GroqProvider } from '@ai-sdk/groq'
 import { mcpService } from '../services/mcp/mcp.service'
@@ -103,7 +104,8 @@ export const getTools = async (
         try {
           const { image } = await generateImage({
             model: modelProvider.image(model),
-            prompt
+            prompt,
+            providerOptions: generateImageProviderBasedOption({ provider, quality: undefined })
           })
 
           // store the image in file and get the url

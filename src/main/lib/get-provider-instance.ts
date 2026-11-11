@@ -138,7 +138,8 @@ export async function getProviderInstanceModel({
         baseURL,
         apiKey: 'none' // @TODO: does not support auth
       })
-
+      // assign imageModel to image such that our handlers are not disturbed
+      Object.assign(customInstance, { image: customInstance.imageModel })
       return customInstance
     }
     case 'poe': {
@@ -162,10 +163,12 @@ export async function getProviderInstanceModel({
         baseURL: 'https://nokeep.ai/v1',
         apiKey
       })
+      // assign imageModel to image such that our handlers are not disturbed
+      Object.assign(noKeepInstance, { image: noKeepInstance.imageModel })
       return noKeepInstance
     }
     case 'nano-gpt': {
-      const nanoGptInstance = createOpenAICompatible({
+      const nanoGptInstance = createOpenAI({
         name: 'nano-gpt',
         baseURL: 'https://nano-gpt.com/api/v1',
         apiKey
