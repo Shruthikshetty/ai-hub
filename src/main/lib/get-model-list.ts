@@ -3,6 +3,7 @@ import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
 import {
+  buildAnthropicModel,
   buildCohereModel,
   buildCustomModel,
   buildFireworksAiModel,
@@ -309,6 +310,31 @@ type CohereResponse = {
 }
 
 /**
+ * Anthropic model type
+ * doc https://docs.anthropic.com/en/api/models-list
+ */
+export type AnthropicModel = {
+  id: string
+  display_name?: string
+  type?: string
+  created_at?: string
+  capabilities?: {
+    image_input?: { supported?: boolean }
+    pdf_input?: { supported?: boolean }
+    thinking?: { supported?: boolean }
+    server_tools?: {
+      web_search?: { supported?: boolean }
+      code_execution?: { supported?: boolean }
+    }
+  }
+}
+
+export type AnthropicResponse = {
+  data: AnthropicModel[]
+  has_more?: boolean
+}
+
+/**
  * Ninja chat model type
  * doc https://docs.ninjachat.ai/models#fetch-models-via-api
  */
@@ -503,6 +529,16 @@ export async function getModelListFromProvider(
         })
         break
       }
+      case 'anthropic': {
+        response = await axios.get('https://api.anthropic.com/v1/models', {
+          headers: {
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01'
+          },
+          timeout: 4000
+        })
+        break
+      }
       case 'huggingface': {
         // Each request targets one pipeline_tag — HuggingFace only supports one at a time.
         // Fire them all in parallel and merge the results.
@@ -649,6 +685,11 @@ export async function getModelListFromProvider(
 
         // Manually append image models since they aren't returned by the /models endpoint
         return [...fetchedModels, ...NINJACHAT_STATIC_MODELS]
+      }
+      case 'anthropic': {
+        const data = (response.data as AnthropicResponse).data
+        if (!data || !Array.isArray(data)) return []
+        return data.map((model: AnthropicModel) => buildAnthropicModel(model, provider.provider))
       }
       case 'custom': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data

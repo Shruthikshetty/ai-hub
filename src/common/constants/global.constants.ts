@@ -246,11 +246,22 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     siteUrl: 'https://opencode.ai/console',
     description:
       'OpenCode provider offering curated models optimized for coding agents and developer workflows.'
+  },
+  {
+    provider: 'anthropic',
+    name: 'Anthropic',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/anthropic.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://platform.claude.com/dashboard',
+    description: 'Anthropic Claude models including opus, sonnet, fable and haiku'
   }
 ]
 
 export const AVAILABLE_PROVIDER_LIST = [
   'openai',
+  'anthropic',
   'ollama',
   'openrouter',
   'google',

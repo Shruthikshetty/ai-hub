@@ -1,5 +1,6 @@
 import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
 import {
+  AnthropicModel,
   CohereModel,
   FireworksAiModel,
   GatewayModel,
@@ -586,6 +587,34 @@ export function buildNinjaChatModel(
       realtime: false,
       vision: false,
       videoReasoning: false
+    }
+  }
+}
+
+/**
+ * function to extract capabilities from an Anthropic model
+ */
+export function buildAnthropicModel(
+  model: AnthropicModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const isVision = model.capabilities?.image_input?.supported ?? false
+  const inputs: ModelIOType[] = ['text']
+
+  if (isVision) {
+    inputs.push('image')
+  }
+
+  return {
+    id: model.id,
+    name: model.display_name ?? model.id,
+    provider,
+    inputs,
+    outputs: ['text'],
+    capabilities: {
+      vision: isVision,
+      videoReasoning: false,
+      realtime: false
     }
   }
 }

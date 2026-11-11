@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@ai-sdk/alibaba": "2.0.82",
+    "@ai-sdk/anthropic": "^4.0.102",
     "@ai-sdk/cerebras": "3.0.84",
     "@ai-sdk/cohere": "4.0.75",
     "@ai-sdk/elevenlabs": "3.0.79",

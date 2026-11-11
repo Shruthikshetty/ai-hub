@@ -1,4 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
+import { createAnthropic } from '@ai-sdk/anthropic'
 import { ModelProviderType, ModelSchemaType } from '../../common/schemas/model.schema'
 import db from '../db'
 import { decryptText } from '../../common/utils/encryption.util'
@@ -159,6 +160,12 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return mistralInstance
+    }
+    case 'anthropic': {
+      const anthropicInstance = createAnthropic({
+        apiKey
+      })
+      return anthropicInstance
     }
     case 'cerebras': {
       const cerebrasInstance = createCerebras({
