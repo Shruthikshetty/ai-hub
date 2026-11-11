@@ -18,7 +18,8 @@ import {
   buildTogetherAiModel,
   buildXaiModel,
   buildAlibabaModel,
-  buildNinjaChatModel
+  buildNinjaChatModel,
+  buildNoKeepModel
 } from './extract-model-capabilities'
 import { NINJACHAT_STATIC_MODELS } from '../../common/custom-providers/ninjachat'
 import { OPENAI_UNLISTED_MODELS } from '../../common/constants/models.constnats'
@@ -369,6 +370,21 @@ type NinjaChatResponse = {
 }
 
 /**
+ * nokeep model type
+ */
+export type NoKeepModel = {
+  id: string
+  name: string
+  type?: 'image' | 'video' | 'text' | string
+  input_modalities?: string[]
+  output_modalities?: string[]
+  context_length?: number
+  max_output_tokens?: number
+  reasoning_efforts?: string[]
+  endpoint?: string
+}
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -526,6 +542,20 @@ export async function getModelListFromProvider(
         response = await axios.get('https://opencode.ai/inference/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
+        })
+        break
+      }
+      case 'nokeep': {
+        response = await axios.get('https://nokeep.ai/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 4000
+        })
+        break
+      }
+      case 'nano-gpt': {
+        response = await axios.get('https://nano-gpt.com/api/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 4000
         })
         break
       }
@@ -692,6 +722,16 @@ export async function getModelListFromProvider(
         return data.map((model: AnthropicModel) => buildAnthropicModel(model, provider.provider))
       }
       case 'custom': {
+        const data = (response.data as OpenAiResponse<OpenAiModel>).data
+        if (!data) return []
+        return data.map((model: OpenAiModel) => buildCustomModel(model.id, provider.provider))
+      }
+      case 'nokeep': {
+        const data = (response.data as OpenAiResponse<NoKeepModel>).data
+        if (!data) return []
+        return data.map((model: NoKeepModel) => buildNoKeepModel(model, provider.provider))
+      }
+      case 'nano-gpt': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
         if (!data) return []
         return data.map((model: OpenAiModel) => buildCustomModel(model.id, provider.provider))

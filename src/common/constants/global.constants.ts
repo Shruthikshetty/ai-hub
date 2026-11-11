@@ -256,6 +256,27 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     server: false,
     siteUrl: 'https://platform.claude.com/dashboard',
     description: 'Anthropic Claude models including opus, sonnet, fable and haiku'
+  },
+  {
+    provider: 'nokeep',
+    name: 'nokeep',
+    icon: 'https://nokeep.ai/logo.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://nokeep.ai/console',
+    description: 'Privacy-focused, zero-retention models including DeepSeek and GLM flash models.'
+  },
+  {
+    provider: 'nano-gpt',
+    name: 'NanoGPT',
+    icon: 'https://models.dev/logos/nano-gpt.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://nano-gpt.com',
+    description:
+      'Privacy first Pay-per-prompt AI aggregator with access to top open and proprietary models.'
   }
 ]
 
@@ -281,7 +302,9 @@ export const AVAILABLE_PROVIDER_LIST = [
   'cohere',
   'alibaba',
   'ninjachat',
-  'opencode'
+  'opencode',
+  'nokeep',
+  'nano-gpt'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const

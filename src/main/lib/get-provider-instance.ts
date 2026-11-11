@@ -133,7 +133,7 @@ export async function getProviderInstanceModel({
         providerDetails?.serverUrl || 'http://localhost:8080',
         '/v1'
       )
-      const customInstance = createOpenAI({
+      const customInstance = createOpenAICompatible({
         name: 'custom',
         baseURL,
         apiKey: 'none' // @TODO: does not support auth
@@ -149,11 +149,28 @@ export async function getProviderInstanceModel({
       return poeInstance
     }
     case 'opencode': {
-      const openCodeInstance = createOpenAI({
+      const openCodeInstance = createOpenAICompatible({
+        name: 'opencode',
         baseURL: 'https://opencode.ai/inference/openai/v1',
         apiKey
       })
       return openCodeInstance
+    }
+    case 'nokeep': {
+      const noKeepInstance = createOpenAICompatible({
+        name: 'nokeep',
+        baseURL: 'https://nokeep.ai/v1',
+        apiKey
+      })
+      return noKeepInstance
+    }
+    case 'nano-gpt': {
+      const nanoGptInstance = createOpenAICompatible({
+        name: 'nano-gpt',
+        baseURL: 'https://nano-gpt.com/api/v1',
+        apiKey
+      })
+      return nanoGptInstance
     }
     case 'mistral': {
       const mistralInstance = createMistral({
