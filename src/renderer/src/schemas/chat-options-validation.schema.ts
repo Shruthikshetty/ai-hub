@@ -48,7 +48,7 @@ export const chatAdditionalOptionsValidationSchema = z.object({
   speech: z
     .object({
       enabled: z.boolean(),
-      voice: z.string().optional(),
+      voice: z.string().min(1, 'Voice is required'),
       model: z
         .object({
           id: z.string(),
