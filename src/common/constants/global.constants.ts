@@ -282,6 +282,31 @@ export const MEDIA_REQUEST_TYPES = [...MEDIA_TYPE, 'all'] as const
 
 export const PROVIDERS_WITH_SEARCH_TOOL = new Set(['openai', 'xai', 'google', 'groq', 'vercel'])
 
+// Allowed file extensions for connector attachments (images, text files, PDFs, Word documents)
+export const CONNECTOR_ALLOWED_ATTACHMENT_EXTENSIONS = new Set([
+  // Images
+  'jpg',
+  'jpeg',
+  'png',
+  'webp',
+  'gif',
+  'bmp',
+  'svg',
+  // PDF
+  'pdf',
+  // Text
+  'txt',
+  'text',
+  'md',
+  'markdown',
+  'csv',
+  'json',
+  'log',
+  // Word documents
+  'doc',
+  'docx'
+])
+
 // available connectors
 export const AVAILABLE_CONNECTORS = [
   {

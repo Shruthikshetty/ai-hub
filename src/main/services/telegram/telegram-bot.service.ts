@@ -4,6 +4,7 @@ import { connectors } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { decryptText } from '../../../common/utils/encryption.util'
 import { resolveMediaPath } from '../../lib/file-storage'
+import { MessagePartsType } from '../../../common/schemas/messages.schema'
 import {
   getConnectorChatContext,
   getAiResponseForBotNonStream,
@@ -16,6 +17,7 @@ import {
   TELEGRAM_BOT_COMMAND_MENU,
   telegramCommands
 } from './telegram-commands'
+import { downloadTelegramAttachment } from './telegram-utils'
 
 /**
  * This is the main telegram service that handles the connection and chat with telegram bot
@@ -99,77 +101,123 @@ class TelegramBotService {
         })
 
         // attach listeners
-        newBot.on('message:text', async (ctx) => {
-          // new mess from the user
-          const newPrompt =
-            ctx.message?.text || 'reply to user that u did not receive any valid request'
+        newBot.on(
+          [
+            'message:text',
+            'message:photo',
+            'message:document',
+            'message:voice',
+            'message:audio',
+            'message:video'
+          ],
+          async (ctx) => {
+            // show typing in ui
+            ctx.replyWithChatAction('typing').catch(() => {})
 
-          // get existing messages or create a new conversation
-          const {
-            conversationId,
-            modelMessages,
-            modelId,
-            provider,
-            systemPrompt,
-            additionalOptions,
-            tools
-          } = await getConnectorChatContext({
-            connectorName: 'telegram',
-            newPrompt
-          })
-
-          // show typing in ui
-          ctx.replyWithChatAction('typing').catch(() => {})
-
-          // generate response based on the query provided
-          const response = await getAiResponseForBotNonStream({
-            modelId,
-            provider,
-            systemPrompt,
-            messages: modelMessages,
-            conversationId,
-            connectorName: 'telegram',
-            additionalOptions,
-            tools,
-            onToolExecutionStart: async (event) => {
-              //show a tool called ui
-              const toolCard = formatTelegramToolBlock(
-                event.toolCall.toolName,
-                event.toolCall.input
-              )
-              await replyHtml(ctx, toolCard)
-              ctx.replyWithChatAction('typing').catch(() => {})
-            },
-            onToolExecutionEnd: async (event) => {
-              // handling for image gen tool
-              if (event.toolCall.toolName === 'img_gen') {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const rawOutput = (event.toolOutput as any)?.output
-                const relativePath: string | undefined = rawOutput?.relativePath
-                // if relative path exist
-                if (relativePath) {
-                  const absolutePath = resolveMediaPath(relativePath)
-                  if (absolutePath) {
-                    // attach photo in chat
-                    await ctx.replyWithPhoto(new InputFile(absolutePath)).catch((err) => {
-                      console.error('[TelegramBot] Failed to send photo:', err)
-                    })
-                    ctx.replyWithChatAction('typing').catch(() => {})
-                  } else {
-                    console.warn('[TelegramBot] Could not resolve media path:', relativePath)
+            // collect attachments if present
+            const attachments: MessagePartsType[] = []
+            if (
+              ctx.message?.photo ||
+              ctx.message?.document ||
+              ctx.message?.voice ||
+              ctx.message?.audio ||
+              ctx.message?.video
+            ) {
+              const downloadResult = await downloadTelegramAttachment(ctx, token)
+              if (downloadResult) {
+                if (downloadResult.ignoredNotice) {
+                  await ctx.reply(downloadResult.ignoredNotice)
+                  // if no accompanying text was provided, stop here
+                  if (!ctx.message?.caption && !ctx.message?.text) {
+                    return
                   }
+                }
+                if (downloadResult.error) {
+                  await ctx.reply(downloadResult.error)
+                  return
+                }
+                if (downloadResult.attachment) {
+                  attachments.push(downloadResult.attachment)
                 }
               }
             }
-          })
 
-          // chunk split message if necessary
-          const messageChunks = splitMessage(response)
-          // Send chunks in guaranteed order
-          for (const chunk of messageChunks) {
-            await replyMarkdown(ctx, chunk)
+            // new prompt from the user (from text or caption)
+            const newPrompt =
+              ctx.message?.text ||
+              ctx.message?.caption ||
+              (attachments.length > 0
+                ? 'Sent with attachments'
+                : 'reply to user that u did not receive any valid request')
+
+            // get existing messages or create a new conversation
+            const {
+              conversationId,
+              modelMessages,
+              modelId,
+              provider,
+              systemPrompt,
+              additionalOptions,
+              tools
+            } = await getConnectorChatContext({
+              connectorName: 'telegram',
+              newPrompt,
+              attachments
+            })
+
+            // show typing in ui
+            ctx.replyWithChatAction('typing').catch(() => {})
+
+            // generate response based on the query provided
+            const response = await getAiResponseForBotNonStream({
+              modelId,
+              provider,
+              systemPrompt,
+              messages: modelMessages,
+              conversationId,
+              connectorName: 'telegram',
+              additionalOptions,
+              tools,
+              onToolExecutionStart: async (event) => {
+                //show a tool called ui
+                const toolCard = formatTelegramToolBlock(
+                  event.toolCall.toolName,
+                  event.toolCall.input
+                )
+                await replyHtml(ctx, toolCard)
+                ctx.replyWithChatAction('typing').catch(() => {})
+              },
+              onToolExecutionEnd: async (event) => {
+                // handling for image gen tool
+                if (event.toolCall.toolName === 'img_gen') {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const rawOutput = (event.toolOutput as any)?.output
+                  const relativePath: string | undefined = rawOutput?.relativePath
+                  // if relative path exist
+                  if (relativePath) {
+                    const absolutePath = resolveMediaPath(relativePath)
+                    if (absolutePath) {
+                      // attach photo in chat
+                      await ctx.replyWithPhoto(new InputFile(absolutePath)).catch((err) => {
+                        console.error('[TelegramBot] Failed to send photo:', err)
+                      })
+                      ctx.replyWithChatAction('typing').catch(() => {})
+                    } else {
+                      console.warn('[TelegramBot] Could not resolve media path:', relativePath)
+                    }
+                  }
+                }
+              }
+            })
+
+            // chunk split message if necessary
+            const messageChunks = splitMessage(response)
+            // Send chunks in guaranteed order
+            for (const chunk of messageChunks) {
+              await replyMarkdown(ctx, chunk)
+            }
           }
-        })
+        )
 
         newBot.catch(async (err) => {
           console.error('[TelegramBot] Unhandled bot error:', err.error)
