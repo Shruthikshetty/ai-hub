@@ -48,7 +48,7 @@ export const chatAdditionalOptionsValidationSchema = z.object({
   speech: z
     .object({
       enabled: z.boolean(),
-      voice: z.string().min(1, 'Voice is required'),
+      voice: z.string().optional(),
       model: z
         .object({
           id: z.string(),
@@ -58,12 +58,21 @@ export const chatAdditionalOptionsValidationSchema = z.object({
         .optional()
     })
     .superRefine((data, ctx) => {
-      if (data.enabled && !data.model) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Model is required when speech is enabled',
-          path: ['enabled']
-        })
+      if (data.enabled) {
+        if (!data.model) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Model is required when speech is enabled',
+            path: ['model']
+          })
+        }
+        if (!data.voice || data.voice.trim() === '') {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Voice is required when speech is enabled',
+            path: ['voice']
+          })
+        }
       }
     })
 })

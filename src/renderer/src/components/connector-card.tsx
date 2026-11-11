@@ -623,6 +623,12 @@ const ConnectorCard = ({
                                                   ))}
                                                 </SelectContent>
                                               </Select>
+                                              {voiceField.state.meta.isTouched &&
+                                                !voiceField.state.meta.isValid && (
+                                                  <p className="text-sm font-normal text-destructive">
+                                                    Please select a voice
+                                                  </p>
+                                                )}
                                             </Field>
                                           )}
                                         </form.Field>
