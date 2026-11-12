@@ -6,6 +6,7 @@
       "name": "ai-hub",
       "dependencies": {
         "@ai-sdk/alibaba": "2.0.82",
+        "@ai-sdk/anthropic": "4.0.96",
         "@ai-sdk/cerebras": "3.0.84",
         "@ai-sdk/cohere": "4.0.75",
         "@ai-sdk/elevenlabs": "3.0.79",
@@ -100,6 +101,8 @@
     "7zip-bin": ["7zip-bin@5.2.0", "", {}, "sha512-ukTPVhqG4jNzMro2qA9HSCSSVJN3aN7tlb+hfqYCt3ER0yWroeA2VR38MNrOHLQ/cVj+DaIMad0kFCtWWowh/A=="],
 
     "@ai-sdk/alibaba": ["@ai-sdk/alibaba@2.0.82", "", { "dependencies": { "@ai-sdk/provider": "4.0.35", "@ai-sdk/provider-utils": "5.0.74" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-rGcwCmXNIrxKmNckHzETxpzSACvdXg9S+LgaWU6ALcV49XFwZoWpgbId1AhRgqKRyt3WvigW2gRXAh/YZIlxIg=="],
+
+    "@ai-sdk/anthropic": ["@ai-sdk/anthropic@4.0.96", "", { "dependencies": { "@ai-sdk/provider": "4.0.35", "@ai-sdk/provider-utils": "5.0.74" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-eq6rKebpYwvOmFkvhbgrQ7J+TtPsGk3KoEDr+Hu0R1EANm562CAly4s0zaCAQW7Xzw1261oWhOnU8zYLPRxzhA=="],
 
     "@ai-sdk/cerebras": ["@ai-sdk/cerebras@3.0.84", "", { "dependencies": { "@ai-sdk/openai-compatible": "3.0.84", "@ai-sdk/provider": "4.0.35", "@ai-sdk/provider-utils": "5.0.74" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-lckLb8BPdzGKOOIObtlXkqImhUgfR61kg8G9K16E3xmjC12kTP2LBuoORYFwqdl2GkyuSiBU6Cr32mc6N8dS7Q=="],
 

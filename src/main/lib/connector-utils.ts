@@ -6,8 +6,63 @@ import { asc, count, desc, eq } from 'drizzle-orm'
 import { generateTitleFromModelMessages } from './generate-title'
 import { messages as messageSchema } from '../../common/db-schemas/message.schema'
 import { getTools } from './get-tools'
+import { normalizeMessages } from './normalize-messages'
+import { AppUIMessage, MessagePartsType } from '../../common/schemas/messages.schema'
+import {
+  CONNECTOR_ALLOWED_ATTACHMENT_EXTENSIONS,
+  EXT_TO_MIME
+} from '../../common/constants/global.constants'
 export { autoStartConnectors } from './startup'
 
+/**
+ * Validates whether an attachment is an allowed type for bots (image, text, pdf).
+ */
+export function isAllowedBotAttachment(mediaType?: string, ext?: string): boolean {
+  if (ext && CONNECTOR_ALLOWED_ATTACHMENT_EXTENSIONS.has(ext.toLowerCase())) {
+    return true
+  }
+  // check the extension is supported
+  if (mediaType) {
+    const lower = mediaType.toLowerCase()
+    if (
+      lower.startsWith('image/') ||
+      lower.startsWith('text/') ||
+      lower === 'application/pdf' ||
+      lower === 'application/json'
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
+/**
+ * Resolves appropriate MIME type for an allowed bot attachment extension.
+ */
+export function resolveBotAttachmentMimeType(ext: string, declaredMime?: string): string {
+  const lowerExt = ext.toLowerCase()
+  if (lowerExt === 'json' || declaredMime === 'application/json') {
+    return 'text/plain'
+  }
+  if (declaredMime && declaredMime !== 'application/octet-stream') {
+    return declaredMime
+  }
+  switch (lowerExt) {
+    case 'pdf':
+      return 'application/pdf'
+    case 'txt':
+    case 'text':
+    case 'log':
+      return 'text/plain'
+    case 'md':
+    case 'markdown':
+      return 'text/markdown'
+    case 'csv':
+      return 'text/csv'
+    default:
+      return EXT_TO_MIME[lowerExt] || declaredMime || 'application/octet-stream'
+  }
+}
 /**
  * split message into chunks my provided maxLength
  */
@@ -60,10 +115,12 @@ export function truncateText(
  */
 export async function getConnectorChatContext({
   connectorName,
-  newPrompt
+  newPrompt,
+  attachments = []
 }: {
   connectorName: string
   newPrompt: string
+  attachments?: MessagePartsType[]
 }) {
   // get the current connector data with active conversation populated
   const connector = await db.query.connectors.findFirst({
@@ -107,11 +164,24 @@ export async function getConnectorChatContext({
     conversationId = connector.activeConversation.id
   }
 
+  // Build user message parts with any attachments
+  const userParts: MessagePartsType[] = []
+  if (attachments && attachments.length > 0) {
+    userParts.push(...attachments)
+  }
+  if (newPrompt) {
+    userParts.push({ type: 'text', text: newPrompt })
+  }
+  // fall back in case no prompt sent
+  if (userParts.length === 0) {
+    userParts.push({ type: 'text', text: 'Sent with attachments' })
+  }
+
   // Insert incoming user prompt into messages
   await db.insert(messages).values({
     role: 'user',
     conversationId: conversationId,
-    parts: [{ type: 'text', text: newPrompt }]
+    parts: userParts
   })
 
   // Fetch conversation messages in chronological order by conversation id
@@ -129,9 +199,10 @@ export async function getConnectorChatContext({
           orderBy: [asc(messages.createdAt)]
         })
 
-  // Normalize messages to feed into model @TODO this is skipped for now any attachments have to be stored in locally or or it wont work in the ui here
+  // Normalize messages to feed into model (resolves media:// attachments to data URIs)
+  const normalizedMessages = await normalizeMessages(dbMessages as unknown as AppUIMessage[])
   // convert to core messages
-  const modelMessages = await convertToModelMessages(dbMessages)
+  const modelMessages = await convertToModelMessages(normalizedMessages)
 
   return {
     conversationId,

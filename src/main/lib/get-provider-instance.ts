@@ -1,4 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
+import { createAnthropic } from '@ai-sdk/anthropic'
 import { ModelProviderType, ModelSchemaType } from '../../common/schemas/model.schema'
 import db from '../db'
 import { decryptText } from '../../common/utils/encryption.util'
@@ -132,12 +133,13 @@ export async function getProviderInstanceModel({
         providerDetails?.serverUrl || 'http://localhost:8080',
         '/v1'
       )
-      const customInstance = createOpenAI({
+      const customInstance = createOpenAICompatible({
         name: 'custom',
         baseURL,
         apiKey: 'none' // @TODO: does not support auth
       })
-
+      // assign imageModel to image such that our handlers are not disturbed
+      Object.assign(customInstance, { image: customInstance.imageModel })
       return customInstance
     }
     case 'poe': {
@@ -148,17 +150,42 @@ export async function getProviderInstanceModel({
       return poeInstance
     }
     case 'opencode': {
-      const openCodeInstance = createOpenAI({
+      const openCodeInstance = createOpenAICompatible({
+        name: 'opencode',
         baseURL: 'https://opencode.ai/inference/openai/v1',
         apiKey
       })
       return openCodeInstance
+    }
+    case 'nokeep': {
+      const noKeepInstance = createOpenAICompatible({
+        name: 'nokeep',
+        baseURL: 'https://nokeep.ai/v1',
+        apiKey
+      })
+      // assign imageModel to image such that our handlers are not disturbed
+      Object.assign(noKeepInstance, { image: noKeepInstance.imageModel })
+      return noKeepInstance
+    }
+    case 'nano-gpt': {
+      const nanoGptInstance = createOpenAI({
+        name: 'nano-gpt',
+        baseURL: 'https://nano-gpt.com/api/v1',
+        apiKey
+      })
+      return nanoGptInstance
     }
     case 'mistral': {
       const mistralInstance = createMistral({
         apiKey
       })
       return mistralInstance
+    }
+    case 'anthropic': {
+      const anthropicInstance = createAnthropic({
+        apiKey
+      })
+      return anthropicInstance
     }
     case 'cerebras': {
       const cerebrasInstance = createCerebras({

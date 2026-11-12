@@ -10,6 +10,7 @@ export default defineConfig({
       externalizeDeps: {
         exclude: [
           '@ai-sdk/alibaba',
+          '@ai-sdk/anthropic',
           '@ai-sdk/cerebras',
           '@ai-sdk/cohere',
           '@ai-sdk/elevenlabs',

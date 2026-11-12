@@ -246,11 +246,43 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     siteUrl: 'https://opencode.ai/console',
     description:
       'OpenCode provider offering curated models optimized for coding agents and developer workflows.'
+  },
+  {
+    provider: 'anthropic',
+    name: 'Anthropic',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/anthropic.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://platform.claude.com/dashboard',
+    description: 'Anthropic Claude models including opus, sonnet, fable and haiku'
+  },
+  {
+    provider: 'nokeep',
+    name: 'nokeep',
+    icon: 'https://nokeep.ai/favicon.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://nokeep.ai/console',
+    description: 'Privacy-focused, zero-retention models including DeepSeek and GLM flash models.'
+  },
+  {
+    provider: 'nano-gpt',
+    name: 'NanoGPT',
+    icon: 'https://models.dev/logos/nano-gpt.svg',
+    enabled: false,
+    apiKey: '',
+    server: false,
+    siteUrl: 'https://nano-gpt.com',
+    description:
+      'Privacy first Pay-per-prompt AI aggregator with access to top open and proprietary models.'
   }
 ]
 
 export const AVAILABLE_PROVIDER_LIST = [
   'openai',
+  'anthropic',
   'ollama',
   'openrouter',
   'google',
@@ -270,7 +302,9 @@ export const AVAILABLE_PROVIDER_LIST = [
   'cohere',
   'alibaba',
   'ninjachat',
-  'opencode'
+  'opencode',
+  'nokeep',
+  'nano-gpt'
 ] as const
 
 export const REASONING_OPTIONS = ['none', 'low', 'medium', 'high'] as const
@@ -281,6 +315,28 @@ export const MEDIA_TYPE = ['image', 'video', 'tts'] as const
 export const MEDIA_REQUEST_TYPES = [...MEDIA_TYPE, 'all'] as const
 
 export const PROVIDERS_WITH_SEARCH_TOOL = new Set(['openai', 'xai', 'google', 'groq', 'vercel'])
+
+// Allowed file extensions for connector attachments (images, text files, PDFs)
+export const CONNECTOR_ALLOWED_ATTACHMENT_EXTENSIONS = new Set([
+  // Images
+  'jpg',
+  'jpeg',
+  'png',
+  'webp',
+  'gif',
+  'bmp',
+  'svg',
+  // PDF
+  'pdf',
+  // Text
+  'txt',
+  'text',
+  'md',
+  'markdown',
+  'csv',
+  'json',
+  'log'
+])
 
 // available connectors
 export const AVAILABLE_CONNECTORS = [

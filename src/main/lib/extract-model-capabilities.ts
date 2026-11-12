@@ -1,5 +1,6 @@
-import { ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
+import { ModelIOSchema, ModelIOType, ModelSchemaType } from '../../common/schemas/model.schema'
 import {
+  AnthropicModel,
   CohereModel,
   FireworksAiModel,
   GatewayModel,
@@ -7,7 +8,9 @@ import {
   GroqModel,
   HuggingFaceModel,
   MistralModel,
+  NanoGptModel,
   NinjaChatModel,
+  NoKeepModel,
   PoeModel,
   TogetherAiModel
 } from './get-model-list'
@@ -430,20 +433,50 @@ export function buildMistralModel(
 }
 
 /**
- * function to build a custom model record for custom providers
- * uses basic id based segregation
+ * function to build a custom model record for custom / generic providers
+ * uses loose, sensible id-based capability extraction
  */
 export function buildCustomModel(
   modelId: string,
   provider: ModelSchemaType['provider']
 ): ModelSchemaType {
-  const isTTS = modelId.toLowerCase().includes('tts')
-  const outputs: ModelIOType[] = []
+  const lower = modelId.toLowerCase()
 
-  // output extraction
-  if (modelId.toLowerCase().includes('image')) {
+  // Outputs
+  const isImage =
+    lower.includes('image') ||
+    lower.includes('flux') ||
+    lower.includes('sdxl') ||
+    lower.includes('banana') || // gemini models
+    lower.includes('midjourney') ||
+    lower.includes('dall-e')
+  const isAudio = lower.includes('tts') || lower.includes('audio') || lower.includes('speech')
+  const isVideo = lower.includes('video') || lower.includes('sora')
+  const isEmbedding = lower.includes('embed')
+
+  // Vision inputs for multimodal chat
+  const isVision =
+    !isImage &&
+    (lower.includes('vision') ||
+      lower.includes('-vl') || //Vision-Language
+      lower.includes('vl-') || //Vision-Language
+      lower.includes('gpt-4o') ||
+      lower.includes('gemini') || // all gemini models
+      lower.includes('claude-3') || // all claude > 3 models
+      lower.includes('pixtral')) // Mistral AI's multimodal vision mode
+
+  const inputs: ModelIOType[] = ['text']
+  if (isVision) inputs.push('image')
+  if (lower.includes('whisper')) inputs.push('audio')
+
+  const outputs: ModelIOType[] = []
+  if (isImage) {
     outputs.push('image')
-  } else if (isTTS) {
+  } else if (isEmbedding) {
+    outputs.push('embedding')
+  } else if (isVideo) {
+    outputs.push('video')
+  } else if (isAudio) {
     outputs.push('audio')
   } else {
     outputs.push('text')
@@ -453,11 +486,11 @@ export function buildCustomModel(
     id: modelId,
     name: modelId,
     provider,
-    inputs: ['text'],
+    inputs,
     outputs,
     capabilities: {
-      realtime: false,
-      vision: false,
+      realtime: lower.includes('realtime'),
+      vision: isVision,
       videoReasoning: false
     }
   }
@@ -586,6 +619,116 @@ export function buildNinjaChatModel(
       realtime: false,
       vision: false,
       videoReasoning: false
+    }
+  }
+}
+
+/**
+ * function to extract capabilities from an Anthropic model
+ */
+export function buildAnthropicModel(
+  model: AnthropicModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const isVision = model.capabilities?.image_input?.supported ?? false
+  const inputs: ModelIOType[] = ['text']
+
+  if (isVision) {
+    inputs.push('image')
+  }
+
+  return {
+    id: model.id,
+    name: model.display_name ?? model.id,
+    provider,
+    inputs,
+    outputs: ['text'],
+    capabilities: {
+      vision: isVision,
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}
+
+/**
+ * function to extract model capabilities for nokeep models
+ */
+export function buildNoKeepModel(
+  model: NoKeepModel,
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const inputs = (model.input_modalities?.filter((m) =>
+    ModelIOSchema.options.includes(m as ModelIOType)
+  ) ?? ['text']) as ModelIOType[]
+
+  const outputs = (model.output_modalities?.filter((m) =>
+    ModelIOSchema.options.includes(m as ModelIOType)
+  ) ?? (model.type ? [model.type as ModelIOType] : ['text'])) as ModelIOType[]
+
+  const isVision = inputs.includes('image')
+
+  return {
+    id: model.id,
+    name: model.name || model.id,
+    provider,
+    inputs: inputs.length > 0 ? inputs : ['text'],
+    outputs: outputs.length > 0 ? outputs : ['text'],
+    capabilities: {
+      vision: isVision,
+      videoReasoning: false,
+      realtime: false
+    }
+  }
+}
+
+/**
+ * function to extract model capabilities for NanoGPT models by category
+ */
+export function buildNanoGptModel(
+  model: NanoGptModel,
+  category: 'text' | 'image' | 'audio' | 'video',
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const id = model.id
+  const name = model.name || id
+  const lower = id.toLowerCase()
+
+  const declaredInputs = model.architecture?.input_modalities?.filter((m) =>
+    ModelIOSchema.options.includes(m as ModelIOType)
+  ) as ModelIOType[] | undefined
+
+  const inferredVision =
+    category === 'text' && /vision|-vl|vl-|gpt-4o|gemini|claude-3|pixtral/.test(lower)
+
+  const inputs: ModelIOType[] =
+    declaredInputs && declaredInputs.length > 0
+      ? declaredInputs
+      : inferredVision
+        ? ['text', 'image']
+        : ['text']
+
+  const declaredOutputs = model.architecture?.output_modalities?.filter((m) =>
+    ModelIOSchema.options.includes(m as ModelIOType)
+  ) as ModelIOType[] | undefined
+
+  const outputs: ModelIOType[] =
+    declaredOutputs && declaredOutputs.length > 0
+      ? declaredOutputs
+      : [category === 'text' && lower.includes('embed') ? 'embedding' : category]
+
+  const isVision = inputs.includes('image')
+
+  return {
+    id,
+    name,
+    provider,
+    inputs,
+    outputs,
+    capabilities: {
+      vision: Boolean(isVision),
+      videoReasoning: false,
+      realtime: lower.includes('realtime')
     }
   }
 }

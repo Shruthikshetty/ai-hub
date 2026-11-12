@@ -3,6 +3,7 @@ import { ProviderGetSchema } from '../db/schema'
 import { decryptText } from '../../common/utils/encryption.util'
 import { ModelSchemaType, ModelIOType, ModelProviderType } from '../../common/schemas/model.schema'
 import {
+  buildAnthropicModel,
   buildCohereModel,
   buildCustomModel,
   buildFireworksAiModel,
@@ -17,13 +18,25 @@ import {
   buildTogetherAiModel,
   buildXaiModel,
   buildAlibabaModel,
-  buildNinjaChatModel
+  buildNinjaChatModel,
+  buildNoKeepModel,
+  buildNanoGptModel
 } from './extract-model-capabilities'
 import { NINJACHAT_STATIC_MODELS } from '../../common/custom-providers/ninjachat'
 import { OPENAI_UNLISTED_MODELS } from '../../common/constants/models.constnats'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
 // types
+export type NanoGptModel = {
+  id: string
+  name?: string
+  architecture?: {
+    input_modalities?: string[]
+    output_modalities?: string[]
+  }
+  [key: string]: unknown
+}
+
 type OpenAiModel = {
   id: string
   object: string
@@ -309,6 +322,33 @@ type CohereResponse = {
 }
 
 /**
+ * Anthropic model type
+ * doc https://docs.anthropic.com/en/api/models-list
+ */
+export type AnthropicModel = {
+  id: string
+  display_name?: string
+  type?: string
+  created_at?: string
+  capabilities?: {
+    image_input?: { supported?: boolean }
+    pdf_input?: { supported?: boolean }
+    thinking?: { supported?: boolean }
+    server_tools?: {
+      web_search?: { supported?: boolean }
+      code_execution?: { supported?: boolean }
+    }
+  }
+}
+
+export type AnthropicResponse = {
+  data: AnthropicModel[]
+  has_more?: boolean
+  first_id?: string | null
+  last_id?: string | null
+}
+
+/**
  * Ninja chat model type
  * doc https://docs.ninjachat.ai/models#fetch-models-via-api
  */
@@ -343,6 +383,21 @@ type NinjaChatResponse = {
 }
 
 /**
+ * nokeep model type
+ */
+export type NoKeepModel = {
+  id: string
+  name: string
+  type?: 'image' | 'video' | 'text' | string
+  input_modalities?: string[]
+  output_modalities?: string[]
+  context_length?: number
+  max_output_tokens?: number
+  reasoning_efforts?: string[]
+  endpoint?: string
+}
+
+/**
  * open AI type response for models endpoint
  */
 type OpenAiResponse<T> = {
@@ -372,6 +427,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<ElevenLabsResponse>
       | AxiosResponse<CohereResponse>
       | AxiosResponse<NinjaChatResponse>
+      | AxiosResponse<AnthropicResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -500,6 +556,62 @@ export async function getModelListFromProvider(
         response = await axios.get('https://opencode.ai/inference/v1/models', {
           headers: { Authorization: `Bearer ${apiKey}` },
           timeout: 2000 //2 seconds
+        })
+        break
+      }
+      case 'nokeep': {
+        response = await axios.get('https://nokeep.ai/v1/models', {
+          headers: { Authorization: `Bearer ${apiKey}` },
+          timeout: 4000
+        })
+        break
+      }
+      case 'nano-gpt': {
+        const headers = { Authorization: `Bearer ${apiKey}` }
+        const timeout = 4000
+
+        // 4 separate endpoints to be called to get the models
+        const endpoints = [
+          { url: 'https://nano-gpt.com/api/v1/models', category: 'text' as const },
+          { url: 'https://nano-gpt.com/api/v1/images/models', category: 'image' as const },
+          { url: 'https://nano-gpt.com/api/v1/audio-models', category: 'audio' as const },
+          { url: 'https://nano-gpt.com/api/v1/video-models', category: 'video' as const }
+        ]
+
+        // fetch all at once parallel
+        const results = await Promise.allSettled(
+          endpoints.map(async ({ url, category }) => {
+            const res = await axios.get<{ data?: NanoGptModel[] }>(url, { headers, timeout })
+            const list = res.data.data ?? []
+            return list.map((m) => buildNanoGptModel(m, category, provider.provider))
+          })
+        )
+
+        // combine all categories and deduplicate by model id using a Set
+        const seen = new Set<string>()
+        const uniqueModels: ModelSchemaType[] = []
+
+        for (const res of results) {
+          if (res.status === 'fulfilled') {
+            for (const m of res.value) {
+              if (!seen.has(m.id)) {
+                seen.add(m.id)
+                uniqueModels.push(m)
+              }
+            }
+          }
+        }
+
+        return uniqueModels
+      }
+      case 'anthropic': {
+        response = await axios.get('https://api.anthropic.com/v1/models', {
+          headers: {
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01'
+          },
+          params: { limit: 50 },
+          timeout: 4000
         })
         break
       }
@@ -650,10 +762,20 @@ export async function getModelListFromProvider(
         // Manually append image models since they aren't returned by the /models endpoint
         return [...fetchedModels, ...NINJACHAT_STATIC_MODELS]
       }
+      case 'anthropic': {
+        const data = (response.data as AnthropicResponse).data
+        if (!data || !Array.isArray(data)) return []
+        return data.map((model: AnthropicModel) => buildAnthropicModel(model, provider.provider))
+      }
       case 'custom': {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
         if (!data) return []
         return data.map((model: OpenAiModel) => buildCustomModel(model.id, provider.provider))
+      }
+      case 'nokeep': {
+        const data = (response.data as OpenAiResponse<NoKeepModel>).data
+        if (!data) return []
+        return data.map((model: NoKeepModel) => buildNoKeepModel(model, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
