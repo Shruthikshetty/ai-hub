@@ -344,6 +344,8 @@ export type AnthropicModel = {
 export type AnthropicResponse = {
   data: AnthropicModel[]
   has_more?: boolean
+  first_id?: string | null
+  last_id?: string | null
 }
 
 /**
@@ -425,6 +427,7 @@ export async function getModelListFromProvider(
       | AxiosResponse<ElevenLabsResponse>
       | AxiosResponse<CohereResponse>
       | AxiosResponse<NinjaChatResponse>
+      | AxiosResponse<AnthropicResponse>
 
     // handel the fetching logic separately for all the providers
     switch (provider.provider as ModelProviderType) {
@@ -607,6 +610,7 @@ export async function getModelListFromProvider(
             'x-api-key': apiKey,
             'anthropic-version': '2023-06-01'
           },
+          params: { limit: 50 },
           timeout: 4000
         })
         break

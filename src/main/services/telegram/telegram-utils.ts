@@ -82,7 +82,8 @@ export async function downloadTelegramAttachment(
     // download and store the attachment
     const downloadUrl = `https://api.telegram.org/file/bot${token}/${file.file_path}`
     const response = await axios.get<ArrayBuffer>(downloadUrl, {
-      responseType: 'arraybuffer'
+      responseType: 'arraybuffer',
+      timeout: 60_000 // 60 seconds timeout for file download
     })
     const buffer = Buffer.from(response.data)
 

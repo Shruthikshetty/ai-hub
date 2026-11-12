@@ -444,12 +444,12 @@ export function buildCustomModel(
 
   // Outputs
   const isImage =
-    !lower.includes('preview') &&
-    (lower.includes('image') ||
-      lower.includes('flux') ||
-      lower.includes('sdxl') ||
-      lower.includes('midjourney') ||
-      lower.includes('dall-e'))
+    lower.includes('image') ||
+    lower.includes('flux') ||
+    lower.includes('sdxl') ||
+    lower.includes('banana') || // gemini models
+    lower.includes('midjourney') ||
+    lower.includes('dall-e')
   const isAudio = lower.includes('tts') || lower.includes('audio') || lower.includes('speech')
   const isVideo = lower.includes('video') || lower.includes('sora')
   const isEmbedding = lower.includes('embed')
@@ -694,14 +694,30 @@ export function buildNanoGptModel(
   const name = model.name || id
   const lower = id.toLowerCase()
 
-  const isVision =
-    model.architecture?.input_modalities?.includes('image') ||
-    (category === 'text' && /vision|-vl|vl-|gpt-4o|gemini|claude-3|pixtral/.test(lower))
+  const declaredInputs = model.architecture?.input_modalities?.filter((m) =>
+    ModelIOSchema.options.includes(m as ModelIOType)
+  ) as ModelIOType[] | undefined
 
-  const inputs: ModelIOType[] = isVision ? ['text', 'image'] : ['text']
-  const outputs: ModelIOType[] = (model.architecture?.output_modalities as ModelIOType[]) ?? [
-    category === 'text' && lower.includes('embed') ? 'embedding' : category
-  ]
+  const inferredVision =
+    category === 'text' && /vision|-vl|vl-|gpt-4o|gemini|claude-3|pixtral/.test(lower)
+
+  const inputs: ModelIOType[] =
+    declaredInputs && declaredInputs.length > 0
+      ? declaredInputs
+      : inferredVision
+        ? ['text', 'image']
+        : ['text']
+
+  const declaredOutputs = model.architecture?.output_modalities?.filter((m) =>
+    ModelIOSchema.options.includes(m as ModelIOType)
+  ) as ModelIOType[] | undefined
+
+  const outputs: ModelIOType[] =
+    declaredOutputs && declaredOutputs.length > 0
+      ? declaredOutputs
+      : [category === 'text' && lower.includes('embed') ? 'embedding' : category]
+
+  const isVision = inputs.includes('image')
 
   return {
     id,
