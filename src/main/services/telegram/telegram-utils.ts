@@ -1,6 +1,6 @@
 import { Context } from 'grammy'
 import path from 'node:path'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { saveFile } from '../../lib/file-storage'
 import { FILE_STORAGE_CATEGORY } from '../../../common/constants/global.constants'
 import { MessagePartsType } from '../../../common/schemas/messages.schema'
@@ -62,7 +62,7 @@ export async function downloadTelegramAttachment(
     mediaType = resolveBotAttachmentMimeType(ext, document.mime_type)
   }
 
-  // Validate allowed file type (image, text, pdf, word)
+  // Validate allowed file type (image, text, pdf)
   if (!isAllowedBotAttachment(mediaType, ext)) {
     return {
       ignoredNotice: '⚠️ The attachment is not supported, so it was ignored.'
@@ -102,8 +102,15 @@ export async function downloadTelegramAttachment(
         filename: fileName
       }
     }
-  } catch (error) {
-    console.error('[TelegramBot] Failed to download or save attachment:', error)
+  } catch (err) {
+    const error = err as AxiosError<Error>
+    console.error('[TelegramBot] Failed to download or save attachment:', {
+      message: error?.message,
+      code: error?.code,
+      status: error?.response?.status,
+      statusText: error?.response?.statusText,
+      data: error?.response?.data
+    })
     return {
       error:
         '⚠️ Failed to download the attachment from Telegram (files must be under 20MB). Please try again.'

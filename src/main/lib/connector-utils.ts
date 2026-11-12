@@ -15,21 +15,19 @@ import {
 export { autoStartConnectors } from './startup'
 
 /**
- * Validates whether an attachment is an allowed type for bots (image, text, pdf, word).
+ * Validates whether an attachment is an allowed type for bots (image, text, pdf).
  */
 export function isAllowedBotAttachment(mediaType?: string, ext?: string): boolean {
   if (ext && CONNECTOR_ALLOWED_ATTACHMENT_EXTENSIONS.has(ext.toLowerCase())) {
     return true
   }
-  // check the extention is supported
+  // check the extension is supported
   if (mediaType) {
     const lower = mediaType.toLowerCase()
     if (
       lower.startsWith('image/') ||
       lower.startsWith('text/') ||
       lower === 'application/pdf' ||
-      lower.includes('word') ||
-      lower === 'application/msword' ||
       lower === 'application/json'
     ) {
       return true
@@ -42,16 +40,16 @@ export function isAllowedBotAttachment(mediaType?: string, ext?: string): boolea
  * Resolves appropriate MIME type for an allowed bot attachment extension.
  */
 export function resolveBotAttachmentMimeType(ext: string, declaredMime?: string): string {
+  const lowerExt = ext.toLowerCase()
+  if (lowerExt === 'json' || declaredMime === 'application/json') {
+    return 'text/plain'
+  }
   if (declaredMime && declaredMime !== 'application/octet-stream') {
     return declaredMime
   }
-  switch (ext.toLowerCase()) {
+  switch (lowerExt) {
     case 'pdf':
       return 'application/pdf'
-    case 'doc':
-      return 'application/msword'
-    case 'docx':
-      return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     case 'txt':
     case 'text':
     case 'log':
@@ -61,10 +59,8 @@ export function resolveBotAttachmentMimeType(ext: string, declaredMime?: string)
       return 'text/markdown'
     case 'csv':
       return 'text/csv'
-    case 'json':
-      return 'application/json'
     default:
-      return EXT_TO_MIME[ext.toLowerCase()] || declaredMime || 'application/octet-stream'
+      return EXT_TO_MIME[lowerExt] || declaredMime || 'application/octet-stream'
   }
 }
 /**
