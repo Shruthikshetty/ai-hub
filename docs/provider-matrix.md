@@ -31,4 +31,6 @@ This document tracks the capabilities of various AI providers integrated into th
 | Poe              |  !   |              |   X   |   X   |  X  |     X      |
 | Ninja Chat       |  ✓   |      ✓       |   ✓   |   X   |  X  |     X      |
 | Open Code        |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
-| Anthropic        |  ✓   |      ✓       |   X   |   X   |  X  |            |
+| Anthropic        |  ✓   |              |   X   |   X   |  X  |            |
+| nokeep           |  ✓   |              |   ✓   |   X   |  X  |            |
+| nano gpt         |  ✓   |      ✓       |   ✓   |   X   |  X  |            |
