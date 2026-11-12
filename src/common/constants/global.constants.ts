@@ -260,7 +260,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
   {
     provider: 'nokeep',
     name: 'nokeep',
-    icon: 'https://nokeep.ai/logo.svg',
+    icon: 'https://nokeep.ai/favicon.svg',
     enabled: false,
     apiKey: '',
     server: false,

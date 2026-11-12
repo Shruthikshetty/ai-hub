@@ -8,6 +8,7 @@ import {
   GroqModel,
   HuggingFaceModel,
   MistralModel,
+  NanoGptModel,
   NinjaChatModel,
   NoKeepModel,
   PoeModel,
@@ -443,11 +444,12 @@ export function buildCustomModel(
 
   // Outputs
   const isImage =
-    lower.includes('image') ||
-    lower.includes('flux') ||
-    lower.includes('sdxl') ||
-    lower.includes('midjourney') ||
-    lower.includes('dall-e')
+    !lower.includes('preview') &&
+    (lower.includes('image') ||
+      lower.includes('flux') ||
+      lower.includes('sdxl') ||
+      lower.includes('midjourney') ||
+      lower.includes('dall-e'))
   const isAudio = lower.includes('tts') || lower.includes('audio') || lower.includes('speech')
   const isVideo = lower.includes('video') || lower.includes('sora')
   const isEmbedding = lower.includes('embed')
@@ -676,6 +678,41 @@ export function buildNoKeepModel(
       vision: isVision,
       videoReasoning: false,
       realtime: false
+    }
+  }
+}
+
+/**
+ * function to extract model capabilities for NanoGPT models by category
+ */
+export function buildNanoGptModel(
+  model: NanoGptModel,
+  category: 'text' | 'image' | 'audio' | 'video',
+  provider: ModelSchemaType['provider']
+): ModelSchemaType {
+  const id = model.id
+  const name = model.name || id
+  const lower = id.toLowerCase()
+
+  const isVision =
+    model.architecture?.input_modalities?.includes('image') ||
+    (category === 'text' && /vision|-vl|vl-|gpt-4o|gemini|claude-3|pixtral/.test(lower))
+
+  const inputs: ModelIOType[] = isVision ? ['text', 'image'] : ['text']
+  const outputs: ModelIOType[] = (model.architecture?.output_modalities as ModelIOType[]) ?? [
+    category === 'text' && lower.includes('embed') ? 'embedding' : category
+  ]
+
+  return {
+    id,
+    name,
+    provider,
+    inputs,
+    outputs,
+    capabilities: {
+      vision: Boolean(isVision),
+      videoReasoning: false,
+      realtime: lower.includes('realtime')
     }
   }
 }

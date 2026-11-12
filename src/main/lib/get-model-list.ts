@@ -19,13 +19,24 @@ import {
   buildXaiModel,
   buildAlibabaModel,
   buildNinjaChatModel,
-  buildNoKeepModel
+  buildNoKeepModel,
+  buildNanoGptModel
 } from './extract-model-capabilities'
 import { NINJACHAT_STATIC_MODELS } from '../../common/custom-providers/ninjachat'
 import { OPENAI_UNLISTED_MODELS } from '../../common/constants/models.constnats'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
 // types
+export type NanoGptModel = {
+  id: string
+  name?: string
+  architecture?: {
+    input_modalities?: string[]
+    output_modalities?: string[]
+  }
+  [key: string]: unknown
+}
+
 type OpenAiModel = {
   id: string
   object: string
@@ -553,11 +564,42 @@ export async function getModelListFromProvider(
         break
       }
       case 'nano-gpt': {
-        response = await axios.get('https://nano-gpt.com/api/v1/models', {
-          headers: { Authorization: `Bearer ${apiKey}` },
-          timeout: 4000
-        })
-        break
+        const headers = { Authorization: `Bearer ${apiKey}` }
+        const timeout = 4000
+
+        // 4 separate endpoints to be called to get the models
+        const endpoints = [
+          { url: 'https://nano-gpt.com/api/v1/models', category: 'text' as const },
+          { url: 'https://nano-gpt.com/api/v1/images/models', category: 'image' as const },
+          { url: 'https://nano-gpt.com/api/v1/audio-models', category: 'audio' as const },
+          { url: 'https://nano-gpt.com/api/v1/video-models', category: 'video' as const }
+        ]
+
+        // fetch all at once parallel
+        const results = await Promise.allSettled(
+          endpoints.map(async ({ url, category }) => {
+            const res = await axios.get<{ data?: NanoGptModel[] }>(url, { headers, timeout })
+            const list = res.data.data ?? []
+            return list.map((m) => buildNanoGptModel(m, category, provider.provider))
+          })
+        )
+
+        // combine all categories and deduplicate by model id using a Set
+        const seen = new Set<string>()
+        const uniqueModels: ModelSchemaType[] = []
+
+        for (const res of results) {
+          if (res.status === 'fulfilled') {
+            for (const m of res.value) {
+              if (!seen.has(m.id)) {
+                seen.add(m.id)
+                uniqueModels.push(m)
+              }
+            }
+          }
+        }
+
+        return uniqueModels
       }
       case 'anthropic': {
         response = await axios.get('https://api.anthropic.com/v1/models', {
@@ -730,11 +772,6 @@ export async function getModelListFromProvider(
         const data = (response.data as OpenAiResponse<NoKeepModel>).data
         if (!data) return []
         return data.map((model: NoKeepModel) => buildNoKeepModel(model, provider.provider))
-      }
-      case 'nano-gpt': {
-        const data = (response.data as OpenAiResponse<OpenAiModel>).data
-        if (!data) return []
-        return data.map((model: OpenAiModel) => buildCustomModel(model.id, provider.provider))
       }
       default: {
         const data = (response.data as OpenAiResponse<OpenAiModel>).data
