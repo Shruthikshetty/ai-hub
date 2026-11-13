@@ -45,6 +45,7 @@ export const getTools = async (
         tools['search'] = (modelProvider as XaiProvider).tools.webSearch() as any
         break
       case 'google':
+      case 'google-vertex':
         tools['search'] = (modelProvider as GoogleProvider).tools.googleSearch({}) as any
         break
       case 'groq':

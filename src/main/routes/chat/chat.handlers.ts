@@ -15,6 +15,7 @@ import { eq } from 'drizzle-orm'
 import { conversations } from '../../db/schema'
 import { normalizeMessages } from '../../lib/normalize-messages'
 import { getTools } from '../../lib/get-tools'
+import { GoogleLanguageModelOptions } from '@ai-sdk/google'
 
 // handler for stream chat route
 export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
@@ -71,7 +72,12 @@ export const streamChat: AppRouteHandler<StreamChatRoute> = async (c) => {
       openai: {
         reasoningEffort: 'low',
         reasoningSummary: 'auto'
-      } as OpenAILanguageModelResponsesOptions
+      } as OpenAILanguageModelResponsesOptions,
+      google: {
+        thinkingConfig: {
+          includeThoughts: true
+        }
+      } as GoogleLanguageModelOptions
     }
   })
 
