@@ -15,6 +15,7 @@ This document tracks the capabilities of various AI providers integrated into th
 | Ollama           |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
 | Open Router      |  ✓   |      ✓       |   X   |   X   |  X  |     X      |
 | Google AI Studio |  ✓   |              |       |       |     |            |
+| Google Vertex AI |  ✓   |              |       |   X   |     |            |
 | AI Gateway       |  ✓   |      ✓       |   ✓   |       |     |            |
 | Groq             |  ✓   |      ✓       |   X   |   X   |     |     !      |
 | Hugging Face     |  ✓   |              |       |       |     |            |

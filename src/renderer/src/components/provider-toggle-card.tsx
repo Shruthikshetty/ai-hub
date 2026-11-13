@@ -116,6 +116,9 @@ export default function ProviderToggleCard({ provider }: { provider: ProviderGet
           >
             {provider.server ? 'API Endpoint' : 'API Key'}
           </Label>
+          {provider.note && !provider.enabled ? (
+            <p className="text-sm text-muted-foreground">❗Note : {provider.note}</p>
+          ) : null}
           <Input
             placeholder={provider.server ? 'http://localhost:11434' : 'sk-...'}
             className="bg-transparent border-border/30"

@@ -277,6 +277,17 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     siteUrl: 'https://nano-gpt.com',
     description:
       'Privacy first Pay-per-prompt AI aggregator with access to top open and proprietary models.'
+  },
+  {
+    provider: 'google-vertex',
+    name: 'Google Vertex AI',
+    icon: 'https://unpkg.com/@lobehub/icons-static-svg@1.102.0/icons/vertexai.svg',
+    enabled: false,
+    apiKey: 'your-project-id:your-api-key',
+    note: 'Enter credentials in the format: <project-id>:<api-key>',
+    server: false,
+    siteUrl: 'https://cloud.google.com/vertex-ai',
+    description: 'Google Vertex AI models using Express Mode with an API key'
   }
 ]
 
@@ -286,6 +297,7 @@ export const AVAILABLE_PROVIDER_LIST = [
   'ollama',
   'openrouter',
   'google',
+  'google-vertex',
   'vercel',
   'groq',
   'huggingface',
@@ -314,7 +326,14 @@ export const MEDIA_TYPE = ['image', 'video', 'tts'] as const
 
 export const MEDIA_REQUEST_TYPES = [...MEDIA_TYPE, 'all'] as const
 
-export const PROVIDERS_WITH_SEARCH_TOOL = new Set(['openai', 'xai', 'google', 'groq', 'vercel'])
+export const PROVIDERS_WITH_SEARCH_TOOL = new Set([
+  'openai',
+  'xai',
+  'google',
+  'google-vertex',
+  'groq',
+  'vercel'
+])
 
 // Allowed file extensions for connector attachments (images, text files, PDFs)
 export const CONNECTOR_ALLOWED_ATTACHMENT_EXTENSIONS = new Set([

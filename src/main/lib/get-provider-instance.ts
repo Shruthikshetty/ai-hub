@@ -20,6 +20,7 @@ import { createElevenLabs } from '@ai-sdk/elevenlabs'
 import { createCohere } from '@ai-sdk/cohere'
 import { createAlibaba } from '../../common/custom-providers/alibaba'
 import { createNinjaChat } from '../../common/custom-providers/ninjachat'
+import { parseVertexCredentials } from '../../common/utils/provider.util'
 
 // get the provider instance based on the provider
 export async function getProviderInstanceModel({
@@ -63,6 +64,18 @@ export async function getProviderInstanceModel({
         apiKey
       })
       return googleInstance
+    }
+    case 'google-vertex': {
+      const creds = parseVertexCredentials(apiKey)
+      const baseURL =
+        providerDetails?.serverUrl ||
+        `https://aiplatform.googleapis.com/v1/projects/${creds.projectId}/locations/global/publishers/google`
+      const vertexInstance = createGoogle({
+        baseURL,
+        apiKey: creds.apiKey,
+        name: 'google-vertex'
+      })
+      return vertexInstance
     }
     case 'groq': {
       const groqInstance = createGroq({
@@ -240,6 +253,24 @@ export async function getProviderInstanceTTS({
 
   // all the tts providers go here
   switch (provider) {
+    case 'google': {
+      const googleInstance = createGoogle({
+        apiKey
+      })
+      return googleInstance
+    }
+    case 'google-vertex': {
+      const creds = parseVertexCredentials(apiKey)
+      const baseURL =
+        providerDetails?.serverUrl ||
+        `https://aiplatform.googleapis.com/v1/projects/${creds.projectId}/locations/global/publishers/google`
+      const vertexInstance = createGoogle({
+        baseURL,
+        apiKey: creds.apiKey,
+        name: 'google-vertex'
+      })
+      return vertexInstance
+    }
     case 'elevenlabs': {
       const elevenlabsInstance = createElevenLabs({
         apiKey

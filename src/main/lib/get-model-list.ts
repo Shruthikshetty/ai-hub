@@ -23,7 +23,10 @@ import {
   buildNanoGptModel
 } from './extract-model-capabilities'
 import { NINJACHAT_STATIC_MODELS } from '../../common/custom-providers/ninjachat'
-import { OPENAI_UNLISTED_MODELS } from '../../common/constants/models.constnats'
+import {
+  OPENAI_UNLISTED_MODELS,
+  VERTEX_STATIC_MODELS
+} from '../../common/constants/models.constnats'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
 // types
@@ -450,6 +453,9 @@ export async function getModelListFromProvider(
           timeout: 2000
         })
         break
+      }
+      case 'google-vertex': {
+        return VERTEX_STATIC_MODELS
       }
       case 'vercel': {
         response = await axios.get('https://ai-gateway.vercel.sh/v1/models', {
