@@ -172,3 +172,29 @@ export const VERTEX_STATIC_MODELS: ModelSchemaType[] = [
     }
   }
 ]
+
+export const MODALITIES = ['text', 'image', 'audio', 'video', 'file', 'embedding'] as const
+
+export const REASONING_TYPES = [
+  'effort', // OpenAI: low, medium, high
+  'budget', // Claude / Gemini: token budget number
+  'toggle', // Gemini / DeepSeek: boolean on/off
+  'fixed' // Model always reasons, no parameters (e.g. o1-preview)
+] as const
+
+export const REASONING_EFFORT_LEVELS = [
+  'none',
+  'minimal',
+  'low',
+  'medium',
+  'high',
+  'xhigh',
+  'max'
+] as const
+
+export const REASONING_DEFAULT_STATES = ['enabled', 'disabled'] as const
+
+export const TTS_GENDERS = ['male', 'female', 'neutral'] as const
+
+export const MODEL_SOURCES = ['github', 'in-app'] as const
+

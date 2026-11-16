@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { AVAILABLE_PROVIDER_LIST } from '../constants/global.constants'
+import { modelSchema as catalogueModelSchema } from '../db-schemas/model.schema'
 
 export const ModelIOSchema = z.enum([
   'text',
@@ -31,8 +32,17 @@ export const modelResponseSchema = z.object({
   data: z.array(modelSchema)
 })
 
+// Schema for the remote catalog container (catalog.json)
+export const catalogSchema = z.object({
+  version: z.number().default(1),
+  updatedAt: z.string(),
+  totalModels: z.number(),
+  models: z.array(catalogueModelSchema)
+})
+
 // extract the type
 export type ModelSchemaType = z.infer<typeof modelSchema>
 export type ModelResponseSchemaType = z.infer<typeof modelResponseSchema>
 export type ModelIOType = z.infer<typeof ModelIOSchema>
 export type ModelProviderType = (typeof AVAILABLE_PROVIDER_LIST)[number]
+export type Catalog = z.infer<typeof catalogSchema>

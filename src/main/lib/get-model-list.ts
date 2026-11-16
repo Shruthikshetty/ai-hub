@@ -26,7 +26,7 @@ import { NINJACHAT_STATIC_MODELS } from '../../common/custom-providers/ninjachat
 import {
   OPENAI_UNLISTED_MODELS,
   VERTEX_STATIC_MODELS
-} from '../../common/constants/models.constnats'
+} from '../../common/constants/models.constants'
 import { HF_MODEL_CATEGORIES } from '../constants/model.constants'
 
 // types
