@@ -197,4 +197,3 @@ export const REASONING_DEFAULT_STATES = ['enabled', 'disabled'] as const
 export const TTS_GENDERS = ['male', 'female', 'neutral'] as const
 
 export const MODEL_SOURCES = ['github', 'in-app'] as const
-
