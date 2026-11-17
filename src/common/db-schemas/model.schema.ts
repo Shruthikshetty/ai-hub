@@ -148,7 +148,7 @@ export const models = sqliteTable(
   },
   (table) => [
     primaryKey({ columns: [table.providerId, table.id] }),
-    index('models_provider_idx').on(table.providerId)
+    index('models_active_idx').on(table.isDeprecated, table.isHidden, table.providerId)
   ]
 )
 

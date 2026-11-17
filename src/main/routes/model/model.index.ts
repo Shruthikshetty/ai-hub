@@ -7,6 +7,8 @@ import * as handlers from './model.handlers'
 import * as routes from './model.route'
 
 // create router for model routes
-export const modelRouter = createRouter().openapi(routes.getModels, handlers.getModels)
+export const modelRouter = createRouter()
+  .openapi(routes.getModels, handlers.getModels)
+  .openapi(routes.getModelsV2, handlers.getModelsV2)
 
 export default modelRouter
