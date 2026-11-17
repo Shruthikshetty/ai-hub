@@ -113,6 +113,13 @@
       "when": 1794852391269,
       "tag": "0015_bumpy_goblin_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1794937630410,
+      "tag": "0016_amazing_warlock",
+      "breakpoints": true
     }
   ]
 }

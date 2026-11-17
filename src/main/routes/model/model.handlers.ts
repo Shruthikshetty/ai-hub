@@ -3,10 +3,11 @@
  */
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { GetModelsRoute, GetModelsV2Route } from './model.route'
+import { AddModelRoute, GetModelsRoute, GetModelsV2Route } from './model.route'
 import db from '../../db'
 import { getModelListFromProvider } from '../../lib/get-model-list'
 import { and } from 'drizzle-orm'
+import { models } from '../../db/schema'
 
 // handler to get all the list of models available
 export const getModels: AppRouteHandler<GetModelsRoute> = async (c) => {
@@ -94,5 +95,24 @@ export const getModelsV2: AppRouteHandler<GetModelsV2Route> = async (c) => {
       data: modelsList
     },
     HTTP_STATUS_CODES.OK
+  )
+}
+
+// handler to add a new model
+export const addModel: AppRouteHandler<AddModelRoute> = async (c) => {
+  // get the request
+  const body = c.req.valid('json')
+
+  // insert to the db
+  const [newModel] = await db.insert(models).values(body).returning()
+
+  // return the success response
+  return c.json(
+    {
+      success: true,
+      data: newModel,
+      message: 'model added successfully'
+    },
+    HTTP_STATUS_CODES.CREATED
   )
 }

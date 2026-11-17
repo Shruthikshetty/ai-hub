@@ -1,7 +1,8 @@
 import { z } from 'zod'
 import { AVAILABLE_PROVIDER_LIST } from '../constants/global.constants'
-import { modelSchema as catalogueModelSchema } from '../db-schemas/model.schema'
+import { modelSchema as catalogueModelSchema, modelsGetSchema } from '../db-schemas/model.schema'
 
+//@DEPRECATED
 export const ModelIOSchema = z.enum([
   'text',
   'image',
@@ -12,6 +13,7 @@ export const ModelIOSchema = z.enum([
   'file'
 ])
 
+//@DEPRECATED
 export const modelSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -27,9 +29,21 @@ export const modelSchema = z.object({
     .nullish()
 })
 
+//@DEPRECATED
 export const modelResponseSchema = z.object({
   success: z.boolean(),
   data: z.array(modelSchema)
+})
+
+export const modelResponseSchemaV2 = z.object({
+  success: z.boolean(),
+  data: z.array(modelsGetSchema)
+})
+
+export const modelAddResponse = z.object({
+  success: z.boolean(),
+  data: modelsGetSchema,
+  message: z.string().optional()
 })
 
 // Schema for the remote catalog container (catalog.json)

@@ -3,9 +3,14 @@
  */
 import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { internalServerErrorDocObject } from '../../constants/doc-constants'
-import { ModelIOSchema, modelResponseSchema } from '../../../common/schemas/model.schema'
-import { modalitySchema, modelsGetSchema } from '../../../common/db-schemas/model.schema'
+import { badRequestDocObject, internalServerErrorDocObject } from '../../constants/doc-constants'
+import {
+  modelAddResponse,
+  ModelIOSchema,
+  modelResponseSchema,
+  modelResponseSchemaV2
+} from '../../../common/schemas/model.schema'
+import { modalitySchema, modelsInsertSchema } from '../../../common/db-schemas/model.schema'
 
 /* route to get all the list of models available
  * @deprecated used v2
@@ -50,10 +55,7 @@ export const getModelsV2 = createRoute({
     [HTTP_STATUS_CODES.OK]: {
       content: {
         'application/json': {
-          schema: z.object({
-            success: z.boolean(),
-            data: z.array(modelsGetSchema)
-          })
+          schema: modelResponseSchemaV2
         }
       },
       description: 'Success response of get all models'
@@ -62,6 +64,37 @@ export const getModelsV2 = createRoute({
   }
 })
 
+// route to add a new custom model
+export const addModel = createRoute({
+  method: 'post',
+  path: '/model',
+  tags: ['Model'],
+  summary: 'Add a custom model to the list of models',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: modelsInsertSchema
+        }
+      },
+      required: true
+    }
+  },
+  responses: {
+    [HTTP_STATUS_CODES.CREATED]: {
+      content: {
+        'application/json': {
+          schema: modelAddResponse
+        }
+      },
+      description: 'Success response for adding a model'
+    },
+    [HTTP_STATUS_CODES.BAD_REQUEST]: badRequestDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export all the types
 export type GetModelsRoute = typeof getModels
 export type GetModelsV2Route = typeof getModelsV2
+export type AddModelRoute = typeof addModel
