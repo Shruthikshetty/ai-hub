@@ -3,7 +3,13 @@
  */
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { AddModelRoute, DeleteModelRoute, GetModelsRoute, GetModelsV2Route } from './model.route'
+import {
+  AddModelRoute,
+  DeleteModelRoute,
+  GetModelsRoute,
+  GetModelsV2Route,
+  UpdateModelRoute
+} from './model.route'
 import db from '../../db'
 import { getModelListFromProvider } from '../../lib/get-model-list'
 import { and, eq } from 'drizzle-orm'
@@ -144,6 +150,40 @@ export const deleteModel: AppRouteHandler<DeleteModelRoute> = async (c) => {
       success: true,
       data: deleted,
       message: 'Model deleted successfully'
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+// handler to update a model
+export const updateModel: AppRouteHandler<UpdateModelRoute> = async (c) => {
+  const { providerId, id } = c.req.valid('param')
+  const body = c.req.valid('json')
+
+  // update the model in the db
+  const [updatedModel] = await db
+    .update(models)
+    .set(body)
+    .where(and(eq(models.providerId, providerId), eq(models.id, id)))
+    .returning()
+
+  // if model not found
+  if (!updatedModel) {
+    return c.json(
+      {
+        success: false,
+        message: 'Model not found'
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+
+  // return success response
+  return c.json(
+    {
+      success: true,
+      data: updatedModel,
+      message: 'Model updated successfully'
     },
     HTTP_STATUS_CODES.OK
   )

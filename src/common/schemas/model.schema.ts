@@ -54,6 +54,14 @@ export const modelDeleteResponse = z.object({
 
 export const deleteModelResponseSchema = modelDeleteResponse
 
+export const modelUpdateResponse = z.object({
+  success: z.boolean(),
+  data: modelsGetSchema,
+  message: z.string().optional()
+})
+
+export const updateModelResponseSchema = modelUpdateResponse
+
 // Schema for the remote catalog container (catalog.json)
 export const catalogSchema = z.object({
   version: z.number().default(1),
@@ -69,3 +77,4 @@ export type ModelIOType = z.infer<typeof ModelIOSchema>
 export type ModelProviderType = (typeof AVAILABLE_PROVIDER_LIST)[number]
 export type Catalog = z.infer<typeof catalogSchema>
 export type ModelDeleteResponseType = z.infer<typeof modelDeleteResponse>
+export type ModelUpdateResponseType = z.infer<typeof modelUpdateResponse>

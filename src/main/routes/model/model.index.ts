@@ -12,5 +12,6 @@ export const modelRouter = createRouter()
   .openapi(routes.getModelsV2, handlers.getModelsV2)
   .openapi(routes.addModel, handlers.addModel)
   .openapi(routes.deleteModel, handlers.deleteModel)
+  .openapi(routes.updateModel, handlers.updateModel)
 
 export default modelRouter

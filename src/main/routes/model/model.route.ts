@@ -11,11 +11,16 @@ import {
 import {
   modelAddResponse,
   modelDeleteResponse,
+  modelUpdateResponse,
   ModelIOSchema,
   modelResponseSchema,
   modelResponseSchemaV2
 } from '../../../common/schemas/model.schema'
-import { modalitySchema, modelsInsertSchema } from '../../../common/db-schemas/model.schema'
+import {
+  modalitySchema,
+  modelsInsertSchema,
+  modelsPatchSchema
+} from '../../../common/db-schemas/model.schema'
 
 /* route to get all the list of models available
  * @deprecated used v2
@@ -141,8 +146,60 @@ export const deleteModel = createRoute({
   }
 })
 
+// route to update a model by providerId and id
+export const updateModel = createRoute({
+  method: 'patch',
+  path: '/model/{providerId}/{id}',
+  tags: ['Model'],
+  summary: 'Update a model by provider ID and model ID',
+  request: {
+    params: z.object({
+      providerId: z.string().openapi({
+        param: {
+          name: 'providerId',
+          in: 'path',
+          required: true,
+          description: 'Provider ID of the model'
+        },
+        example: 'openai'
+      }),
+      id: z.string().openapi({
+        param: {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Model ID'
+        },
+        example: 'gpt-4o'
+      })
+    }),
+    body: {
+      content: {
+        'application/json': {
+          schema: modelsPatchSchema
+        }
+      },
+      required: true
+    }
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: modelUpdateResponse
+        }
+      },
+      description: 'Success response for updating a model'
+    },
+    [HTTP_STATUS_CODES.BAD_REQUEST]: badRequestDocObject,
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export all the types
 export type GetModelsRoute = typeof getModels
 export type GetModelsV2Route = typeof getModelsV2
 export type AddModelRoute = typeof addModel
 export type DeleteModelRoute = typeof deleteModel
+export type UpdateModelRoute = typeof updateModel
