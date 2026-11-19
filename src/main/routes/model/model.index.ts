@@ -10,5 +10,7 @@ import * as routes from './model.route'
 export const modelRouter = createRouter()
   .openapi(routes.getModels, handlers.getModels)
   .openapi(routes.getModelsV2, handlers.getModelsV2)
+  .openapi(routes.addModel, handlers.addModel)
+  .openapi(routes.deleteModel, handlers.deleteModel)
 
 export default modelRouter

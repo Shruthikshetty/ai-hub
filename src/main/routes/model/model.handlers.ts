@@ -3,10 +3,10 @@
  */
 import { AppRouteHandler } from '../../types'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { AddModelRoute, GetModelsRoute, GetModelsV2Route } from './model.route'
+import { AddModelRoute, DeleteModelRoute, GetModelsRoute, GetModelsV2Route } from './model.route'
 import db from '../../db'
 import { getModelListFromProvider } from '../../lib/get-model-list'
-import { and } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { models } from '../../db/schema'
 
 // handler to get all the list of models available
@@ -114,5 +114,37 @@ export const addModel: AppRouteHandler<AddModelRoute> = async (c) => {
       message: 'model added successfully'
     },
     HTTP_STATUS_CODES.CREATED
+  )
+}
+
+// handler to delete a model
+export const deleteModel: AppRouteHandler<DeleteModelRoute> = async (c) => {
+  const { providerId, id } = c.req.valid('param')
+
+  // delete the model using its composite primary key (providerId, id)
+  const [deleted] = await db
+    .delete(models)
+    .where(and(eq(models.providerId, providerId), eq(models.id, id)))
+    .returning()
+
+  // if model not found
+  if (!deleted) {
+    return c.json(
+      {
+        success: false,
+        message: 'Model not found'
+      },
+      HTTP_STATUS_CODES.NOT_FOUND
+    )
+  }
+
+  // return success response
+  return c.json(
+    {
+      success: true,
+      data: deleted,
+      message: 'Model deleted successfully'
+    },
+    HTTP_STATUS_CODES.OK
   )
 }

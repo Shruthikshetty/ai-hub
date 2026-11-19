@@ -3,9 +3,14 @@
  */
 import { createRoute, z } from '@hono/zod-openapi'
 import * as HTTP_STATUS_CODES from '../../constants/http-status-codes.constants'
-import { badRequestDocObject, internalServerErrorDocObject } from '../../constants/doc-constants'
+import {
+  badRequestDocObject,
+  internalServerErrorDocObject,
+  zodNotFoundDocObject
+} from '../../constants/doc-constants'
 import {
   modelAddResponse,
+  modelDeleteResponse,
   ModelIOSchema,
   modelResponseSchema,
   modelResponseSchemaV2
@@ -94,7 +99,50 @@ export const addModel = createRoute({
   }
 })
 
+// route to delete a model by providerId and id
+export const deleteModel = createRoute({
+  method: 'delete',
+  path: '/model/{providerId}/{id}',
+  tags: ['Model'],
+  summary: 'Delete a model by provider ID and model ID',
+  request: {
+    params: z.object({
+      providerId: z.string().openapi({
+        param: {
+          name: 'providerId',
+          in: 'path',
+          required: true,
+          description: 'Provider ID of the model'
+        },
+        example: 'openai'
+      }),
+      id: z.string().openapi({
+        param: {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Model ID'
+        },
+        example: 'gpt-4o'
+      })
+    })
+  },
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: modelDeleteResponse
+        }
+      },
+      description: 'Success response for deleting a model'
+    },
+    [HTTP_STATUS_CODES.NOT_FOUND]: zodNotFoundDocObject,
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export all the types
 export type GetModelsRoute = typeof getModels
 export type GetModelsV2Route = typeof getModelsV2
 export type AddModelRoute = typeof addModel
+export type DeleteModelRoute = typeof deleteModel
