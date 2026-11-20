@@ -50,7 +50,7 @@ export const getModels: AppRouteHandler<GetModelsRoute> = async (c) => {
 
 // handler to get all the list of models available from local database (V2)
 export const getModelsV2: AppRouteHandler<GetModelsV2Route> = async (c) => {
-  const { output, providerId } = c.req.valid('query')
+  const { output, providerId, hidden } = c.req.valid('query')
 
   // get all the providers that are enabled and not hidden
   const enabledProviders = await db.query.providers.findMany({
@@ -74,13 +74,13 @@ export const getModelsV2: AppRouteHandler<GetModelsV2Route> = async (c) => {
     return c.json({ success: true, data: [] }, HTTP_STATUS_CODES.OK)
   }
 
-  // fetch models from enabled providers only, omitting deprecated and hidden models
+  // fetch models from enabled providers, omitting deprecated models
   let modelsList = await db.query.models.findMany({
     where: (model, { inArray, eq, and }) =>
       and(
         inArray(model.providerId, targetProviders),
         eq(model.isDeprecated, false),
-        eq(model.isHidden, false)
+        eq(model.isHidden, hidden ?? false)
       ),
     orderBy: (model, { desc, asc }) => [
       desc(model.isFavorite),

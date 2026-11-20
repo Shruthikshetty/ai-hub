@@ -58,7 +58,20 @@ export const getModelsV2 = createRoute({
   request: {
     query: z.object({
       output: modalitySchema.optional(),
-      providerId: z.string().optional()
+      providerId: z.string().optional(),
+      hidden: z
+        .union([z.boolean(), z.enum(['true', 'false'])])
+        .optional()
+        .transform((val) => val === true || val === 'true')
+        .openapi({
+          param: {
+            name: 'hidden',
+            in: 'query',
+            required: false,
+            description: 'Whether to fetch hidden models (defaults to false)'
+          },
+          example: false
+        })
     })
   },
   responses: {
