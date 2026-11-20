@@ -78,3 +78,5 @@ export type ModelProviderType = (typeof AVAILABLE_PROVIDER_LIST)[number]
 export type Catalog = z.infer<typeof catalogSchema>
 export type ModelDeleteResponseType = z.infer<typeof modelDeleteResponse>
 export type ModelUpdateResponseType = z.infer<typeof modelUpdateResponse>
+export type ModelResponseSchemaV2 = z.infer<typeof modelResponseSchemaV2>
+export type ModelAddResponseType = z.infer<typeof modelAddResponse>

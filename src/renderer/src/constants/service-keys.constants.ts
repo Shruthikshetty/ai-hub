@@ -4,6 +4,7 @@
 export const QUERY_KEYS = {
   userFetch: 'user-fetch',
   modelsFetch: 'models-fetch',
+  modelsFetchV2: 'models-fetch-v2',
   providersFetch: 'providers-fetch',
   conversationsFetch: 'conversations-fetch',
   conversationMessagesFetch: 'conversation-messages-fetch',
@@ -38,5 +39,6 @@ export const MUTATION_KEYS = {
   addMcpServer: 'add-mcp-server',
   updateMcpServerById: 'update-mcp-server-by-id',
   deleteMcpServerById: 'delete-mcp-server-by-id',
-  testMcpServer: 'test-mcp-server'
+  testMcpServer: 'test-mcp-server',
+  addModel: 'add-model'
 }
