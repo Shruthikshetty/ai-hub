@@ -52,8 +52,6 @@ export const modelDeleteResponse = z.object({
   message: z.string().optional()
 })
 
-export const deleteModelResponseSchema = modelDeleteResponse
-
 export const modelUpdateResponse = z.object({
   success: z.boolean(),
   data: modelsGetSchema,

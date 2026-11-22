@@ -40,5 +40,6 @@ export const MUTATION_KEYS = {
   updateMcpServerById: 'update-mcp-server-by-id',
   deleteMcpServerById: 'delete-mcp-server-by-id',
   testMcpServer: 'test-mcp-server',
-  addModel: 'add-model'
+  addModel: 'add-model',
+  deleteModelById: 'delete-model-by-id'
 }

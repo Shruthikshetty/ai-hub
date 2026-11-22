@@ -104,3 +104,30 @@ export function useAddModel() {
     }
   })
 }
+
+/**
+ * Delete model entry
+ */
+export function useDeleteModel() {
+  // query client
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: [MUTATION_KEYS.deleteModelById],
+    mutationFn: async (id: string) => {
+      const response = await window.api.request('/api/model/' + id, 'DELETE')
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    onSuccess: () => {
+      successToast('Model deleted successfully')
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.modelsFetchV2]
+      })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to delete model')
+    }
+  })
+}
