@@ -13,5 +13,6 @@ export const modelRouter = createRouter()
   .openapi(routes.addModel, handlers.addModel)
   .openapi(routes.deleteModel, handlers.deleteModel)
   .openapi(routes.updateModel, handlers.updateModel)
+  .openapi(routes.syncCatalog, handlers.syncCatalog)
 
 export default modelRouter

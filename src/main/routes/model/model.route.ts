@@ -14,7 +14,8 @@ import {
   modelUpdateResponse,
   ModelIOSchema,
   modelResponseSchema,
-  modelResponseSchemaV2
+  modelResponseSchemaV2,
+  syncCatalogResponse
 } from '../../../common/schemas/model.schema'
 import {
   modalitySchema,
@@ -210,9 +211,29 @@ export const updateModel = createRoute({
   }
 })
 
+// route to sync local model catalog with remote catalog
+export const syncCatalog = createRoute({
+  method: 'post',
+  path: '/model/sync',
+  tags: ['Model'],
+  summary: 'Sync local model catalog with remote catalog',
+  responses: {
+    [HTTP_STATUS_CODES.OK]: {
+      content: {
+        'application/json': {
+          schema: syncCatalogResponse
+        }
+      },
+      description: 'Success response for syncing model catalog'
+    },
+    [HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR]: internalServerErrorDocObject
+  }
+})
+
 // export all the types
 export type GetModelsRoute = typeof getModels
 export type GetModelsV2Route = typeof getModelsV2
 export type AddModelRoute = typeof addModel
 export type DeleteModelRoute = typeof deleteModel
 export type UpdateModelRoute = typeof updateModel
+export type SyncCatalogRoute = typeof syncCatalog

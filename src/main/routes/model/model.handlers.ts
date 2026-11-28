@@ -8,12 +8,20 @@ import {
   DeleteModelRoute,
   GetModelsRoute,
   GetModelsV2Route,
+  SyncCatalogRoute,
   UpdateModelRoute
 } from './model.route'
 import db from '../../db'
 import { getModelListFromProvider } from '../../lib/get-model-list'
 import { and, eq } from 'drizzle-orm'
 import { models } from '../../db/schema'
+import { syncModelCatalog } from '../../lib/model-catalog-sync'
+import axios from 'axios'
+import {
+  REMOTE_MODEL_CATALOG_TIMEOUT,
+  REMOTE_MODEL_CATALOG_URL
+} from '../../constants/config.constants'
+import { catalogSchema } from '../../../common/schemas/model.schema'
 
 // handler to get all the list of models available
 export const getModels: AppRouteHandler<GetModelsRoute> = async (c) => {
@@ -184,6 +192,39 @@ export const updateModel: AppRouteHandler<UpdateModelRoute> = async (c) => {
       success: true,
       data: updatedModel,
       message: 'Model updated successfully'
+    },
+    HTTP_STATUS_CODES.OK
+  )
+}
+
+// handler to sync with the catalog
+export const syncCatalog: AppRouteHandler<SyncCatalogRoute> = async (c) => {
+  // fetch from remote catalog
+  const response = await axios.get(REMOTE_MODEL_CATALOG_URL, {
+    timeout: REMOTE_MODEL_CATALOG_TIMEOUT
+  })
+  const parsedCatalog = catalogSchema.safeParse(response.data)
+
+  // if remote catalog is invalid
+  if (!parsedCatalog || !parsedCatalog?.success || !parsedCatalog?.data) {
+    return c.json(
+      {
+        success: false,
+        message: 'Failed to fetch remote catalog'
+      },
+      HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR
+    )
+  }
+
+  // sync the model catalog
+  const data = await syncModelCatalog(parsedCatalog?.data)
+
+  // return success response
+  return c.json(
+    {
+      success: true,
+      data: data,
+      message: 'Model catalog synced successfully'
     },
     HTTP_STATUS_CODES.OK
   )

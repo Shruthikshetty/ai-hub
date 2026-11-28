@@ -96,26 +96,6 @@ export const videoOptionsSchema = z.object({
   defaultResolution: z.string().default('720p')
 })
 
-// Schema for an individual model
-export const modelSchema = z.object({
-  providerId: z.string(),
-  id: z.string(),
-  canonicalId: z.string(),
-  name: z.string(),
-  originProvider: z.string(),
-  inputs: z.array(modalitySchema).default(['text']),
-  outputs: z.array(modalitySchema).default(['text']),
-  capabilities: modelCapabilitiesSchema,
-  imageOptions: imageOptionsSchema.nullable().default(null),
-  ttsOptions: ttsOptionsSchema.nullable().default(null),
-  videoOptions: videoOptionsSchema.nullable().default(null),
-  contextLength: z.number().int().nullable().default(null),
-  maxOutputTokens: z.number().int().nullable().default(null),
-  description: z.string().nullable().default(null),
-  tags: z.array(z.string()).default([]),
-  isDeprecated: z.boolean().default(false)
-})
-
 // tables -------->
 
 export const models = sqliteTable(
@@ -171,5 +151,4 @@ export type ImageOptions = z.infer<typeof imageOptionsSchema>
 export type TtsVoice = z.infer<typeof ttsVoiceSchema>
 export type TtsOptions = z.infer<typeof ttsOptionsSchema>
 export type VideoOptions = z.infer<typeof videoOptionsSchema>
-export type Model = z.infer<typeof modelSchema>
 export type ModelSource = z.infer<typeof modelSourceSchema>
