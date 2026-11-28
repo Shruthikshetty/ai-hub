@@ -117,8 +117,14 @@ export const addModel: AppRouteHandler<AddModelRoute> = async (c) => {
   // get the request
   const body = c.req.valid('json')
 
-  // insert to the db
-  const [newModel] = await db.insert(models).values(body).returning()
+  // insert to the db (default custom models to 'in-app' since git hub models are not meant to be added manually )
+  const [newModel] = await db
+    .insert(models)
+    .values({
+      ...body,
+      source: body.source ?? 'in-app'
+    })
+    .returning()
 
   // return the success response
   return c.json(

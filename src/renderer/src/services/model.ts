@@ -67,7 +67,7 @@ export function useFetchModelsV2({
       }
       // query params
       const queryString = params.toString() ? `?${params.toString()}` : ''
-      const response = await window.api.request(`/api/model${queryString}`, 'GET')
+      const response = await window.api.request(`/api/v2/model${queryString}`, 'GET')
       if (!response.success) {
         throw response
       }

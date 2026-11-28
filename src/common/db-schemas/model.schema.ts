@@ -135,8 +135,20 @@ export const models = sqliteTable(
 // schemas ------->
 
 export const modelsGetSchema = createSelectSchema(models)
-export const modelsInsertSchema = createInsertSchema(models)
-export const modelsPatchSchema = modelsInsertSchema.partial()
+export const modelsInsertSchema = createInsertSchema(models, {
+  inputs: z.array(modalitySchema),
+  outputs: z.array(modalitySchema),
+  capabilities: modelCapabilitiesSchema,
+  imageOptions: imageOptionsSchema,
+  ttsOptions: ttsOptionsSchema,
+  videoOptions: videoOptionsSchema,
+  tags: z.array(z.string())
+})
+export const modelsPatchSchema = modelsInsertSchema
+  .partial()
+  .refine((value) => Object.values(value).some((field) => field !== undefined), {
+    message: 'At least one field is required'
+  })
 
 // export types
 export type ModelGetSchema = z.infer<typeof modelsGetSchema>
