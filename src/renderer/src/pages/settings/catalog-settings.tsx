@@ -1,5 +1,6 @@
 import { MODALITIES } from '@common/constants/models.constants'
 import { Modality } from '@common/db-schemas/model.schema'
+import ModelCard from '@renderer/components/model-card'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import {
@@ -148,9 +149,11 @@ function CatalogTab() {
       </div>
       {/*  list of all the models*/}
       <h2 className="text-sm text-muted-foreground">Showing {data?.data?.length ?? 0} models</h2>
-      <ul>
+      <ul className="flex flex-col gap-3">
         {data?.data.map((model) => (
-          <li key={`${model.providerId}-${model.id}`}>{model.name}</li>
+          <li key={`${model.providerId}-${model.id}`}>
+            <ModelCard model={model} />
+          </li>
         ))}
       </ul>
     </div>
