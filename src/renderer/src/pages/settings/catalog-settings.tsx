@@ -1,5 +1,5 @@
 import { MODALITIES } from '@common/constants/models.constants'
-import { Modality } from '@common/db-schemas/model.schema'
+import { Modality, ModelGetSchema } from '@common/db-schemas/model.schema'
 import ModelCard from '@renderer/components/model-card'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
@@ -15,6 +15,7 @@ import { useFetchModelsV2 as useFetchModels } from '@renderer/services/model'
 import { useFetchProviders } from '@renderer/services/provider'
 import { Eye, EyeOff, Plus, Search, Star } from 'lucide-react'
 import { useMemo, useState, useDeferredValue } from 'react'
+import { Components, Virtuoso } from 'react-virtuoso'
 
 //types
 type FilterState = {
@@ -60,7 +61,7 @@ function CatalogTab() {
   )
 
   return (
-    <div className="h-full w-full px-[5%] py-5 flex flex-col gap-5 overflow-auto">
+    <div className="h-full w-full px-[5%] py-4 flex flex-col gap-4 overflow-hidden">
       {/* header */}
       <div className="flex flex-row gap-5 justify-between items-end">
         <div>
@@ -148,17 +149,27 @@ function CatalogTab() {
         </Button>
       </div>
       {/*  list of all the models*/}
-      <div className="flex flex-col gap-3 w-full overflow-auto">
-        <h2 className="text-sm text-muted-foreground">Showing {data?.data?.length ?? 0} models</h2>
-        <ul className="flex flex-col gap-3">
-          {data?.data.map((model) => (
-            <li key={`${model.providerId}-${model.id}`}>
-              <ModelCard model={model} />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Virtuoso
+        className="flex-1"
+        data={data?.data ?? []}
+        computeItemKey={(_, model) => `${model.providerId}-${model.id}`}
+        context={{ total: data?.data?.length ?? 0 }}
+        components={catalogListComponents}
+        itemContent={(_, model) => (
+          <div className="pb-3">
+            <ModelCard model={model} />
+          </div>
+        )}
+      />
     </div>
+  )
+}
+
+// sub components
+
+const catalogListComponents: Components<ModelGetSchema, { total: number }> = {
+  Header: ({ context }: { context: { total: number } }) => (
+    <p className="pb-3 text-xs text-muted-foreground">Showing {context?.total ?? 0} models</p>
   )
 }
 
