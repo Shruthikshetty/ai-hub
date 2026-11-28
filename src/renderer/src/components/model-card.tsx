@@ -7,15 +7,36 @@ import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Card, CardContent } from './ui/card'
 import { useUpdateModel } from '@renderer/services/model'
-import { useState } from 'react'
+import ModelDetailsDialog from './model-details-dailog'
 
 function ModelCard({ model }: { model: ModelGetSchema }) {
-  const [isExpanded, setIsExpanded] = useState(false)
   // get model badges from model
   const capabilityBadges = useMemo(() => getModelBadges(model), [model])
 
   //hook to update model
   const { mutate } = useUpdateModel()
+
+  // function to toggle model visibility
+  const handleToggleVisibility = () => {
+    mutate({
+      id: model.id,
+      providerId: model.providerId,
+      data: {
+        isHidden: !model.isHidden
+      }
+    })
+  }
+
+  // function to toggle model favorite
+  const handleToggleFavorite = () => {
+    mutate({
+      id: model.id,
+      providerId: model.providerId,
+      data: {
+        isFavorite: !model.isFavorite
+      }
+    })
+  }
 
   return (
     <Card className={cn(model.isHidden && 'opacity-60')}>
@@ -25,15 +46,22 @@ function ModelCard({ model }: { model: ModelGetSchema }) {
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="flex flex-row gap-3 items-center">
               <p className="truncate text-base font-semibold leading-tight">{model.name}</p>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground"
-                onClick={() => setIsExpanded((prev) => !prev)}
+              <ModelDetailsDialog
+                model={model}
+                handleToggleFavorite={handleToggleFavorite}
+                handleToggleVisibility={handleToggleVisibility}
+                capabilityBadges={capabilityBadges}
               >
-                <Expand />
-              </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground"
+                  aria-label="View model details"
+                >
+                  <Expand />
+                </Button>
+              </ModelDetailsDialog>
             </div>
             <p className="truncate font-mono text-xs text-muted-foreground">{model.id}</p>
             {model.description && (
@@ -55,15 +83,7 @@ function ModelCard({ model }: { model: ModelGetSchema }) {
               type="button"
               variant="ghost"
               size="icon"
-              onClick={() => {
-                mutate({
-                  id: model.id,
-                  providerId: model.providerId,
-                  data: {
-                    isFavorite: !model.isFavorite
-                  }
-                })
-              }}
+              onClick={handleToggleFavorite}
               aria-label={model.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             >
               <Star
@@ -77,15 +97,7 @@ function ModelCard({ model }: { model: ModelGetSchema }) {
               type="button"
               variant={model.isHidden ? 'secondary' : 'ghost'}
               size="icon"
-              onClick={() => {
-                mutate({
-                  id: model.id,
-                  providerId: model.providerId,
-                  data: {
-                    isHidden: !model.isHidden
-                  }
-                })
-              }}
+              onClick={handleToggleVisibility}
               aria-label={model.isHidden ? 'Show in chat' : 'Hide from chat'}
             >
               {model.isHidden ? (
