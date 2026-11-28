@@ -76,11 +76,17 @@ async function normalizeFileParts(parts: AppUIMessage['parts']): Promise<any[]> 
 export async function normalizeMessages(messages: AppUIMessage[]): Promise<any[]> {
   return (
     await Promise.all(
-      messages.map(async (msg) => ({
-        ...msg,
-        // Wait for file parts to be resolved
-        parts: await normalizeFileParts(msg.parts)
-      }))
+      messages.map(async (msg) => {
+        // Strip reasoning/thought parts from past turns before sending to the model.
+        const nonReasoningParts = msg.parts.filter((p) => p.type !== 'reasoning')
+        const partsToProcess = nonReasoningParts.length > 0 ? nonReasoningParts : msg.parts
+
+        return {
+          ...msg,
+          // Wait for file parts to be resolved
+          parts: await normalizeFileParts(partsToProcess)
+        }
+      })
     )
   ).filter(Boolean)
 }

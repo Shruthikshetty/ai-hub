@@ -178,9 +178,7 @@
       "indexes": {
         "providers_provider_unique": {
           "name": "providers_provider_unique",
-          "columns": [
-            "provider"
-          ],
+          "columns": ["provider"],
           "isUnique": true
         }
       },
@@ -278,9 +276,7 @@
       "indexes": {
         "conversations_updated_at_idx": {
           "name": "conversations_updated_at_idx",
-          "columns": [
-            "updated_at"
-          ],
+          "columns": ["updated_at"],
           "isUnique": false
         }
       },
@@ -339,10 +335,7 @@
       "indexes": {
         "messages_conv_created_idx": {
           "name": "messages_conv_created_idx",
-          "columns": [
-            "conversationId",
-            "created_at"
-          ],
+          "columns": ["conversationId", "created_at"],
           "isUnique": false
         }
       },
@@ -351,12 +344,8 @@
           "name": "message_conversationId_conversations_id_fk",
           "tableFrom": "message",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "conversationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["conversationId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -442,17 +431,12 @@
       "indexes": {
         "media_type_id_idx": {
           "name": "media_type_id_idx",
-          "columns": [
-            "type",
-            "id"
-          ],
+          "columns": ["type", "id"],
           "isUnique": false
         },
         "media_message_id_idx": {
           "name": "media_message_id_idx",
-          "columns": [
-            "messageId"
-          ],
+          "columns": ["messageId"],
           "isUnique": false
         }
       },
@@ -583,12 +567,8 @@
           "name": "connectors_active_conversation_id_conversations_id_fk",
           "tableFrom": "connectors",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "active_conversation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["active_conversation_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -684,9 +664,7 @@
       "indexes": {
         "mcp_servers_name_unique": {
           "name": "mcp_servers_name_unique",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": true
         }
       },

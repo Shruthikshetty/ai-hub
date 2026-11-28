@@ -283,7 +283,7 @@ export const AVAILABLE_PROVIDERS_DEFAULT_DETAILS = [
     name: 'Google Vertex AI',
     icon: 'https://unpkg.com/@lobehub/icons-static-svg@1.102.0/icons/vertexai.svg',
     enabled: false,
-    apiKey: 'your-project-id:your-api-key',
+    apiKey: '',
     note: 'Enter credentials in the format: <project-id>:<api-key>',
     server: false,
     siteUrl: 'https://cloud.google.com/vertex-ai',

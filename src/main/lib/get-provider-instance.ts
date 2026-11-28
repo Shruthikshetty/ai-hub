@@ -181,11 +181,14 @@ export async function getProviderInstanceModel({
       return noKeepInstance
     }
     case 'nano-gpt': {
-      const nanoGptInstance = createOpenAI({
+      const nanoGptInstance = createOpenAICompatible({
         name: 'nano-gpt',
         baseURL: 'https://nano-gpt.com/api/v1',
+        includeUsage: true,
         apiKey
       })
+      // assign imageModel to image such that our handlers are not disturbed
+      Object.assign(nanoGptInstance, { image: nanoGptInstance.imageModel })
       return nanoGptInstance
     }
     case 'mistral': {
