@@ -53,6 +53,7 @@ export function useUpdateProviderById() {
       // invalidate the providers query
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.modelsFetch] }),
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.modelsFetchV2] }),
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.providersFetch] })
       ])
     },

@@ -17,7 +17,7 @@ import { Eye, EyeOff, Plus, Search, Star } from 'lucide-react'
 import { useMemo, useState, useDeferredValue } from 'react'
 import { Components, Virtuoso } from 'react-virtuoso'
 
-//types
+// types
 type FilterState = {
   isFavorite: boolean
   isHidden: boolean
