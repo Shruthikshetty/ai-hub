@@ -1,6 +1,7 @@
 import { MODALITIES } from '@common/constants/models.constants'
 import { Modality } from '@common/db-schemas/model.schema'
 import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -12,7 +13,7 @@ import { cn } from '@renderer/lib/utils'
 import { useFetchModelsV2 as useFetchModels } from '@renderer/services/model'
 import { useFetchProviders } from '@renderer/services/provider'
 import { Eye, EyeOff, Plus, Star } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useDeferredValue } from 'react'
 
 //types
 type FilterState = {
@@ -35,6 +36,8 @@ function CatalogTab() {
     output: 'all',
     search: ''
   })
+  // differ the search query to prevent multiple requests
+  const searchQuery = useDeferredValue(filters.search)
 
   // fetch models with filters
   const { data } = useFetchModels({
@@ -42,7 +45,7 @@ function CatalogTab() {
     providerId: filters.provider === 'all' ? undefined : filters.provider,
     hidden: filters.isHidden ? true : undefined,
     isFavorite: filters.isFavorite ? true : undefined,
-    search: filters.search,
+    search: searchQuery,
     sortFav: false
   })
 
@@ -79,6 +82,12 @@ function CatalogTab() {
         </Button>
       </div>
       {/* search */}
+      <Input
+        placeholder="Search by provider, name or ID..."
+        value={filters.search}
+        className="py-4"
+        onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+      />
       {/* additional filters favorite , hidden , providers */}
       <div className="flex flex-row flex-wrap gap-3 items-center">
         {/* providers dropdown */}
