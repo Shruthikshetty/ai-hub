@@ -148,14 +148,16 @@ function CatalogTab() {
         </Button>
       </div>
       {/*  list of all the models*/}
-      <h2 className="text-sm text-muted-foreground">Showing {data?.data?.length ?? 0} models</h2>
-      <ul className="flex flex-col gap-3">
-        {data?.data.map((model) => (
-          <li key={`${model.providerId}-${model.id}`}>
-            <ModelCard model={model} />
-          </li>
-        ))}
-      </ul>
+      <div className="flex flex-col gap-3 w-full overflow-auto">
+        <h2 className="text-sm text-muted-foreground">Showing {data?.data?.length ?? 0} models</h2>
+        <ul className="flex flex-col gap-3">
+          {data?.data.map((model) => (
+            <li key={`${model.providerId}-${model.id}`}>
+              <ModelCard model={model} />
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
