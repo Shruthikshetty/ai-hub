@@ -12,7 +12,7 @@ import {
 import { cn } from '@renderer/lib/utils'
 import { useFetchModelsV2 as useFetchModels } from '@renderer/services/model'
 import { useFetchProviders } from '@renderer/services/provider'
-import { Eye, EyeOff, Plus, Star } from 'lucide-react'
+import { Eye, EyeOff, Plus, Search, Star } from 'lucide-react'
 import { useMemo, useState, useDeferredValue } from 'react'
 
 //types
@@ -58,8 +58,6 @@ function CatalogTab() {
     [providersData?.data]
   )
 
-  const models = data?.data ?? []
-
   return (
     <div className="h-full w-full px-[5%] py-5 flex flex-col gap-5 overflow-auto">
       {/* header */}
@@ -82,12 +80,15 @@ function CatalogTab() {
         </Button>
       </div>
       {/* search */}
-      <Input
-        placeholder="Search by provider, name or ID..."
-        value={filters.search}
-        className="py-4"
-        onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
-      />
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search by provider, name or ID..."
+          value={filters.search}
+          className="py-4 pl-9"
+          onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+        />
+      </div>
       {/* additional filters favorite , hidden , providers */}
       <div className="flex flex-row flex-wrap gap-3 items-center">
         {/* providers dropdown */}
@@ -146,9 +147,9 @@ function CatalogTab() {
         </Button>
       </div>
       {/*  list of all the models*/}
-      <h2 className="text-sm text-muted-foreground">{models.length} models</h2>
+      <h2 className="text-sm text-muted-foreground">Showing {data?.data?.length ?? 0} models</h2>
       <ul>
-        {models.map((model) => (
+        {data?.data.map((model) => (
           <li key={`${model.providerId}-${model.id}`}>{model.name}</li>
         ))}
       </ul>
