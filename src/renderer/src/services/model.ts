@@ -54,15 +54,21 @@ export function useFetchModelsV2({
   output,
   providerId,
   hidden,
+  isFavorite,
+  search,
+  sortFav,
   fetchEnabled = true
 }: {
   output?: Modality
   providerId?: string
   hidden?: boolean
+  isFavorite?: boolean
+  search?: string
+  sortFav?: boolean
   fetchEnabled?: boolean
 } = {}) {
   return useQuery<ModelResponseSchemaV2, ApiError>({
-    queryKey: [QUERY_KEYS.modelsFetchV2, output, providerId, hidden],
+    queryKey: [QUERY_KEYS.modelsFetchV2, output, providerId, hidden, isFavorite, search, sortFav],
     queryFn: async (): Promise<ModelResponseSchemaV2> => {
       // generate search params
       const params = new URLSearchParams()
@@ -75,6 +81,15 @@ export function useFetchModelsV2({
       if (hidden !== undefined) {
         params.append('hidden', String(hidden))
       }
+      if (isFavorite !== undefined) {
+        params.append('isFavorite', String(isFavorite))
+      }
+      if (search?.trim()) {
+        params.append('search', search.trim())
+      }
+      if (sortFav !== undefined) {
+        params.append('sortFav', String(sortFav))
+      }
       // query params
       const queryString = params.toString() ? `?${params.toString()}` : ''
       const response = await window.api.request(`/api/v2/model${queryString}`, 'GET')
@@ -84,6 +99,7 @@ export function useFetchModelsV2({
       return response
     },
     enabled: fetchEnabled,
+    placeholderData: (prev) => prev,
     staleTime: FETCH_MODELS_STALE_TIME
   })
 }

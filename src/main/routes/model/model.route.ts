@@ -72,6 +72,33 @@ export const getModelsV2 = createRoute({
             description: 'Filter by hidden status (omit to fetch all models)'
           },
           example: false
+        }),
+      isFavorite: z
+        .union([z.boolean(), z.enum(['true', 'false'])])
+        .optional()
+        .transform((val) => (val === undefined ? undefined : val === true || val === 'true'))
+        .openapi({
+          param: {
+            name: 'isFavorite',
+            in: 'query',
+            required: false,
+            description: 'Filter by favorite status (omit to fetch all models)'
+          },
+          example: false
+        }),
+      search: z.string().optional(),
+      sortFav: z
+        .union([z.boolean(), z.enum(['true', 'false'])])
+        .optional()
+        .transform((val) => (val === undefined ? true : val === true || val === 'true'))
+        .openapi({
+          param: {
+            name: 'sortFav',
+            in: 'query',
+            required: false,
+            description: 'Sort favorite models first (defaults to true)'
+          },
+          example: true
         })
     })
   },

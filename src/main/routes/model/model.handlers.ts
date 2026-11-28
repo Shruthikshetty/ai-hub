@@ -17,6 +17,7 @@ import { and, eq } from 'drizzle-orm'
 import { models } from '../../db/schema'
 import { syncModelCatalog } from '../../lib/model-catalog-sync'
 import axios from 'axios'
+import { matchesSearchTokens } from '../../../common/utils/search.util'
 import {
   REMOTE_MODEL_CATALOG_TIMEOUT,
   REMOTE_MODEL_CATALOG_URL
@@ -58,7 +59,7 @@ export const getModels: AppRouteHandler<GetModelsRoute> = async (c) => {
 
 // handler to get all the list of models available from local database (V2)
 export const getModelsV2: AppRouteHandler<GetModelsV2Route> = async (c) => {
-  const { output, providerId, hidden } = c.req.valid('query')
+  const { output, providerId, hidden, isFavorite, search, sortFav } = c.req.valid('query')
 
   // get all the providers that are enabled and not hidden
   const enabledProviders = await db.query.providers.findMany({
@@ -88,18 +89,25 @@ export const getModelsV2: AppRouteHandler<GetModelsV2Route> = async (c) => {
       and(
         inArray(model.providerId, targetProviders),
         eq(model.isDeprecated, false),
-        hidden !== undefined ? eq(model.isHidden, hidden) : undefined
+        hidden !== undefined ? eq(model.isHidden, hidden) : undefined,
+        isFavorite !== undefined ? eq(model.isFavorite, isFavorite) : undefined
       ),
-    orderBy: (model, { desc, asc }) => [
-      desc(model.isFavorite),
-      asc(model.sortOrder),
-      asc(model.name)
-    ]
+    orderBy: (model, { desc, asc }) =>
+      sortFav
+        ? [desc(model.isFavorite), asc(model.sortOrder), asc(model.name)]
+        : [asc(model.sortOrder), asc(model.name)]
   })
 
   // filter models by output modality if requested
   if (output) {
     modelsList = modelsList.filter((model) => (model.outputs ?? []).includes(output))
+  }
+
+  // filter models by search query (name, id, or provider) if requested
+  if (search?.trim()) {
+    modelsList = modelsList.filter((model) =>
+      matchesSearchTokens(search, [model.name, model.id, model.providerId])
+    )
   }
 
   // send response
