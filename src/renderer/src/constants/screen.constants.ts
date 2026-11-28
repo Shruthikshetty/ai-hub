@@ -19,7 +19,8 @@ import {
   Video,
   Volume2,
   Unplug,
-  Wrench
+  Wrench,
+  Boxes
 } from 'lucide-react'
 
 // side tray items (do not change order add new items at the end)
@@ -118,6 +119,10 @@ export const SETTINGS_TABS = [
   {
     name: 'Tools',
     icon: Wrench
+  },
+  {
+    name: 'Catalog',
+    icon: Boxes
   }
 ] as const
 

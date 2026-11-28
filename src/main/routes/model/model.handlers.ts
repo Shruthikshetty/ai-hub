@@ -88,7 +88,7 @@ export const getModelsV2: AppRouteHandler<GetModelsV2Route> = async (c) => {
       and(
         inArray(model.providerId, targetProviders),
         eq(model.isDeprecated, false),
-        eq(model.isHidden, hidden ?? false)
+        hidden !== undefined ? eq(model.isHidden, hidden) : undefined
       ),
     orderBy: (model, { desc, asc }) => [
       desc(model.isFavorite),

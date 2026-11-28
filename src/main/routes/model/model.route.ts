@@ -63,13 +63,13 @@ export const getModelsV2 = createRoute({
       hidden: z
         .union([z.boolean(), z.enum(['true', 'false'])])
         .optional()
-        .transform((val) => val === true || val === 'true')
+        .transform((val) => (val === undefined ? undefined : val === true || val === 'true'))
         .openapi({
           param: {
             name: 'hidden',
             in: 'query',
             required: false,
-            description: 'Whether to fetch hidden models (defaults to false)'
+            description: 'Filter by hidden status (omit to fetch all models)'
           },
           example: false
         })

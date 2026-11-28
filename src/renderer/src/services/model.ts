@@ -52,18 +52,28 @@ export function useFetchModels({
  */
 export function useFetchModelsV2({
   output,
+  providerId,
+  hidden,
   fetchEnabled = true
 }: {
   output?: Modality
+  providerId?: string
+  hidden?: boolean
   fetchEnabled?: boolean
-}) {
+} = {}) {
   return useQuery<ModelResponseSchemaV2, ApiError>({
-    queryKey: [QUERY_KEYS.modelsFetchV2, output],
+    queryKey: [QUERY_KEYS.modelsFetchV2, output, providerId, hidden],
     queryFn: async (): Promise<ModelResponseSchemaV2> => {
       // generate search params
       const params = new URLSearchParams()
       if (output) {
         params.append('output', output)
+      }
+      if (providerId) {
+        params.append('providerId', providerId)
+      }
+      if (hidden !== undefined) {
+        params.append('hidden', String(hidden))
       }
       // query params
       const queryString = params.toString() ? `?${params.toString()}` : ''
