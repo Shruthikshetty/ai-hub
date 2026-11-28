@@ -2,12 +2,15 @@
  * This @file contains all model related services
  */
 
-import { Modality, ModelInsertSchema } from '@common/db-schemas/model.schema'
+import { Modality, ModelInsertSchema, ModelPatchSchema } from '@common/db-schemas/model.schema'
 import {
   ModelAddResponseType,
+  ModelDeleteResponseType,
   ModelIOType,
   ModelResponseSchemaType,
-  ModelResponseSchemaV2
+  ModelResponseSchemaV2,
+  ModelUpdateResponseType,
+  SyncCatalogResponseType
 } from '@common/schemas/model.schema'
 import { ApiError } from '@common/types'
 import { FETCH_MODELS_STALE_TIME } from '@renderer/constants/config.constants'
@@ -111,10 +114,13 @@ export function useAddModel() {
 export function useDeleteModel() {
   // query client
   const queryClient = useQueryClient()
-  return useMutation({
+  return useMutation<ModelDeleteResponseType, ApiError, { providerId: string; id: string }>({
     mutationKey: [MUTATION_KEYS.deleteModelById],
-    mutationFn: async (id: string) => {
-      const response = await window.api.request('/api/model/' + id, 'DELETE')
+    mutationFn: async ({ providerId, id }) => {
+      const response = await window.api.request(
+        `/api/model/${encodeURIComponent(providerId)}/${encodeURIComponent(id)}`,
+        'DELETE'
+      )
       if (!response.success) {
         throw response
       }
@@ -128,6 +134,67 @@ export function useDeleteModel() {
     },
     onError: (error) => {
       errorToast(error?.message ?? 'Failed to delete model')
+    }
+  })
+}
+
+/**
+ * Route to update a model
+ */
+export function useUpdateModel() {
+  // query client
+  const queryClient = useQueryClient()
+  return useMutation<
+    ModelUpdateResponseType,
+    ApiError,
+    { providerId: string; id: string; data: ModelPatchSchema }
+  >({
+    mutationKey: [MUTATION_KEYS.updateModelById],
+    mutationFn: async ({ providerId, id, data }) => {
+      const response = await window.api.request(
+        `/api/model/${encodeURIComponent(providerId)}/${encodeURIComponent(id)}`,
+        'PATCH',
+        data
+      )
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    onSuccess: () => {
+      successToast('Model updated successfully')
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.modelsFetchV2]
+      })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to update model')
+    }
+  })
+}
+
+/**
+ * Sync local model catalog with the remote catalog
+ */
+export function useSyncModelCatalog() {
+  const queryClient = useQueryClient()
+  return useMutation<SyncCatalogResponseType, ApiError, void>({
+    mutationKey: [MUTATION_KEYS.syncModelCatalog],
+    mutationFn: async () => {
+      const response = await window.api.request('/api/model/sync', 'POST')
+      if (!response.success) {
+        throw response
+      }
+      return response
+    },
+    onSuccess: (data) => {
+      successToast(`Synced ${data.data.totalSynced} models`)
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.modelsFetchV2]
+      })
+    },
+    onError: (error) => {
+      errorToast(error?.message ?? 'Failed to sync model catalog')
     }
   })
 }
