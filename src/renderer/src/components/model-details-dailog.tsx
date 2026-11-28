@@ -9,7 +9,7 @@ import {
 } from './ui/dialog'
 import { useState } from 'react'
 import { Button } from './ui/button'
-import { Check, Eye, EyeOff, Minus, Star } from 'lucide-react'
+import { Check, Dot, Eye, EyeOff, Minus, Star } from 'lucide-react'
 import { cn } from '@renderer/lib/utils'
 import { ModelBadgeItem } from '@renderer/lib/model.utils'
 import { Badge } from './ui/badge'
@@ -123,7 +123,7 @@ function ModelDetailsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="flex flex-col gap-4 min-w-[60vw] sm:max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="flex flex-col gap-4 w-[85vw] max-w-[90vw] sm:max-w-[90vw] lg:max-w-[70vw] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{model.name}</DialogTitle>
           <DialogDescription className="font-mono text-xs">{model.id}</DialogDescription>
@@ -210,6 +210,26 @@ function ModelDetailsDialog({
             </div>
           ) : (
             <p>Reasoning is not supported.</p>
+          )}
+
+          {/* voices (only when available) */}
+          {model.ttsOptions?.voices && model.ttsOptions.voices.length > 0 && (
+            <>
+              <h2 className="mt-2 text-sm font-semibold tracking-wide text-foreground">VOICES</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
+                {model.ttsOptions.voices.map((voice) => (
+                  <div key={voice.id} className="flex items-start gap-1.5 text-foreground">
+                    <Dot className="size-4 shrink-0 mt-0.5 text-muted-foreground" />
+                    <p className="flex flex-wrap items-baseline gap-1">
+                      <span>{voice.label}</span>
+                      {voice.gender && (
+                        <span className="text-muted-foreground capitalize">({voice.gender})</span>
+                      )}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </DialogContent>
